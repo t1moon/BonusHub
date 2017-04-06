@@ -24,13 +24,13 @@
     </LinearLayout>
 
 
-    <fragment
-        android:id="@+id/fragment_navigation_drawer"
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation_view"
         android:name="com.example.timur.BonusHub.activity.FragmentDrawer"
         android:layout_width="@dimen/nav_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:layout="@layout/fragment_navigation_drawer"
-        tools:layout="@layout/fragment_navigation_drawer" />
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_view" />
 
 </android.support.v4.widget.DrawerLayout>
