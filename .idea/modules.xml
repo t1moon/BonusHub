@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BonusHub.iml" filepath="$PROJECT_DIR$/BonusHub.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bonushubhost/bonushubhost.iml" filepath="$PROJECT_DIR$/bonushubhost/bonushubhost.iml" />
     </modules>
   </component>
 </project>
