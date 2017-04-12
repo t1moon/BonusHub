@@ -4,7 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BonusHub.iml" filepath="$PROJECT_DIR$/BonusHub.iml" />
       <module fileurl="file://$PROJECT_DIR$/bonuslib/bonuslib.iml" filepath="$PROJECT_DIR$/bonuslib/bonuslib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bonuslib/bonuslib.iml" filepath="$PROJECT_DIR$/bonuslib/bonuslib.iml" />
       <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/host/host.iml" filepath="$PROJECT_DIR$/host/host.iml" />
       <module fileurl="file://$PROJECT_DIR$/host/host.iml" filepath="$PROJECT_DIR$/host/host.iml" />
     </modules>
   </component>
