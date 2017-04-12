@@ -1,4 +1,4 @@
-package com.example.timur.BonusHub.activity;
+package com.example.BonusHub.activity;
 
 
 import android.app.Activity;
