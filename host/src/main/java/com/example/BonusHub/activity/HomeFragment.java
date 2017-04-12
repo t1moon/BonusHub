@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.example.timur.BonusHub.R;
 
@@ -16,6 +17,8 @@ import com.example.timur.BonusHub.R;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
+
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -23,7 +26,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -32,6 +34,7 @@ public class HomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Inflate the layout for this fragment
+
         return rootView;
     }
 

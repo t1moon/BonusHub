@@ -10,14 +10,21 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.bonuslib.db.HelperFactory;
+import com.example.bonuslib.model.Host;
 import com.example.timur.BonusHub.R;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -26,6 +33,9 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
+
+
+    private EditText host_title, host_description;
 
 
     @Override
@@ -43,6 +53,7 @@ public class MainActivity extends AppCompatActivity{
         nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
+
 
     }
 
@@ -149,4 +160,22 @@ public class MainActivity extends AppCompatActivity{
         new IntentIntegrator(this).initiateScan();
     }
 
+    public void onSaveClick(View view) throws SQLException {
+
+        host_title = (EditText) findViewById(R.id.host_title);
+        host_description = (EditText) findViewById(R.id.host_description);
+
+        Host host = new Host();
+        host.setTitle(host_title.getText().toString());
+        host.setDescription(host_description.getText().toString());
+        HelperFactory.getHelper().getHostDAO().create(host);
+    }
+
+    public void onShowClick(View view) throws SQLException {
+        List<Host> allHosts = HelperFactory.getHelper().getHostDAO().getAllHosts();
+        for(Host host : allHosts) {
+            Log.d("qwe", host.getTitle());
+        }
+
+    }
 }
