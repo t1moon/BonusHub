@@ -1,6 +1,5 @@
-package com.example.BonusHub.activity;
+package com.example.BonusHub.activity.activity;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -17,11 +16,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.fragment.HostInfoFragment;
+import com.example.BonusHub.activity.fragment.ScanQrFragment;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.model.Host;
 import com.example.timur.BonusHub.R;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -54,7 +53,20 @@ public class MainActivity extends AppCompatActivity{
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
+        setupStartFragment();
+    }
 
+    private void setupStartFragment() {
+        Fragment fragment = null;
+        try {
+            fragment = (Fragment) HostInfoFragment.class.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.container_body, fragment).commit();
     }
 
     @Override
@@ -89,13 +101,13 @@ public class MainActivity extends AppCompatActivity{
         Class fragmentClass;
         switch(menuItem.getItemId()) {
             case R.id.nav_first_fragment:
-                fragmentClass = HomeFragment.class;
+                fragmentClass = ScanQrFragment.class;
                 break;
             case R.id.nav_second_fragment:
-                fragmentClass = HomeFragment.class;
+                fragmentClass = HostInfoFragment.class;
                 break;
             default:
-                fragmentClass = HomeFragment.class;
+                fragmentClass = ScanQrFragment.class;
         }
 
         try {
@@ -140,25 +152,6 @@ public class MainActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-
-    // Get the results:
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if(result != null) {
-            if(result.getContents() == null) {
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    public void onScanClick(View view) {
-        new IntentIntegrator(this).initiateScan();
-    }
 
     public void onSaveClick(View view) throws SQLException {
 

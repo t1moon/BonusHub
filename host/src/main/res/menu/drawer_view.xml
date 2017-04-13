@@ -4,11 +4,11 @@
         <item
             android:id="@+id/nav_first_fragment"
             android:icon="@drawable/ic_action_search"
-            android:title="First" />
+            android:title="Scan QR" />
         <item
             android:id="@+id/nav_second_fragment"
             android:icon="@drawable/ic_action_search"
-            android:title="Second" />
+            android:title="Host Profile" />
         <item
             android:id="@+id/nav_third_fragment"
             android:icon="@drawable/ic_action_search"
