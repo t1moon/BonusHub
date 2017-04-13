@@ -1,6 +1,5 @@
-package com.example.BonusHub.activity;
+package com.example.BonusHub.activity.activity;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -10,14 +9,21 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.fragment.HostInfoFragment;
+import com.example.BonusHub.activity.fragment.ScanQrFragment;
+import com.example.bonuslib.db.HelperFactory;
+import com.example.bonuslib.model.Host;
 import com.example.timur.BonusHub.R;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -26,6 +32,9 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
+
+
+    private EditText host_title, host_description;
 
 
     @Override
@@ -44,6 +53,20 @@ public class MainActivity extends AppCompatActivity{
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
+        setupStartFragment();
+    }
+
+    private void setupStartFragment() {
+        Fragment fragment = null;
+        try {
+            fragment = (Fragment) HostInfoFragment.class.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.container_body, fragment).commit();
     }
 
     @Override
@@ -78,13 +101,13 @@ public class MainActivity extends AppCompatActivity{
         Class fragmentClass;
         switch(menuItem.getItemId()) {
             case R.id.nav_first_fragment:
-                fragmentClass = HomeFragment.class;
+                fragmentClass = ScanQrFragment.class;
                 break;
             case R.id.nav_second_fragment:
-                fragmentClass = HomeFragment.class;
+                fragmentClass = HostInfoFragment.class;
                 break;
             default:
-                fragmentClass = HomeFragment.class;
+                fragmentClass = ScanQrFragment.class;
         }
 
         try {
@@ -130,23 +153,22 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-    // Get the results:
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if(result != null) {
-            if(result.getContents() == null) {
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
+    public void onSaveClick(View view) throws SQLException {
+
+        host_title = (EditText) findViewById(R.id.host_title);
+        host_description = (EditText) findViewById(R.id.host_description);
+
+        Host host = new Host();
+        host.setTitle(host_title.getText().toString());
+        host.setDescription(host_description.getText().toString());
+        HelperFactory.getHelper().getHostDAO().create(host);
+    }
+
+    public void onShowClick(View view) throws SQLException {
+        List<Host> allHosts = HelperFactory.getHelper().getHostDAO().getAllHosts();
+        for(Host host : allHosts) {
+            Log.d("qwe", host.getTitle());
         }
-    }
 
-    public void onScanClick(View view) {
-        new IntentIntegrator(this).initiateScan();
     }
-
 }
