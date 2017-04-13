@@ -36,7 +36,7 @@ public class HostInfoFragment extends Fragment {
             public void onClick(View v) {
                 final FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container_body, new HostEditInfoFragment(), "");
-                ft.addToBackStack();
+                ft.addToBackStack(null);
                 ft.commit();
             }
         });
