@@ -153,17 +153,6 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-    public void onSaveClick(View view) throws SQLException {
-
-        host_title = (EditText) findViewById(R.id.host_title);
-        host_description = (EditText) findViewById(R.id.host_description);
-
-        Host host = new Host();
-        host.setTitle(host_title.getText().toString());
-        host.setDescription(host_description.getText().toString());
-        HelperFactory.getHelper().getHostDAO().create(host);
-    }
-
     public void onShowClick(View view) throws SQLException {
         List<Host> allHosts = HelperFactory.getHelper().getHostDAO().getAllHosts();
         for(Host host : allHosts) {

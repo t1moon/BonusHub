@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +34,10 @@ public class HostInfoFragment extends Fragment {
         edit.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                EditText editText = (EditText) rootView.findViewById(R.id.host_title);
-//                editText.setEnabled(true);
+                final FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.container_body, new HostEditInfoFragment(), "");
+                ft.addToBackStack();
+                ft.commit();
             }
         });
         return rootView;

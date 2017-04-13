@@ -35,8 +35,8 @@
             android:elevation="4dp"
             android:paddingBottom="24dp">
 
-            <EditText
-                android:id="@+id/host_title"
+            <TextView
+                android:id="@+id/host_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -56,10 +56,10 @@
             android:layout_marginTop="5dp"
             android:orientation="vertical">
 
-            <EditText
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/host_description"
+                android:id="@+id/host_description_tv"
                 android:layout_margin="5dp"
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
@@ -70,12 +70,12 @@
                 android:text="Description"
                 android:focusable="false"/>
 
-            <Button
-                android:id="@+id/save_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Save"
-                android:onClick="onSaveClick"/>
+            <!--<Button-->
+                <!--android:id="@+id/save_btn"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Save"-->
+                <!--android:onClick="onSaveClick"/>-->
 
             <Button
                 android:id="@+id/show_btn"
