@@ -2,95 +2,117 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/header_cover_image"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/side_nav_bar" />
-
-        <ImageButton
-            android:id="@+id/user_profile_photo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_below="@+id/header_cover_image"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="-60dp"
-            android:elevation="5dp"
-            android:padding="20dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_profile"/>
-
-        <RelativeLayout
-            android:id="@+id/profile_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/header_cover_image"
-            android:background="#ebca0707"
-            android:elevation="4dp"
-            android:paddingBottom="24dp">
-
-            <TextView
-                android:id="@+id/host_title_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="76dp"
-                android:text="Surf Coffee"
-                android:textColor="#fff"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:focusable="false"/>
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/profile_layout"
-            android:layout_marginTop="5dp"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
+            <RelativeLayout
+                android:id="@+id/image_view"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="@drawable/logo_reverse"
+                android:elevation="4dp"
+                android:gravity="bottom|center"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:id="@+id/host_title_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:text="Surf Coffee"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/host_description_tv"
-                android:layout_margin="5dp"
-                android:layout_marginBottom="3dp"
-                android:layout_marginTop="3dp"
-                android:background="#fff"
-                android:clickable="false"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical">
 
-                android:padding="20dp"
-                android:text="Description"
-                android:focusable="false"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/host_description_tv"
+                    android:text="Описание"/>
+                <TextView
+                    android:id="@+id/host_description_tv"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="3dp"
+                    android:background="#fff"
+                    android:padding="20dp"
+                    android:hint="Здесь будет ваше описание"
+                    android:elevation="4dp"/>
+                <TextView
+                    android:id="@+id/host_address_tv"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="3dp"
+                    android:background="#fff"
+                    android:padding="20dp"
+                    android:elevation="4dp"
+                    android:hint="Здесь будет ваш адрес" />
 
-            <!--<Button-->
-                <!--android:id="@+id/save_btn"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="Save"-->
-                <!--android:onClick="onSaveClick"/>-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/host_open_time_tv"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginTop="3dp"
+                        android:background="#fff"
+                        android:padding="20dp"
+                        android:elevation="4dp"
+                        android:hint="Время открытия"
+                        android:layout_weight="1"/>
 
-            <Button
-                android:id="@+id/show_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Show"
-                android:onClick="onShowClick"/>
+                    <TextView
+                        android:id="@+id/host_close_time_tv"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginTop="3dp"
+                        android:background="#fff"
+                        android:padding="20dp"
+                        android:elevation="4dp"
+                        android:hint="Время закрытя"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:id="@+id/edit"
-            android:theme="@style/Widget.Design.FloatingActionButton" />
-    </RelativeLayout>
+            android:src="@drawable/ic_edit_black_24dp"
+            android:theme="@style/Widget.Design.FloatingActionButton"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            app:layout_anchor="@id/image_view"
+            app:layout_anchorGravity="bottom|right|end"
+            app:borderWidth="0dp" />
+    </android.support.design.widget.CoordinatorLayout>
+
 </ScrollView>

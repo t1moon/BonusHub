@@ -29,6 +29,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public DatabaseHelper(Context context){
         super(context,DATABASE_NAME, null, DATABASE_VERSION);
+//        context.deleteDatabase("bonus.db");
     }
 
     //Выполняется, когда файл с БД не найден на устройстве
@@ -53,7 +54,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try{
             //Так делают ленивые, гораздо предпочтительнее не удаляя БД аккуратно вносить изменения
             TableUtils.dropTable(connectionSource, Host.class, true);
-            onCreate(db, connectionSource);
+            try
+            {
+                TableUtils.createTableIfNotExists(connectionSource, Host.class);
+            }
+            catch (SQLException e){
+                Log.e(TAG, "error creating DB " + DATABASE_NAME);
+                throw new RuntimeException(e);
+            } catch (java.sql.SQLException e) {
+                e.printStackTrace();
+            }
         }
         catch (SQLException e){
             Log.e(TAG,"error upgrading db "+DATABASE_NAME+"from ver "+oldVer);
@@ -63,7 +73,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    //синглтон для GoalDAO
+    //синглтон для HostDAO
     public HostDao getHostDAO() throws SQLException, java.sql.SQLException {
         if(hostDao == null){
             hostDao = new HostDao(getConnectionSource(), Host.class);

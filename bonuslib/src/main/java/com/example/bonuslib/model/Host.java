@@ -27,13 +27,11 @@ public class Host{
     @DatabaseField(columnName = "time_open", dataType = DataType.INTEGER)
     private int time_open;
 
-
-    @DatabaseField(columnName = "time_open", dataType = DataType.INTEGER)
+    @DatabaseField(columnName = "time_close", dataType = DataType.INTEGER)
     private int time_close;
 
 
     public Host() {
-
     }
 
     public Host(String title, String description){
@@ -79,5 +77,9 @@ public class Host{
 
     public void setTime_close(int time_close) {
         this.time_close = time_close;
+    }
+
+    public int getId() {
+        return Id;
     }
 }

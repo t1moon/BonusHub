@@ -1,5 +1,6 @@
 package com.example.BonusHub.activity.activity;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -25,10 +26,11 @@ import com.example.timur.BonusHub.R;
 import java.sql.SQLException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity{
-
+public class MainActivity extends AppCompatActivity {
+    private int host_id;
+    SharedPreferences sp;
     private Toolbar mToolbar;
-//    private FragmentDrawer drawerFragment;
+
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(mToolbar);
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle =  new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open,  R.string.drawer_close);
+        drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawer.addDrawerListener(drawerToggle);
 
         nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
@@ -99,7 +101,7 @@ public class MainActivity extends AppCompatActivity{
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
         Class fragmentClass;
-        switch(menuItem.getItemId()) {
+        switch (menuItem.getItemId()) {
             case R.id.nav_first_fragment:
                 fragmentClass = ScanQrFragment.class;
                 break;
@@ -145,19 +147,21 @@ public class MainActivity extends AppCompatActivity{
             Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
             return true;
         }
-        if(id == R.id.action_search){
+        if (id == R.id.action_search) {
             Toast.makeText(getApplicationContext(), "Search action is selected!", Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    public void setHost_id(int host_id) {
+        sp = this.getPreferences(MODE_PRIVATE);
+        sp.edit().putInt("host_id", host_id).commit();
 
-    public void onShowClick(View view) throws SQLException {
-        List<Host> allHosts = HelperFactory.getHelper().getHostDAO().getAllHosts();
-        for(Host host : allHosts) {
-            Log.d("qwe", host.getTitle());
-        }
+    }
 
+    public int getHost_id() {
+        sp = this.getPreferences(MODE_PRIVATE);
+        return sp.getInt("host_id", 0);
     }
 }

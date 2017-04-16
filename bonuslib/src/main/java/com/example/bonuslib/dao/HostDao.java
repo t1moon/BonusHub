@@ -23,4 +23,8 @@ public class HostDao extends BaseDaoImpl<Host, Integer> {
         return this.queryForAll();
     }
 
+    public Host getHostById(int id) throws java.sql.SQLException {
+        return this.queryForId(id);
+    }
+
 }
