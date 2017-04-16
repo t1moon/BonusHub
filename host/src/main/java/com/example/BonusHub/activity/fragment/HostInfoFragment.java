@@ -1,19 +1,14 @@
 package com.example.BonusHub.activity.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.bonuslib.db.HelperFactory;
@@ -21,7 +16,6 @@ import com.example.bonuslib.model.Host;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class HostInfoFragment extends Fragment {
 

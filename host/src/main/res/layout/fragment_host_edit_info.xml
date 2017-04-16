@@ -9,16 +9,7 @@
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:orientation="vertical"
-        tools:context="com.example.BonusHub.activity.fragment.HostEditInfoFragment">
-
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            android:elevation="4dp"
-            card_view:cardCornerRadius="4dp">
+        tools:context="com.example.BonusHub.activity.fragment.HostStartInfoFragment">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -61,17 +52,6 @@
                 </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 
-
-        </android.support.v7.widget.CardView>
-
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            card_view:cardCornerRadius="4dp">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -96,15 +76,15 @@
                     android:onClick="onCloseTimeBtnClick"
                     android:text="Время закрытия" />
             </LinearLayout>
-        </android.support.v7.widget.CardView>
-
 
         <Button
             android:id="@+id/save_btn"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="50dp"
-            android:text="SAVE" />
+            android:text="SAVE"
+            android:textColor="@color/colorAccent"/>
 
 
     </LinearLayout>

@@ -2,9 +2,13 @@ package com.example.BonusHub.activity.fragment;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,28 +18,26 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.bonuslib.dao.HostDao;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.model.Host;
 import com.example.timur.BonusHub.R;
-import com.j256.ormlite.stmt.UpdateBuilder;
+import com.google.zxing.integration.android.IntentIntegrator;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 
-public class HostEditInfoFragment extends Fragment {
+public class HostStartInfoFragment extends Fragment {
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private boolean set_open_time = false, set_close_time = false;
     private Button save_btn;
     private Button open_time_btn;
     private Button close_time_btn;
-    private EditText host_title_et;
-    private EditText host_description_et;
-    private EditText host_address_et;
+    private EditText host_title;
+    private EditText host_description;
+    private EditText host_address;
     View rootView;
-    int host_id;
-
-    public HostEditInfoFragment() {
+    public HostStartInfoFragment() {
         // Required empty public constructor
     }
 
@@ -53,58 +55,43 @@ public class HostEditInfoFragment extends Fragment {
 
         set_open_time = false;
         set_close_time = false;
-
-        host_title_et = (EditText) rootView.findViewById(R.id.host_title_et);
-        host_description_et = (EditText) rootView.findViewById(R.id.host_description_et);
-        host_address_et = (EditText) rootView.findViewById(R.id.host_address_et);
+        save_btn = (Button) rootView.findViewById(R.id.save_btn);
         open_time_btn = (Button) rootView.findViewById(R.id.open_time_btn);
         close_time_btn = (Button) rootView.findViewById(R.id.close_time_btn);
-        save_btn = (Button) rootView.findViewById(R.id.save_btn);
-
-        host_id = getActivity().
-                getPreferences(Context.MODE_PRIVATE).getInt("host_id", -1);
-
-        Toast.makeText(getContext(), Integer.toString(host_id), Toast.LENGTH_SHORT).show();
-
-        Host host = null;
-        try {
-            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        inflate_fields(host);
 
         save_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Host host = null;
+                host_title = (EditText) rootView.findViewById(R.id.host_title_et);
+                host_description = (EditText) rootView.findViewById(R.id.host_description_et);
+                host_address = (EditText) rootView.findViewById(R.id.host_address_et);
+
+                Host host = new Host();
+                host.setTitle(host_title.getText().toString());
+                host.setDescription(host_description.getText().toString());
+                host.setAddress(host_address.getText().toString());
+                if (set_open_time && set_close_time) {
+                    host.setTime_open(open_hour * 60 + open_minute);
+                    host.setTime_close(close_hour*60 + close_minute);
+                }
+
+                int host_id = 0;
                 try {
-
-                    UpdateBuilder<Host, Integer> updateBuilder = HelperFactory.getHelper().
-                            getHostDAO().updateBuilder();
-
-                    updateBuilder.where().eq("Id", host_id);
-
-                    updateBuilder.updateColumnValue("title", host_title_et.getText());
-                    updateBuilder.updateColumnValue("description", host_description_et.getText());
-                    updateBuilder.updateColumnValue("address", host_address_et.getText());
-                    if (set_open_time)
-                        updateBuilder.updateColumnValue("time_open", open_hour * 60 + open_minute);
-                    if (set_close_time)
-                        updateBuilder.updateColumnValue("time_close", close_hour * 60 + close_minute);
-
-                    updateBuilder.update();
-
-
+                    HelperFactory.getHelper().getHostDAO().create(host);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                host_id = host.getId();
+                ((MainActivity)getActivity()).setHost_id(host_id);
 
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.popBackStackImmediate();
+                final FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.container_body, new HostInfoFragment(), "");
+                ft.commit();
 
+//                Toast.makeText(getContext(), Integer.toString(host_id), Toast.LENGTH_SHORT).show();
+//                FragmentManager fragmentManager = getFragmentManager();
+//                fragmentManager.popBackStackImmediate();
             }
         });
 
@@ -159,21 +146,5 @@ public class HostEditInfoFragment extends Fragment {
         timePickerDialog.show();
     }
 
-    void inflate_fields(Host host) {
-
-        if (host != null) {
-            host_title_et.setText(host.getTitle());
-            host_description_et.setText(host.getDescription());
-            host_address_et.setText(host.getAddress());
-            if (host.getTime_open() % 60 == 0)
-                open_time_btn.setText(host.getTime_open() / 60 + ":" + "00");
-            else
-                open_time_btn.setText(host.getTime_open() / 60 + ":" + host.getTime_open() % 60);
-            if (host.getTime_close() % 60 == 0)
-                close_time_btn.setText(host.getTime_close() / 60 + ":" + "00");
-            else
-                close_time_btn.setText(host.getTime_close() / 60 + ":" + host.getTime_close() % 60);
-        }
-    }
 
 }
