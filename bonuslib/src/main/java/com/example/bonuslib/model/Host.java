@@ -21,6 +21,17 @@ public class Host{
     @DatabaseField(columnName = "description")
     private String description;
 
+    @DatabaseField(columnName = "address")
+    private String address;
+
+    @DatabaseField(columnName = "time_open", dataType = DataType.INTEGER)
+    private int time_open;
+
+
+    @DatabaseField(columnName = "time_open", dataType = DataType.INTEGER)
+    private int time_close;
+
+
     public Host() {
 
     }
@@ -44,5 +55,29 @@ public class Host{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getTime_open() {
+        return time_open;
+    }
+
+    public void setTime_open(int time_open) {
+        this.time_open = time_open;
+    }
+
+    public int getTime_close() {
+        return time_close;
+    }
+
+    public void setTime_close(int time_close) {
+        this.time_close = time_close;
     }
 }
