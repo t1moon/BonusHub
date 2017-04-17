@@ -13,10 +13,8 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.bonuslib.dao.HostDao;
 import com.example.bonuslib.db.HelperFactory;
-import com.example.bonuslib.model.Host;
+import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 import com.j256.ormlite.stmt.UpdateBuilder;
 
@@ -49,7 +47,7 @@ public class HostEditInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        rootView = inflater.inflate(R.layout.fragment_host_edit_info, container, false);
+        rootView = inflater.inflate(R.layout.fragment_edit, container, false);
 
         set_open_time = false;
         set_close_time = false;
@@ -62,7 +60,7 @@ public class HostEditInfoFragment extends Fragment {
         save_btn = (Button) rootView.findViewById(R.id.save_btn);
 
         host_id = getActivity().
-                getPreferences(Context.MODE_PRIVATE).getInt("host_id", -1);
+                getSharedPreferences("bonus", Context.MODE_PRIVATE).getInt("host_id", -1);
 
         Toast.makeText(getContext(), Integer.toString(host_id), Toast.LENGTH_SHORT).show();
 

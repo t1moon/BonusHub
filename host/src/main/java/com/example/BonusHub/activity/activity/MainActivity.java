@@ -1,6 +1,5 @@
 package com.example.BonusHub.activity.activity;
 
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -10,25 +9,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.fragment.HostInfoFragment;
-import com.example.BonusHub.activity.fragment.HostStartInfoFragment;
+import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
-import com.example.bonuslib.db.HelperFactory;
-import com.example.bonuslib.model.Host;
 import com.example.timur.BonusHub.R;
 
-import java.sql.SQLException;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
-    SharedPreferences sp;
     private Toolbar mToolbar;
 
     private DrawerLayout mDrawer;
@@ -66,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             if (host_id != -1)
                 fragment = (Fragment) HostInfoFragment.class.newInstance();
             else
-                fragment = (Fragment) HostStartInfoFragment.class.newInstance();
+                fragment = (Fragment) StartFragment.class.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -159,14 +150,5 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setHost_id(int host_id) {
-        sp = this.getPreferences(MODE_PRIVATE);
-        sp.edit().putInt("host_id", host_id).commit();
 
-    }
-
-    public int getHost_id() {
-        sp = this.getPreferences(MODE_PRIVATE);
-        return sp.getInt("host_id", 0);
-    }
 }

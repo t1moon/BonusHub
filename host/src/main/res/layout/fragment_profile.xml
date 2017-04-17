@@ -27,7 +27,6 @@
                     android:layout_height="wrap_content"
                     android:textColor="#000"
                     android:textSize="30sp"
-                    android:textStyle="bold"
                     android:text="Surf Coffee"/>
 
             </RelativeLayout>
@@ -111,8 +110,9 @@
             android:layout_margin="16dp"
             android:clickable="true"
             app:layout_anchor="@id/image_view"
-            app:layout_anchorGravity="bottom|right|end"
-            app:borderWidth="0dp" />
+            app:layout_anchorGravity="bottom|right"
+            app:borderWidth="0dp"
+            app:backgroundTint="#fff"/>
     </android.support.design.widget.CoordinatorLayout>
 
 </ScrollView>

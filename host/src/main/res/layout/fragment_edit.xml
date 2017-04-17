@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:orientation="vertical"
-        tools:context="com.example.BonusHub.activity.fragment.HostStartInfoFragment">
+        tools:context="com.example.BonusHub.activity.fragment.StartFragment">
 
             <LinearLayout
                 android:layout_width="match_parent"

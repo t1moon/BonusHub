@@ -1,4 +1,4 @@
-package com.example.bonuslib.model;
+package com.example.bonuslib.host;
 
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
