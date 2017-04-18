@@ -4,15 +4,16 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.example.BonusHub.activity.manager.HostInfoView;
-import com.example.BonusHub.activity.manager.HostStartInfoManager;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.timur.BonusHub.R;
 
@@ -21,12 +22,15 @@ import java.sql.SQLException;
 public class StartFragment extends Fragment {
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
-    private Button save_btn;
+    private TextView save_tv;
     private Button open_time_btn;
     private Button close_time_btn;
     private EditText host_title;
     private EditText host_description;
     private EditText host_address;
+
+    Toolbar toolbar;
+
     View rootView;
 
     public StartFragment() {
@@ -41,12 +45,21 @@ public class StartFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_edit, container, false);
+        rootView = inflater.inflate(R.layout.fragment_start, container, false);
+        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar_topic_top);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+
 
         host_title = (EditText) rootView.findViewById(R.id.host_title_et);
         host_description = (EditText) rootView.findViewById(R.id.host_description_et);
         host_address = (EditText) rootView.findViewById(R.id.host_address_et);
-        save_btn = (Button) rootView.findViewById(R.id.save_btn);
+        save_tv = (TextView) rootView.findViewById(R.id.save_tv);
         open_time_btn = (Button) rootView.findViewById(R.id.open_time_btn);
         close_time_btn = (Button) rootView.findViewById(R.id.close_time_btn);
 
@@ -65,7 +78,7 @@ public class StartFragment extends Fragment {
             }
         });
 
-        save_btn.setOnClickListener(new View.OnClickListener() {
+        save_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -89,7 +102,7 @@ public class StartFragment extends Fragment {
 
     public void goToProfileFragment() {
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.container_body, new HostInfoFragment(), "");
+        ft.replace(R.id.container_body, new ProfileFragment(), "");
         ft.commit();
     }
 

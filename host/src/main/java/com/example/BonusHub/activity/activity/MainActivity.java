@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.BonusHub.activity.fragment.HostInfoFragment;
+import com.example.BonusHub.activity.fragment.ProfileFragment;
 import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
 import com.example.timur.BonusHub.R;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             if (host_id != -1)
-                fragment = (Fragment) HostInfoFragment.class.newInstance();
+                fragment = (Fragment) StartFragment.class.newInstance();
             else
                 fragment = (Fragment) StartFragment.class.newInstance();
         } catch (Exception e) {
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 fragmentClass = ScanQrFragment.class;
                 break;
             case R.id.nav_second_fragment:
-                fragmentClass = HostInfoFragment.class;
+                fragmentClass = ProfileFragment.class;
                 break;
             default:
                 fragmentClass = ScanQrFragment.class;
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 

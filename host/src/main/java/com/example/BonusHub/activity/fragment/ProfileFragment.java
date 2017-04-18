@@ -15,7 +15,7 @@ import com.example.BonusHub.activity.manager.HostManager;
 import com.example.BonusHub.activity.manager.HostInfoManager;
 import com.example.timur.BonusHub.R;
 
-public class HostInfoFragment extends Fragment implements HostInfoView {
+public class ProfileFragment extends Fragment implements HostInfoView {
 
     private TextView host_open_time_tv;
     private TextView host_close_time_tv;
@@ -25,8 +25,7 @@ public class HostInfoFragment extends Fragment implements HostInfoView {
 
     private HostManager hostManager;
 
-
-    public HostInfoFragment() {
+    public ProfileFragment() {
         // Required empty public constructor
     }
 
