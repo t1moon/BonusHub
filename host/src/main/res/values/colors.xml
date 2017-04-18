@@ -6,4 +6,5 @@
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
     <color name="colorAccent">#3D5AFE</color>
+    <color name="edit_profile">#5F76BF</color>
 </resources>

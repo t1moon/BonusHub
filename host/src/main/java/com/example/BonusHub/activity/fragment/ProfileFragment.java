@@ -10,9 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.BonusHub.activity.manager.HostInfoView;
-import com.example.BonusHub.activity.manager.HostManager;
-import com.example.BonusHub.activity.manager.HostInfoManager;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -51,7 +48,7 @@ public class ProfileFragment extends Fragment {
 
         setInfo();
 
-        final FloatingActionButton edit = (FloatingActionButton) rootView.findViewById(R.id.edit);
+        final TextView edit = (TextView) rootView.findViewById(R.id.edit);
 
         edit.setOnClickListener(new View.OnClickListener() {
             @Override

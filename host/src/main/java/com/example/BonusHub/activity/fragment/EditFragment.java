@@ -102,7 +102,7 @@ public class EditFragment extends Fragment {
                 }
 
                 FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.popBackStackImmediate();
+                fragmentManager.popBackStack();
 
             }
         });
