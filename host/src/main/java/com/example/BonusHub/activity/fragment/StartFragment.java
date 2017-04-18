@@ -52,10 +52,6 @@ public class StartFragment extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-
         host_title = (EditText) rootView.findViewById(R.id.host_title_et);
         host_description = (EditText) rootView.findViewById(R.id.host_description_et);
         host_address = (EditText) rootView.findViewById(R.id.host_address_et);
@@ -86,14 +82,21 @@ public class StartFragment extends Fragment {
                 String description = host_description.getText().toString();
                 String address = host_address.getText().toString();
 
-                try {
-                    HelperFactory.getHelper().getHostDAO().createHost(title, description,
-                            address, open_hour, open_minute, close_hour, close_minute);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                if (title.equals(""))
+                    host_title.setError("Введите название");
+                else if (description.equals(""))
+                    host_description.setError("Введите описание");
+                else if (address.equals(""))
+                    host_address.setError("Введите адрес");
+                else {
+                    try {
+                        HelperFactory.getHelper().getHostDAO().createHost(title, description,
+                                address, open_hour, open_minute, close_hour, close_minute);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    goToProfileFragment();
                 }
-
-                goToProfileFragment();
             }
         });
 
@@ -137,12 +140,4 @@ public class StartFragment extends Fragment {
                 }, 0, 0, false);
         timePickerDialog.show();
     }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-    }
-
 }
