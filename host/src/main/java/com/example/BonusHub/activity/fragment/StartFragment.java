@@ -1,6 +1,7 @@
 package com.example.BonusHub.activity.fragment;
 
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -28,6 +29,7 @@ public class StartFragment extends Fragment {
     private EditText host_title;
     private EditText host_description;
     private EditText host_address;
+    private int host_id;
 
     Toolbar toolbar;
 
@@ -90,11 +92,15 @@ public class StartFragment extends Fragment {
                     host_address.setError("Введите адрес");
                 else {
                     try {
-                        HelperFactory.getHelper().getHostDAO().createHost(title, description,
+                        host_id = HelperFactory.getHelper().getHostDAO().createHost(title, description,
                                 address, open_hour, open_minute, close_hour, close_minute);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
+
+                    getActivity().getPreferences(Context.MODE_PRIVATE).edit()
+                            .putInt("host_id", host_id).apply();
+
                     goToProfileFragment();
                 }
             }

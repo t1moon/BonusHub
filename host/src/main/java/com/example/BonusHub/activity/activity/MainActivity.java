@@ -1,5 +1,6 @@
 package com.example.BonusHub.activity.activity;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -21,14 +22,10 @@ import com.example.timur.BonusHub.R;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
-
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
-
-
-    private EditText host_title, host_description;
-
+    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             if (host_id != -1)
-                fragment = (Fragment) StartFragment.class.newInstance();
+                fragment = (Fragment) ProfileFragment.class.newInstance();
             else
                 fragment = (Fragment) StartFragment.class.newInstance();
         } catch (Exception e) {

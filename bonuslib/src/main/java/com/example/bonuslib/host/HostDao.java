@@ -38,10 +38,8 @@ public class HostDao extends BaseDaoImpl<Host, Integer> {
         host.setTime_open(open_hour * 60 + open_minute);
         host.setTime_close(close_hour * 60 + close_minute);
 
-        int host_id = -1;
-
-        host_id = host.getId();
         this.create(host);
+        int host_id = host.getId();
         return host_id;
     }
 
