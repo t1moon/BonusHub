@@ -24,22 +24,7 @@ public class HostInfoManager implements HostManager {
     }
     @Override
     public void onResume() {
-        try {
-            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if (host != null) {
-            String title = host.getTitle();
-            String description = host.getDescription();
-            String address = host.getAddress();
-            int open_hour = host.getTime_open() / 60;
-            int open_minute = host.getTime_open() % 60;
-            int close_hour = host.getTime_close() / 60;
-            int close_minute = host.getTime_close() % 60;
-            if (hostInfoView != null)
-                hostInfoView.setInfo(title, description, address, open_hour, open_minute, close_hour, close_minute);
-        }
+
         }
 
 
