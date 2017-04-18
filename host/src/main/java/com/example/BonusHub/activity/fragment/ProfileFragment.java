@@ -65,7 +65,7 @@ public class ProfileFragment extends Fragment {
 
     public void goToEditFragment() {
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.container_body, new HostEditInfoFragment(), "");
+        ft.replace(R.id.container_body, new EditFragment(), "");
         ft.addToBackStack(null);
         ft.commit();
     }

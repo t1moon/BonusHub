@@ -5,11 +5,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -20,11 +23,11 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 
 import java.sql.SQLException;
 
-public class HostEditInfoFragment extends Fragment {
+public class EditFragment extends Fragment {
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private boolean set_open_time = false, set_close_time = false;
-    private Button save_btn;
+    private TextView save_tv;
     private Button open_time_btn;
     private Button close_time_btn;
     private EditText host_title_et;
@@ -33,7 +36,8 @@ public class HostEditInfoFragment extends Fragment {
     View rootView;
     int host_id;
 
-    public HostEditInfoFragment() {
+    Toolbar toolbar;
+    public EditFragment() {
         // Required empty public constructor
     }
 
@@ -52,28 +56,25 @@ public class HostEditInfoFragment extends Fragment {
         set_open_time = false;
         set_close_time = false;
 
-        host_title_et = (EditText) rootView.findViewById(R.id.host_title_et);
-        host_description_et = (EditText) rootView.findViewById(R.id.host_description_et);
-        host_address_et = (EditText) rootView.findViewById(R.id.host_address_et);
-        open_time_btn = (Button) rootView.findViewById(R.id.open_time_btn);
-        close_time_btn = (Button) rootView.findViewById(R.id.close_time_btn);
-        save_btn = (Button) rootView.findViewById(R.id.save_btn);
+        host_title_et = (EditText) rootView.findViewById(R.id.edit_host_title_et);
+        host_description_et = (EditText) rootView.findViewById(R.id.edit_host_description_et);
+        host_address_et = (EditText) rootView.findViewById(R.id.edit_host_address_et);
+        open_time_btn = (Button) rootView.findViewById(R.id.edit_open_time_btn);
+        close_time_btn = (Button) rootView.findViewById(R.id.edit_close_time_btn);
+        save_tv = (TextView) rootView.findViewById(R.id.edit_save_tv);
 
-        host_id = getActivity().
-                getSharedPreferences("bonus", Context.MODE_PRIVATE).getInt("host_id", -1);
+        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar_edit);
 
-        Toast.makeText(getContext(), Integer.toString(host_id), Toast.LENGTH_SHORT).show();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        Host host = null;
-        try {
-            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        inflate_fields(host);
+        setInfo();
 
-        save_btn.setOnClickListener(new View.OnClickListener() {
+        save_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -124,6 +125,37 @@ public class HostEditInfoFragment extends Fragment {
         return rootView;
     }
 
+    public void setInfo() {
+        host_id = getActivity().getPreferences(Context.MODE_PRIVATE).getInt("host_id", -1);
+        Host host = null;
+        try {
+            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (host != null) {
+            String title = host.getTitle();
+            String description = host.getDescription();
+            String address = host.getAddress();
+            int open_hour = host.getTime_open() / 60;
+            int open_minute = host.getTime_open() % 60;
+            int close_hour = host.getTime_close() / 60;
+            int close_minute = host.getTime_close() % 60;
+
+            host_title_et.setText(title);
+            host_description_et.setText(description);
+            host_address_et.setText(address);
+            if (open_minute != 0)
+                open_time_btn.setText(open_hour + ":" + open_minute);
+            else
+                open_time_btn.setText(open_hour + ":" + "00");
+            if (close_minute != 0)
+                close_time_btn.setText(close_hour + ":" + close_minute);
+            else
+                close_time_btn.setText(close_hour + ":" + "00");
+        }
+    }
+
     private void pickTime(final View v) {
         // Launch Time Picker Dialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
@@ -157,21 +189,5 @@ public class HostEditInfoFragment extends Fragment {
         timePickerDialog.show();
     }
 
-    void inflate_fields(Host host) {
-
-        if (host != null) {
-            host_title_et.setText(host.getTitle());
-            host_description_et.setText(host.getDescription());
-            host_address_et.setText(host.getAddress());
-            if (host.getTime_open() % 60 == 0)
-                open_time_btn.setText(host.getTime_open() / 60 + ":" + "00");
-            else
-                open_time_btn.setText(host.getTime_open() / 60 + ":" + host.getTime_open() % 60);
-            if (host.getTime_close() % 60 == 0)
-                close_time_btn.setText(host.getTime_close() / 60 + ":" + "00");
-            else
-                close_time_btn.setText(host.getTime_close() / 60 + ":" + host.getTime_close() % 60);
-        }
-    }
 
 }
