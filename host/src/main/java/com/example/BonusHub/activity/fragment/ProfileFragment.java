@@ -5,16 +5,22 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ProfileFragment extends Fragment {
 
@@ -33,6 +39,7 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +73,7 @@ public class ProfileFragment extends Fragment {
         ft.addToBackStack(null);
         ft.commit();
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -78,7 +86,8 @@ public class ProfileFragment extends Fragment {
 
 
     public void setInfo() {
-        host_id = getActivity().getPreferences(Context.MODE_PRIVATE).getInt("host_id", -1);
+        host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
+        Log.d("host", Integer.toString(host_id));
         Host host = null;
         try {
             host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);

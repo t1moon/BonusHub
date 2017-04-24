@@ -4,10 +4,14 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,22 +20,23 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.bonuslib.db.HelperFactory;
+import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
+import com.j256.ormlite.stmt.UpdateBuilder;
 
 import java.sql.SQLException;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class StartFragment extends Fragment {
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
-    private TextView save_tv;
     private Button open_time_btn;
     private Button close_time_btn;
     private EditText host_title;
     private EditText host_description;
     private EditText host_address;
     private int host_id;
-
-    Toolbar toolbar;
 
     View rootView;
 
@@ -48,16 +53,10 @@ public class StartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_start, container, false);
-        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar_topic_top);
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         host_title = (EditText) rootView.findViewById(R.id.host_title_et);
         host_description = (EditText) rootView.findViewById(R.id.host_description_et);
         host_address = (EditText) rootView.findViewById(R.id.host_address_et);
-        save_tv = (TextView) rootView.findViewById(R.id.save_tv);
         open_time_btn = (Button) rootView.findViewById(R.id.open_time_btn);
         close_time_btn = (Button) rootView.findViewById(R.id.close_time_btn);
 
@@ -76,35 +75,7 @@ public class StartFragment extends Fragment {
             }
         });
 
-        save_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String title = host_title.getText().toString();
-                String description = host_description.getText().toString();
-                String address = host_address.getText().toString();
-
-                if (title.equals(""))
-                    host_title.setError("Введите название");
-                else if (description.equals(""))
-                    host_description.setError("Введите описание");
-                else if (address.equals(""))
-                    host_address.setError("Введите адрес");
-                else {
-                    try {
-                        host_id = HelperFactory.getHelper().getHostDAO().createHost(title, description,
-                                address, open_hour, open_minute, close_hour, close_minute);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-
-                    getActivity().getPreferences(Context.MODE_PRIVATE).edit()
-                            .putInt("host_id", host_id).apply();
-
-                    goToProfileFragment();
-                }
-            }
-        });
+        setHasOptionsMenu(true);
 
         return rootView;
     }
@@ -146,4 +117,45 @@ public class StartFragment extends Fragment {
                 }, 0, 0, false);
         timePickerDialog.show();
     }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case R.id.continue_btn:
+                String title = host_title.getText().toString();
+                String description = host_description.getText().toString();
+                String address = host_address.getText().toString();
+
+                if (title.equals(""))
+                    host_title.setError("Введите название");
+                else if (description.equals(""))
+                    host_description.setError("Введите описание");
+                else if (address.equals(""))
+                    host_address.setError("Введите адрес");
+                else {
+                    try {
+                        host_id = HelperFactory.getHelper().getHostDAO().createHost(title, description,
+                                address, open_hour, open_minute, close_hour, close_minute);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    getActivity().getPreferences(MODE_PRIVATE).edit()
+                            .putInt("host_id", host_id).apply();
+
+                    goToProfileFragment();
+
+                }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.start_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
 }

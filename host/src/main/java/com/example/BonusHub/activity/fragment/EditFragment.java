@@ -5,9 +5,16 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,6 +23,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -27,7 +35,6 @@ public class EditFragment extends Fragment {
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private boolean set_open_time = false, set_close_time = false;
-    private TextView save_tv;
     private Button open_time_btn;
     private Button close_time_btn;
     private EditText host_title_et;
@@ -36,7 +43,6 @@ public class EditFragment extends Fragment {
     View rootView;
     int host_id;
 
-    Toolbar toolbar;
     public EditFragment() {
         // Required empty public constructor
     }
@@ -61,51 +67,10 @@ public class EditFragment extends Fragment {
         host_address_et = (EditText) rootView.findViewById(R.id.edit_host_address_et);
         open_time_btn = (Button) rootView.findViewById(R.id.edit_open_time_btn);
         close_time_btn = (Button) rootView.findViewById(R.id.edit_close_time_btn);
-        save_tv = (TextView) rootView.findViewById(R.id.edit_save_tv);
 
-        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar_edit);
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setHasOptionsMenu(true);
 
         setInfo();
-
-        save_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Host host = null;
-                try {
-
-                    UpdateBuilder<Host, Integer> updateBuilder = HelperFactory.getHelper().
-                            getHostDAO().updateBuilder();
-
-                    updateBuilder.where().eq("Id", host_id);
-
-                    updateBuilder.updateColumnValue("title", host_title_et.getText());
-                    updateBuilder.updateColumnValue("description", host_description_et.getText());
-                    updateBuilder.updateColumnValue("address", host_address_et.getText());
-                    if (set_open_time)
-                        updateBuilder.updateColumnValue("time_open", open_hour * 60 + open_minute);
-                    if (set_close_time)
-                        updateBuilder.updateColumnValue("time_close", close_hour * 60 + close_minute);
-
-                    updateBuilder.update();
-
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.popBackStack();
-
-            }
-        });
 
         open_time_btn.setOnClickListener(new View.OnClickListener() {
 
@@ -114,7 +79,6 @@ public class EditFragment extends Fragment {
                 pickTime(v);
             }
         });
-
         close_time_btn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -122,11 +86,14 @@ public class EditFragment extends Fragment {
                 pickTime(v);
             }
         });
+
         return rootView;
     }
 
+
     public void setInfo() {
         host_id = getActivity().getPreferences(Context.MODE_PRIVATE).getInt("host_id", -1);
+        Log.d("host_Id", Integer.toString(host_id));
         Host host = null;
         try {
             host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
@@ -189,5 +156,44 @@ public class EditFragment extends Fragment {
         timePickerDialog.show();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case R.id.continue_btn:
+                try {
+
+                    UpdateBuilder<Host, Integer> updateBuilder = HelperFactory.getHelper().
+                            getHostDAO().updateBuilder();
+
+                    updateBuilder.where().eq("Id", host_id);
+
+                    updateBuilder.updateColumnValue("title", host_title_et.getText());
+                    updateBuilder.updateColumnValue("description", host_description_et.getText());
+                    updateBuilder.updateColumnValue("address", host_address_et.getText());
+                    if (set_open_time)
+                        updateBuilder.updateColumnValue("time_open", open_hour * 60 + open_minute);
+                    if (set_close_time)
+                        updateBuilder.updateColumnValue("time_close", close_hour * 60 + close_minute);
+
+                    updateBuilder.update();
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.popBackStack();
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.start_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
 }

@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -25,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
-    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +39,36 @@ public class MainActivity extends AppCompatActivity {
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawer.addDrawerListener(drawerToggle);
-
         nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
+        // Setup behaviour for back home button, hamburger etc.
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+          @Override
+          public void onBackStackChanged() {
+              if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                  getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
+                  mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                      @Override
+                      public void onClick(View v) {
+                          onBackPressed();
+                      }
+                  });
+              } else {
+                  //show hamburger
+                  getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                  drawerToggle.syncState();
+                  mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                      @Override
+                      public void onClick(View v) {
+                          mDrawer.openDrawer(GravityCompat.START);
+                      }
+                  });
+              }
+          }
+      }
+        );
         setupStartFragment();
     }
 
@@ -51,10 +77,16 @@ public class MainActivity extends AppCompatActivity {
         int host_id = this.getPreferences(MODE_PRIVATE).getInt("host_id", -1);
 
         try {
-            if (host_id != -1)
+            if (host_id != -1) {
                 fragment = (Fragment) ProfileFragment.class.newInstance();
-            else
+                getSupportActionBar().setDisplayShowTitleEnabled(false);
+            } else {
                 fragment = (Fragment) StartFragment.class.newInstance();
+                getSupportActionBar().setDisplayShowTitleEnabled(false);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,29 +155,6 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.closeDrawers();
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        if (id == R.id.action_search) {
-            Toast.makeText(getApplicationContext(), "Search action is selected!", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
 
 }
