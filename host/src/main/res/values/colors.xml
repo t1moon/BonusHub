@@ -7,4 +7,6 @@
     <color name="navigationBarColor">#000000</color>
     <color name="colorAccent">#3D5AFE</color>
     <color name="edit_profile">#5F76BF</color>
+    <color name="colorOverlay">#78ffffff</color>
+    <color name="colorAccentOverlay">#1400bcd4</color>
 </resources>

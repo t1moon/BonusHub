@@ -1,6 +1,7 @@
 package com.example.BonusHub.activity.fragment;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -46,6 +47,7 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+
 
         host_title = (TextView) rootView.findViewById(R.id.host_title_tv);
         host_description = (TextView) rootView.findViewById(R.id.host_description_tv);
