@@ -11,12 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.client.DividerItemDecoration;
 import com.example.client.HostAdapter;
 import com.example.client.R;
+import com.example.client.RecyclerTouchListener;
 
 
 import java.sql.SQLException;
@@ -55,6 +57,19 @@ public class ListHostFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Host movie = hostList.get(position);
+                Toast.makeText(getActivity().getApplicationContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+
 
         prepareHostData();
 
@@ -81,5 +96,6 @@ public class ListHostFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
     }
+
 
 }
