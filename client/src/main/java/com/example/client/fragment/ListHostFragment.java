@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
+import com.example.client.DividerItemDecoration;
 import com.example.client.HostAdapter;
 import com.example.client.R;
 
@@ -51,7 +52,9 @@ public class ListHostFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
+
 
         prepareHostData();
 
@@ -62,7 +65,7 @@ public class ListHostFragment extends Fragment {
         Host host = new Host("first", "desc");
         hostList.add(host);
 
-        host = new Host("se", "qwe");
+        host = new Host("second", "qwe");
         hostList.add(host);
 
         mAdapter.notifyDataSetChanged();

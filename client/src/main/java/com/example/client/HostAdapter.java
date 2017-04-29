@@ -20,11 +20,12 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
     private List<Host> hostsList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title;
+        public TextView title, descrpition;
 
         public MyViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.rv_title);
+            descrpition = (TextView) view.findViewById(R.id.rv_description);
         }
     }
 
@@ -45,6 +46,7 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Host host = hostsList.get(position);
         holder.title.setText(host.getTitle());
+        holder.descrpition.setText(host.getDescription());
     }
 
     @Override
