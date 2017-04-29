@@ -3,6 +3,7 @@ package com.example.client.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -60,8 +61,7 @@ public class ListHostFragment extends Fragment {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Host movie = hostList.get(position);
-                Toast.makeText(getActivity().getApplicationContext(), movie.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                goToHostFragment();
             }
 
             @Override
@@ -70,10 +70,16 @@ public class ListHostFragment extends Fragment {
             }
         }));
 
-
         prepareHostData();
 
         return rootView;
+    }
+
+    public void goToHostFragment() {
+        final FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.container_body, new HostFragment(), "");
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     private void prepareHostData() {
