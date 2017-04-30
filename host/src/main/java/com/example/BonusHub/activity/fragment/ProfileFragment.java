@@ -1,25 +1,26 @@
 package com.example.BonusHub.activity.fragment;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.BonusHub.activity.activity.MainActivity;
+import com.bumptech.glide.Glide;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -66,6 +67,19 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+
+        try {
+            Glide.with(this).load(R.drawable.bonus_hub_logo).into((ImageView) getActivity().findViewById(R.id.backdrop));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Here I can add logo on appbar
+//        LinearLayout logoLinearLayout = (LinearLayout)getActivity().findViewById(R.id.logo_layout);
+//        CircleImageView logoView = new CircleImageView(getActivity());
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(500, 500);
+//        logoView.setLayoutParams(params);
+//        logoView.setImageResource(R.drawable.bonus_logo);
+//        logoLinearLayout.addView(logoView);
         return rootView;
     }
 

@@ -4,8 +4,9 @@
 
     <item
         android:id="@+id/continue_btn"
-        android:title="Продолжить"
+        android:icon="@drawable/ic_check_white_24dp"
         android:orderInCategory="100"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"
+        android:title=""/>
 
 </menu>

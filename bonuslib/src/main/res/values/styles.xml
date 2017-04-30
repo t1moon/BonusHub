@@ -1,27 +1,33 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="MyMaterialTheme" parent="MyMaterialTheme.Base">
+    <!--<style name="MyMaterialTheme" parent="MyMaterialTheme.Base">-->
 
-    </style>
+    <!--</style>-->
 
-    <style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
+    <!--<style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">-->
+        <!--<item name="windowNoTitle">true</item>-->
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
+        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+        <!--<item name="colorAccent">@color/colorAccent</item>-->
+    <!--</style>-->
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <!--&lt;!&ndash; inherit from the material theme &ndash;&gt;-->
-    <!--<style name="AppTheme" parent="android:Theme.Material">-->
-        <!--&lt;!&ndash; Main theme colors &ndash;&gt;-->
-        <!--&lt;!&ndash;   your app branding color for the app bar &ndash;&gt;-->
-        <!--<item name="android:colorPrimary">@color/colorPrimary</item>-->
-        <!--&lt;!&ndash;   darker variant for the status bar and contextual app bars &ndash;&gt;-->
-        <!--<item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>-->
-        <!--&lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;-->
-        <!--<item name="android:colorAccent">@color/colorAccent</item>-->
-    <!--</style>-->
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
