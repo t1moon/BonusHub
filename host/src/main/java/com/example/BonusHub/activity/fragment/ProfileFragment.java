@@ -120,6 +120,8 @@ public class ProfileFragment extends Fragment {
             int close_minute = host.getTime_close() % 60;
 
             host_title.setText(title);
+//            TextView titleToolbar = (TextView) getActivity().findViewById(R.id.title_toolbar);
+//            titleToolbar.setText(title);
             host_description.setText(description);
             host_address.setText(address);
             if (open_minute != 0)

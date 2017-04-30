@@ -10,25 +10,6 @@
         android:orientation="vertical"
         tools:context="com.example.BonusHub.activity.fragment.StartFragment">
 
-        <!--<android.support.v7.widget.Toolbar-->
-            <!--android:id="@+id/toolbar_edit"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="?attr/colorPrimary"-->
-            <!--android:minHeight="?attr/actionBarSize"-->
-            <!--app:titleTextColor="@android:color/white">-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/edit_save_tv"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="end"-->
-                <!--android:layout_marginRight="20dp"-->
-                <!--android:text="Сохранить"-->
-                <!--android:textColor="#ffffff"-->
-                <!--android:textSize="15sp" />-->
-
-        <!--</android.support.v7.widget.Toolbar>-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,6 +55,12 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Время работы"
+            android:layout_gravity="center"
+            android:textColor="@color/black"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,15 +73,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Время открытия" />
+                android:hint="Время открытия" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"/>
             <Button
                 android:id="@+id/edit_close_time_btn"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Время закрытия" />
+                android:hint="Время закрытия" />
         </LinearLayout>
 
     </LinearLayout>

@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
           @Override
           public void onBackStackChanged() {
-              Log.d("FUCK", Integer.toString(getSupportFragmentManager().getBackStackEntryCount()));
               if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                   getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
                   mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
