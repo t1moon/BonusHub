@@ -175,16 +175,14 @@ public class MainActivity extends AppCompatActivity {
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
-        Class fragmentClass;
+        Class fragmentClass = null;
         switch (menuItem.getItemId()) {
-            case R.id.nav_first_fragment:
+            case 0:
                 fragmentClass = ScanQrFragment.class;
                 break;
-            case R.id.nav_second_fragment:
+            case 1:
                 fragmentClass = ProfileFragment.class;
                 break;
-            default:
-                fragmentClass = ScanQrFragment.class;
         }
 
         try {
