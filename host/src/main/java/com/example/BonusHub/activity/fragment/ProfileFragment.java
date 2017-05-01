@@ -67,12 +67,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
-        try {
-            Glide.with(this).load(R.drawable.bonus_hub_logo).into((ImageView) getActivity().findViewById(R.id.backdrop));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         // Here I can add logo on appbar
 //        LinearLayout logoLinearLayout = (LinearLayout)getActivity().findViewById(R.id.logo_layout);
 //        CircleImageView logoView = new CircleImageView(getActivity());

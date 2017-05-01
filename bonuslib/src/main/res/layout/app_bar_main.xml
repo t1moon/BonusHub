@@ -33,19 +33,10 @@
                     android:id="@+id/backdrop"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:src="@drawable/bonus_hub_logo"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax" />
-
-                <TextView
-                    android:id="@+id/title_toolbar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="40dp"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"/>
 
             </RelativeLayout>
 

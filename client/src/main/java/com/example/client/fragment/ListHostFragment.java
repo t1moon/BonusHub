@@ -44,6 +44,7 @@ public class ListHostFragment extends Fragment {
     private HostAdapter mAdapter;
     private TextView profileName;
 
+
     public ListHostFragment() {
         // Required empty public constructor
     }
@@ -84,11 +85,6 @@ public class ListHostFragment extends Fragment {
 
         setInfo();
 
-        try {
-            Glide.with(this).load(R.drawable.bonus_hub_logo).into((ImageView) getActivity().findViewById(R.id.backdrop));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return rootView;
     }
 
