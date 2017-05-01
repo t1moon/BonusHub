@@ -147,15 +147,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setupDrawerContent(NavigationView navigationView) {
+    private void setupDrawerContent(final NavigationView navigationView) {
+        Menu drawerMenu = navigationView.getMenu();
+        drawerMenu.add(0,0,0, "Считать QR-код");
+        drawerMenu.add(0,1,1, "Профиль заведения");
+
+
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        uncheckAllMenuItems(navigationView);
                         selectDrawerItem(menuItem);
                         return true;
                     }
                 });
+    }
+
+    private void uncheckAllMenuItems(NavigationView navigationView) {
+        final Menu menu = navigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            item.setChecked(false);
+        }
     }
 
     public void selectDrawerItem(MenuItem menuItem) {

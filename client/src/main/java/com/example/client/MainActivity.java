@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import com.example.bonuslib.db.HelperFactory;
 import com.example.client.fragment.ListHostFragment;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
@@ -48,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
         drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawer.addDrawerListener(drawerToggle);
         nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
-
-
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
@@ -167,15 +167,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setupDrawerContent(NavigationView navigationView) {
+    private void setupDrawerContent(final NavigationView navigationView) {
+
+        Menu drawerMenu = navigationView.getMenu();
+        drawerMenu.add(0,0,0, "Показать QR-код");
+        drawerMenu.add(0,1,1, "Показать список заведений");
+
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        uncheckAllMenuItems(navigationView);
                         selectDrawerItem(menuItem);
                         return true;
                     }
                 });
+    }
+
+    private void uncheckAllMenuItems(NavigationView navigationView) {
+        final Menu menu = navigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            item.setChecked(false);
+            }
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
@@ -183,7 +197,10 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = null;
         Class fragmentClass = null;
         switch (menuItem.getItemId()) {
-            case R.id.nav_second_fragment:
+            case 0:
+                fragmentClass = ListHostFragment.class;
+                break;
+            case 1:
                 fragmentClass = ListHostFragment.class;
                 break;
         }
