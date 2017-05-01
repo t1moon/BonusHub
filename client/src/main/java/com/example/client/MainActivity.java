@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.client.fragment.ListHostFragment;
+import com.example.client.fragment.QRFragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -198,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
         Class fragmentClass = null;
         switch (menuItem.getItemId()) {
             case 0:
-                fragmentClass = ListHostFragment.class;
+                fragmentClass = QRFragment.class;
                 break;
             case 1:
                 fragmentClass = ListHostFragment.class;
