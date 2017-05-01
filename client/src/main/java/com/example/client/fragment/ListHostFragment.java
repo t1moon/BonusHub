@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.client.DividerItemDecoration;
@@ -40,6 +42,7 @@ public class ListHostFragment extends Fragment {
     private List<Host> hostList = new ArrayList<>();
     private RecyclerView recyclerView;
     private HostAdapter mAdapter;
+    private TextView profileName;
 
     public ListHostFragment() {
         // Required empty public constructor
@@ -79,6 +82,8 @@ public class ListHostFragment extends Fragment {
 
         prepareHostData();
 
+        setInfo();
+
         try {
             Glide.with(this).load(R.drawable.bonus_hub_logo).into((ImageView) getActivity().findViewById(R.id.backdrop));
         } catch (Exception e) {
@@ -87,6 +92,23 @@ public class ListHostFragment extends Fragment {
         return rootView;
     }
 
+    private void setInfo() {
+        int client_id = getActivity().getPreferences(MODE_PRIVATE).getInt("client_id", -1);
+        Log.d("cl_id", Integer.toString(client_id));
+        Client client = null;
+        try {
+            client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (client != null) {
+            NavigationView nvDrawer = (NavigationView) getActivity().findViewById(R.id.navigation_view);
+            View header = nvDrawer.getHeaderView(0);
+            TextView profileName = (TextView) header.findViewById(R.id.tv_profile_name);
+            profileName.setText(client.getName());
+        }
+
+    }
     public void goToHostFragment() {
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.container_body, new HostFragment(), "");
@@ -104,6 +126,7 @@ public class ListHostFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
 
     }
+
 
     @Override
     public void onAttach(Context context) {

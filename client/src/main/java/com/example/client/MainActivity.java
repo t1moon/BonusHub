@@ -12,10 +12,16 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
+import com.example.bonuslib.client.Client;
+import com.example.bonuslib.db.HelperFactory;
 import com.example.client.fragment.ListHostFragment;
+
+import java.sql.SQLException;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
@@ -24,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
 
+
+    public static int CLIENT_ID = 7;
+    public static String CLIENT_NAME = "Timur";
+    public static String CLIENT_IDENTIFICATOR = "QfgnJKEGNRojer";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawer.addDrawerListener(drawerToggle);
         nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
+
+
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
@@ -73,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         setupStartFragment();
+
     }
 
     /**
@@ -109,12 +122,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupStartFragment() {
         Fragment fragment = null;
-        int host_id = this.getPreferences(MODE_PRIVATE).getInt("host_id", -1);
+        int client_id = this.getPreferences(MODE_PRIVATE).getInt("client_id", -1);
+
+        if (client_id == -1) {
+            try {
+                client_id = HelperFactory.getHelper().getClientDAO().createClient(CLIENT_NAME, CLIENT_IDENTIFICATOR);
+                Log.d("MA, create",Integer.toString(client_id) );
+                this.getPreferences(MODE_PRIVATE).edit()
+                        .putInt("client_id", client_id).apply();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
         try {
-            fragment = (Fragment) ListHostFragment.class.newInstance();
+            try {
+                fragment = (Fragment) ListHostFragment.class.newInstance();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         getSupportActionBar().setDisplayShowTitleEnabled(false);

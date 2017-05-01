@@ -20,7 +20,7 @@
                     android:background="#fff"
                     android:paddingTop="20dp"
                     android:paddingBottom="10dp"
-                    android:text="Surf Coffee"
+                    android:text="Здесь будет Ваше название"
                     android:textColor="#000"
                     android:textSize="30dp" />
 
@@ -151,7 +151,7 @@
             android:padding="10dp"
             android:text="EDIT PROFILE"
             android:textAlignment="center"
-            android:textColor="@color/edit_profile" />
+            android:textColor="@color/colorAccent" />
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

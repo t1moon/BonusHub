@@ -5,6 +5,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.bonuslib.client.Client;
+import com.example.bonuslib.client.ClientDao;
 import com.example.bonuslib.host.Host;
 import com.example.bonuslib.host.HostDao;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -22,10 +24,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME ="bonus.db";
 
     //с каждым увеличением версии, при нахождении в устройстве БД с предыдущей версией будет выполнен метод onUpgrade();
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 6;
 
     //ссылки на DAO соответсвующие сущностям, хранимым в БД
     private HostDao hostDao = null;
+    private ClientDao clientDao = null;
 
     public DatabaseHelper(Context context){
         super(context,DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,6 +41,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try
         {
             TableUtils.createTable(connectionSource, Host.class);
+            TableUtils.createTable(connectionSource, Client.class);
         }
         catch (SQLException e){
             Log.e(TAG, "error creating DB " + DATABASE_NAME);
@@ -54,6 +58,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             //Так делают ленивые, гораздо предпочтительнее не удаляя БД аккуратно вносить изменения
             TableUtils.dropTable(connectionSource, Host.class, true);
+            TableUtils.dropTable(connectionSource, Client.class, true);
             this.onCreate(db, connectionSource);
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
@@ -67,7 +72,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
         return hostDao;
     }
-
+    //синглтон для ClientDAO
+    public ClientDao getClientDAO() throws SQLException, java.sql.SQLException {
+        if(clientDao == null){
+            clientDao = new ClientDao(getConnectionSource(), Client.class);
+        }
+        return clientDao;
+    }
 
     //выполняется при закрытии приложения
     @Override

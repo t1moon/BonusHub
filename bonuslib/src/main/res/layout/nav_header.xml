@@ -19,6 +19,7 @@
         android:src="@drawable/ic_profile" />
 
     <TextView
+        android:id="@+id/tv_profile_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -26,12 +27,5 @@
         android:text="Android Studio"
         android:textSize="20dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="android.studio@android.com"
-        android:textSize="15dp"/>
 
 </LinearLayout>
