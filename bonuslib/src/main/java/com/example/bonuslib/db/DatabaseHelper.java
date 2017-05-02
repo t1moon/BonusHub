@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client.ClientDao;
+import com.example.bonuslib.client_host.ClientHost;
+import com.example.bonuslib.client_host.ClientHostDao;
 import com.example.bonuslib.host.Host;
 import com.example.bonuslib.host.HostDao;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -29,6 +31,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     //ссылки на DAO соответсвующие сущностям, хранимым в БД
     private HostDao hostDao = null;
     private ClientDao clientDao = null;
+    private ClientHostDao clientHostDao = null;
 
     public DatabaseHelper(Context context){
         super(context,DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,6 +45,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         {
             TableUtils.createTable(connectionSource, Host.class);
             TableUtils.createTable(connectionSource, Client.class);
+            TableUtils.createTable(connectionSource, ClientHost.class);
         }
         catch (SQLException e){
             Log.e(TAG, "error creating DB " + DATABASE_NAME);
@@ -59,6 +63,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             //Так делают ленивые, гораздо предпочтительнее не удаляя БД аккуратно вносить изменения
             TableUtils.dropTable(connectionSource, Host.class, true);
             TableUtils.dropTable(connectionSource, Client.class, true);
+            TableUtils.dropTable(connectionSource, ClientHost.class, true);
             this.onCreate(db, connectionSource);
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
@@ -78,6 +83,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             clientDao = new ClientDao(getConnectionSource(), Client.class);
         }
         return clientDao;
+    }
+    //синглтон для ClientHostDAO
+    public ClientHostDao getClientHostDAO() throws SQLException, java.sql.SQLException {
+        if(clientHostDao == null){
+            clientHostDao = new ClientHostDao(getConnectionSource(), ClientHost.class);
+        }
+        return clientHostDao;
     }
 
     //выполняется при закрытии приложения
