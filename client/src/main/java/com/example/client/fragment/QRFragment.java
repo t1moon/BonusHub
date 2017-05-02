@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.example.client.MainActivity;
 import com.example.client.R;
@@ -20,8 +21,8 @@ import com.google.zxing.common.BitMatrix;
 public class QRFragment extends Fragment {
 
     View rootView;
-    public final static int QRcodeWidth = 500 ;
-    Bitmap bitmap ;
+    public final static int QRcodeWidth = 500;
+    Bitmap bitmap;
     ImageView imageView;
 
 
@@ -39,12 +40,28 @@ public class QRFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_qrcode, container, false);
         imageView = (ImageView) rootView.findViewById(R.id.iv_qrcode);
-        try {
-            bitmap = TextToImageEncode(MainActivity.CLIENT_IDENTIFICATOR);
-        } catch (WriterException e) {
-            e.printStackTrace();
-        }
-        imageView.setImageBitmap(bitmap);
+        final ProgressBar spinner;
+        spinner = (ProgressBar)rootView.findViewById(R.id.progressBar);
+        spinner.setVisibility(View.VISIBLE);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    bitmap = TextToImageEncode(MainActivity.CLIENT_IDENTIFICATOR);
+                    imageView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(bitmap);
+                            spinner.setVisibility(View.GONE);
+                        }
+                    });
+
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
         return rootView;
     }
 
@@ -69,14 +86,13 @@ public class QRFragment extends Fragment {
             int offset = y * bitMatrixWidth;
             for (int x = 0; x < bitMatrixWidth; x++) {
                 pixels[offset + x] = bitMatrix.get(x, y) ?
-                        getResources().getColor(R.color.black):getResources().getColor(R.color.white);
+                        getResources().getColor(R.color.black) : getResources().getColor(R.color.white);
             }
         }
         Bitmap bitmap = Bitmap.createBitmap(bitMatrixWidth, bitMatrixHeight, Bitmap.Config.ARGB_4444);
         bitmap.setPixels(pixels, 0, 500, 0, 0, bitMatrixWidth, bitMatrixHeight);
         return bitmap;
     }
-
 
 
     @Override
