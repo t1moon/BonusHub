@@ -23,6 +23,7 @@ import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.client.fragment.ListHostFragment;
 import com.example.client.fragment.QRFragment;
+import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
+
+        clearTables();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -104,6 +107,11 @@ public class MainActivity extends AppCompatActivity {
         populateHosts();
         setupStartFragment();
 
+    }
+
+    private void clearTables() {
+        ConnectionSource connectionSource = HelperFactory.getHelper().getConnectionSource();
+        HelperFactory.getHelper().clearTables(connectionSource);
     }
 
     private void setupClient() {

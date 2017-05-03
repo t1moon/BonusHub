@@ -55,6 +55,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+
     //Выполняется, когда БД имеет версию отличную от текущей
     @Override
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVer,
@@ -68,6 +69,17 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void clearTables(ConnectionSource connectionSource) {
+        try {
+            TableUtils.clearTable(connectionSource, Host.class);
+            TableUtils.clearTable(connectionSource, Client.class);
+            TableUtils.clearTable(connectionSource, ClientHost.class);
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
         //синглтон для HostDAO
