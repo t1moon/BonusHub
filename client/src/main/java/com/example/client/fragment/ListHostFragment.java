@@ -123,13 +123,15 @@ public class ListHostFragment extends Fragment {
             e.printStackTrace();
         }
 
+        List<Host> hosts = new ArrayList<>();
         try {
-            // Это что должно быть
-//            hostList = HelperFactory.getHelper().getClientHostDAO().lookupHostForClient(client);
-            // а это для пробы
-            hostList = HelperFactory.getHelper().getHostDAO().getAllHosts();
+            hosts = HelperFactory.getHelper().getClientHostDAO().lookupHostForClient(client);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+
+        for (Host item: hosts) {
+            hostList.add(item);
         }
 
         mAdapter.notifyDataSetChanged();
