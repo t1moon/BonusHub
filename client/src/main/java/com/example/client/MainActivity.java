@@ -20,11 +20,13 @@ import android.widget.TextView;
 
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
+import com.example.bonuslib.host.Host;
 import com.example.client.fragment.ListHostFragment;
 import com.example.client.fragment.QRFragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
@@ -37,11 +39,23 @@ public class MainActivity extends AppCompatActivity {
     public static int CLIENT_ID = 7;
     public static String CLIENT_NAME = "Timur";
     public static String CLIENT_IDENTIFICATOR = "QfgnJKEGNRojer";
+
+    private static int client_id;
+
+    public static int getClientId() {
+        return client_id;
+    }
+
+    public static void setClient_id(int client_id) {
+        MainActivity.client_id = client_id;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
@@ -85,10 +99,52 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
+        setupClient();
+        populateHosts();
         setupStartFragment();
 
     }
 
+    private void setupClient() {
+        int client_id = this.getPreferences(MODE_PRIVATE).getInt("client_id", -1);
+
+        if (client_id == -1) {
+            try {
+                client_id = HelperFactory.getHelper().getClientDAO().createClient(CLIENT_NAME, CLIENT_IDENTIFICATOR);
+                Log.d("MA, create",Integer.toString(client_id) );
+                this.getPreferences(MODE_PRIVATE).edit()
+                        .putInt("client_id", client_id).apply();
+                setClient_id(client_id);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            setClient_id(client_id);
+        }
+    }
+    private void populateHosts() {
+        Client client = null;
+        try {
+            client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        List<Host> hostList = new ArrayList<>();
+        Host host = new Host("Surf coffee", "Best", "Baumanskaya");
+        hostList.add(host);
+        host = new Host("One bucks", "Sweety", "Tverskay");
+        hostList.add(host);
+        try {
+            for (Host item: hostList) {
+                HelperFactory.getHelper().getHostDAO().createHost(item);
+                HelperFactory.getHelper().getClientHostDAO().createClientHost(client, item, 0);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * Initializing collapsing toolbar
      * Will show and hide the toolbar title on scroll
@@ -123,20 +179,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupStartFragment() {
         Fragment fragment = null;
-        int client_id = this.getPreferences(MODE_PRIVATE).getInt("client_id", -1);
-
-        if (client_id == -1) {
-            try {
-                client_id = HelperFactory.getHelper().getClientDAO().createClient(CLIENT_NAME, CLIENT_IDENTIFICATOR);
-                Log.d("MA, create",Integer.toString(client_id) );
-                this.getPreferences(MODE_PRIVATE).edit()
-                        .putInt("client_id", client_id).apply();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-        }
-
         try {
             try {
                 fragment = (Fragment) ListHostFragment.class.newInstance();

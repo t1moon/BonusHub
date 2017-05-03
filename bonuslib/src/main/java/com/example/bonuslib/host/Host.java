@@ -24,9 +24,11 @@ public class Host{
     @DatabaseField(columnName = "address")
     private String address;
 
+    // in minutes
     @DatabaseField(columnName = "time_open", dataType = DataType.INTEGER)
     private int time_open;
 
+    // in minutes
     @DatabaseField(columnName = "time_close", dataType = DataType.INTEGER)
     private int time_close;
 
@@ -34,9 +36,10 @@ public class Host{
     public Host() {
     }
 
-    public Host(String title, String description){
+    public Host(String title, String description, String address){
         this.title = title;
         this.description = description;
+        this.address = address;
     }
 
     public String getTitle() {

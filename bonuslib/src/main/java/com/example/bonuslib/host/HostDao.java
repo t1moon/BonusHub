@@ -28,16 +28,7 @@ public class HostDao extends BaseDaoImpl<Host, Integer> {
         return this.queryForId(id);
     }
 
-    public int createHost(String title, String description,
-                          String address, int open_hour, int open_minute,
-                          int close_hour, int close_minute) throws java.sql.SQLException {
-        Host host = new Host();
-        host.setTitle(title);
-        host.setDescription(description);
-        host.setAddress(address);
-        host.setTime_open(open_hour * 60 + open_minute);
-        host.setTime_close(close_hour * 60 + close_minute);
-
+    public int createHost(Host host) throws java.sql.SQLException {
         this.create(host);
         int host_id = host.getId();
         return host_id;

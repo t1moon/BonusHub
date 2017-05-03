@@ -19,6 +19,9 @@ public class ClientHost {
     @DatabaseField(canBeNull = true, columnName = "points")
     private int points;
 
+    public ClientHost() {
+    }
+
     public ClientHost(Client client, Host host, int points) {
         this.client = client;
         this.host= host;

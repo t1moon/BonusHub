@@ -27,6 +27,7 @@ import com.example.bonuslib.host.Host;
 import com.example.client.DividerItemDecoration;
 import com.example.client.GridSpacingItemDecoration;
 import com.example.client.HostAdapter;
+import com.example.client.MainActivity;
 import com.example.client.R;
 import com.example.client.RecyclerTouchListener;
 
@@ -36,6 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.example.client.MainActivity.CLIENT_ID;
+import static com.example.client.MainActivity.getClientId;
+
 
 public class ListHostFragment extends Fragment {
 
@@ -81,22 +85,20 @@ public class ListHostFragment extends Fragment {
             }
         }));
 
-        prepareHostData();
-
         setInfo();
+        prepareHostData();
 
         return rootView;
     }
 
     private void setInfo() {
-        int client_id = getActivity().getPreferences(MODE_PRIVATE).getInt("client_id", -1);
-        Log.d("cl_id", Integer.toString(client_id));
         Client client = null;
         try {
-            client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
+            client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         if (client != null) {
             NavigationView nvDrawer = (NavigationView) getActivity().findViewById(R.id.navigation_view);
             View header = nvDrawer.getHeaderView(0);
@@ -113,11 +115,22 @@ public class ListHostFragment extends Fragment {
     }
 
     private void prepareHostData() {
-        Host host = new Host("first", "desc");
-        hostList.add(host);
+        Client client = null;
+        int client_id = getClientId();
+        try {
+            client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-        host = new Host("second", "qwe");
-        hostList.add(host);
+        try {
+            // Это что должно быть
+//            hostList = HelperFactory.getHelper().getClientHostDAO().lookupHostForClient(client);
+            // а это для пробы
+            hostList = HelperFactory.getHelper().getHostDAO().getAllHosts();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         mAdapter.notifyDataSetChanged();
 

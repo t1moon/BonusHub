@@ -142,8 +142,10 @@ public class StartFragment extends Fragment {
                     host_address.setError("Введите адрес");
                 else {
                     try {
-                        host_id = HelperFactory.getHelper().getHostDAO().createHost(title, description,
-                                address, open_hour, open_minute, close_hour, close_minute);
+                        Host host = new Host(title, description, address);
+                        host.setTime_open(open_hour * 60 + open_minute);
+                        host.setTime_close(close_hour * 60 + close_minute);
+                        host_id = HelperFactory.getHelper().getHostDAO().createHost(host);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
