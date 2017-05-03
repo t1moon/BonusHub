@@ -25,10 +25,10 @@ import java.util.Map;
 
 public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder>  {
 //
-//    private List<Host> hostsList;
+//    private List<AboutHost> hostsList;
 //    private List<Integer> points;
 
-//    private Map<Host, Integer> pointsToHost;
+//    private Map<AboutHost, Integer> pointsToHost;
     private List<ClientHost> clientHostList;
     private Context context;
 
@@ -51,7 +51,7 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
 //        this.hostsList = hostsList;
 //        this.points = points;
 //
-//        Iterator<Host> it1 = hostsList.iterator();
+//        Iterator<AboutHost> it1 = hostsList.iterator();
 //        Iterator<Integer> it2 = points.iterator();
 //
 //        while (it1.hasNext() && it2.hasNext()) {

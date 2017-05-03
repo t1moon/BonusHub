@@ -3,15 +3,11 @@ package com.example.client.fragment;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,8 +17,6 @@ import android.widget.TextView;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
-import com.example.bonuslib.host.Host;
-import com.example.client.DividerItemDecoration;
 import com.example.client.GridSpacingItemDecoration;
 import com.example.client.HostAdapter;
 import com.example.client.MainActivity;
@@ -41,8 +35,7 @@ public class ListHostFragment extends Fragment {
     private List<ClientHost> clientHostsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private HostAdapter mAdapter;
-    private TextView profileName;
-
+    private MainActivity mainActivity;
 
     public ListHostFragment() {
         // Required empty public constructor
@@ -51,6 +44,7 @@ public class ListHostFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mainActivity = (MainActivity) getActivity();
     }
 
 
@@ -104,17 +98,9 @@ public class ListHostFragment extends Fragment {
 
     public void goToHostFragment(int position) {
         final Bundle bundle = new Bundle();
-
         int host_id = mAdapter.getItemByPosition(position).getHost().getId();
-
         bundle.putInt("host_id", host_id);
-        Fragment fragment = new HostFragment();
-        fragment.setArguments(bundle);
-
-        final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.container_body, fragment, "");
-        ft.addToBackStack(null);
-        ft.commit();
+        mainActivity.pushFragment(new HostFragment(), true, bundle);
     }
 
     private void prepareHostData() {

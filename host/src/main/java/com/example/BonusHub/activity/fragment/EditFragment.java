@@ -42,6 +42,7 @@ public class EditFragment extends Fragment {
     private EditText host_address_et;
     View rootView;
     int host_id;
+    MainActivity mainActivity;
 
     public EditFragment() {
         // Required empty public constructor
@@ -50,6 +51,7 @@ public class EditFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mainActivity = (MainActivity) getActivity();
     }
 
     @Override
@@ -166,8 +168,7 @@ public class EditFragment extends Fragment {
                     UpdateBuilder<Host, Integer> updateBuilder = HelperFactory.getHelper().
                             getHostDAO().updateBuilder();
 
-                    updateBuilder.where().eq("Id", host_id);
-
+                    updateBuilder.where().eq("host_id", host_id);
                     updateBuilder.updateColumnValue("title", host_title_et.getText());
                     updateBuilder.updateColumnValue("description", host_description_et.getText());
                     updateBuilder.updateColumnValue("address", host_address_et.getText());
@@ -182,9 +183,7 @@ public class EditFragment extends Fragment {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.popBackStack();
-
+                mainActivity.popFragment();
                 return true;
         }
         return super.onOptionsItemSelected(item);

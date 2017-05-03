@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -38,6 +40,7 @@ public class StartFragment extends Fragment {
     private EditText host_description;
     private EditText host_address;
     private int host_id;
+    private MainActivity mainActivity;
 
     View rootView;
 
@@ -48,6 +51,7 @@ public class StartFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mainActivity = (MainActivity) getActivity();
     }
 
     @Override
@@ -82,9 +86,8 @@ public class StartFragment extends Fragment {
     }
 
     public void goToProfileFragment() {
-        final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.container_body, new ProfileFragment(), "");
-        ft.commit();
+        mainActivity.setCurrentFragment(FragmentType.ProfileHost);
+        mainActivity.pushFragment(new ProfileFragment(), true);
     }
 
     private void pickTime(final View v) {

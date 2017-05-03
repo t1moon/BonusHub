@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -32,6 +33,7 @@ public class ProfileFragment extends Fragment {
     private TextView host_description;
     private TextView host_address;
     private int host_id;
+    private MainActivity mainActivity;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -40,6 +42,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mainActivity = (MainActivity) getActivity();
     }
 
 
@@ -63,7 +66,7 @@ public class ProfileFragment extends Fragment {
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToEditFragment();
+                mainActivity.pushFragment(new EditFragment(), true);
             }
         });
 
@@ -75,13 +78,6 @@ public class ProfileFragment extends Fragment {
 //        logoView.setImageResource(R.drawable.bonus_logo);
 //        logoLinearLayout.addView(logoView);
         return rootView;
-    }
-
-    public void goToEditFragment() {
-        final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.container_body, new EditFragment(), "");
-        ft.addToBackStack(null);
-        ft.commit();
     }
 
     @Override

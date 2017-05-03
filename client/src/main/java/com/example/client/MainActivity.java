@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.bonuslib.BaseActivity;
+import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
@@ -29,15 +31,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
 
-    public static String CLIENT_NAME = "Timur";
-    public static String CLIENT_IDENTIFICATOR = "QfgnJKEGNRojer";
+    public final static String CLIENT_NAME = "Timur";
+    public final static String CLIENT_IDENTIFICATOR = "QfgnJKEGNRojer";
+    public final static int MENUITEM_QR = 0;
+    public final static int MENUITEM_LISTHOST = 1;
 
     private static int client_id;
 
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     public static void setClient_id(int client_id) {
         MainActivity.client_id = client_id;
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,21 +191,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupStartFragment() {
-        Fragment fragment = null;
-        try {
-            try {
-                fragment = (Fragment) ListHostFragment.class.newInstance();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        }
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container_body, fragment).commit();
+        setCurrentFragment(FragmentType.ListHost);
+        pushFragment(new ListHostFragment(), true);
     }
 
     @Override
@@ -221,8 +213,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupDrawerContent(final NavigationView navigationView) {
 
         Menu drawerMenu = navigationView.getMenu();
-        drawerMenu.add(0,0,0, "Показать QR-код");
-        drawerMenu.add(0,1,1, "Показать список заведений");
+        drawerMenu.add(0,MENUITEM_QR,0, "Показать QR-код");
+        drawerMenu.add(0,MENUITEM_LISTHOST,1, "Показать список заведений");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -246,31 +238,27 @@ public class MainActivity extends AppCompatActivity {
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
-        Class fragmentClass = null;
         switch (menuItem.getItemId()) {
-            case 0:
-                fragmentClass = QRFragment.class;
+            case MENUITEM_QR:
+                setCurrentFragment(FragmentType.QR);
+                fragment = new QRFragment();
                 break;
-            case 1:
-                fragmentClass = ListHostFragment.class;
+            case MENUITEM_LISTHOST:
+                setCurrentFragment(FragmentType.ListHost);
+                fragment = new ListHostFragment();
                 break;
         }
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (fragment != null) {
+            pushFragment(fragment, true);
+            menuItem.setChecked(true);  // Highlight the selected item has been done by NavigationView
+            setTitle(menuItem.getTitle());  // Set action bar title
+            mDrawer.closeDrawers();
         }
+    }
 
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container_body, fragment).commit();
-
-        // Highlight the selected item has been done by NavigationView
-        menuItem.setChecked(true);
-        // Set action bar title
-        setTitle(menuItem.getTitle());
-        // Close the navigation drawer
-        mDrawer.closeDrawers();
+    @Override
+    protected int getFragmentContainerResId() {
+        return R.id.container_body;
     }
 
 

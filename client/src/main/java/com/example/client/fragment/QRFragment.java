@@ -25,7 +25,6 @@ public class QRFragment extends Fragment {
     Bitmap bitmap;
     ImageView imageView;
 
-
     public QRFragment() {
         // Required empty public constructor
     }

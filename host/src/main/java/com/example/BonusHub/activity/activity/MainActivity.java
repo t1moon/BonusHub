@@ -1,7 +1,6 @@
 package com.example.BonusHub.activity.activity;
 
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
@@ -10,28 +9,27 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.BonusHub.activity.fragment.ProfileFragment;
 import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
+import com.example.bonuslib.BaseActivity;
+import com.example.bonuslib.FragmentType;
 import com.example.timur.BonusHub.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
+    public final static int MENUITEM_READ_QR = 0;
+    public final static int MENUITEM_SHOW_PROFILE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,31 +49,31 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup behaviour for back home button, hamburger etc.
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-          @Override
-          public void onBackStackChanged() {
-              if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                  getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
-                  mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View v) {
-                          onBackPressed();
-                      }
-                  });
-                  appBarLayout.setExpanded(false);
-              } else {
-                  //show hamburger
-                  getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                  drawerToggle.syncState();
-                  mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View v) {
-                          mDrawer.openDrawer(GravityCompat.START);
-                      }
-                  });
-                  appBarLayout.setExpanded(true);
-              }
-          }
-      }
+                                                                      @Override
+                                                                      public void onBackStackChanged() {
+                                                                          if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                                                                              getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
+                                                                              mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                                                                  @Override
+                                                                                  public void onClick(View v) {
+                                                                                      onBackPressed();
+                                                                                  }
+                                                                              });
+                                                                              appBarLayout.setExpanded(false);
+                                                                          } else {
+                                                                              //show hamburger
+                                                                              getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                                                                              drawerToggle.syncState();
+                                                                              mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                                                                  @Override
+                                                                                  public void onClick(View v) {
+                                                                                      mDrawer.openDrawer(GravityCompat.START);
+                                                                                  }
+                                                                              });
+                                                                              appBarLayout.setExpanded(true);
+                                                                          }
+                                                                      }
+                                                                  }
         );
         setupStartFragment();
     }
@@ -109,27 +107,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupStartFragment() {
-        Fragment fragment = null;
+        Fragment fragment;
         int host_id = this.getPreferences(MODE_PRIVATE).getInt("host_id", -1);
-
-        try {
-            if (host_id != -1) {
-                fragment = (Fragment) ProfileFragment.class.newInstance();
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
-            } else {
-                fragment = (Fragment) StartFragment.class.newInstance();
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setDisplayShowHomeEnabled(true);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (host_id != -1) {
+            setCurrentFragment(FragmentType.ProfileHost);
+            fragment = new ProfileFragment();
+        } else {
+            setCurrentFragment(FragmentType.StartHost);
+            fragment = new StartFragment();
         }
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container_body, fragment).commit();
+        pushFragment(fragment, true);
     }
 
     @Override
@@ -149,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupDrawerContent(final NavigationView navigationView) {
         Menu drawerMenu = navigationView.getMenu();
-        drawerMenu.add(0,0,0, "Считать QR-код");
-        drawerMenu.add(0,1,1, "Профиль заведения");
+        drawerMenu.add(0, 0, 0, "Считать QR-код");
+        drawerMenu.add(0, 1, 1, "Профиль заведения");
 
 
         navigationView.setNavigationItemSelectedListener(
@@ -174,33 +161,37 @@ public class MainActivity extends AppCompatActivity {
 
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
-        Fragment fragment = null;
-        Class fragmentClass = null;
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
         switch (menuItem.getItemId()) {
-            case 0:
-                fragmentClass = ScanQrFragment.class;
+            case MENUITEM_READ_QR:
+                if (fragment.getClass() != ScanQrFragment.class) {
+                    fragment = new ScanQrFragment();
+                    pushFragment(fragment, true);
+                }
                 break;
-            case 1:
-                fragmentClass = ProfileFragment.class;
+            case MENUITEM_SHOW_PROFILE:
+                if (getCurrentStackSize() > 1) {
+                    popWholeStack();
+                    break;
+                }
+                if (fragment.getClass() != ProfileFragment.class) {
+                    setCurrentFragment(FragmentType.ProfileHost);
+                    fragment = new ProfileFragment();
+                    pushFragment(fragment, false);
+                }
                 break;
         }
-
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (fragment != null) {
+            menuItem.setChecked(true);  // Highlight the selected item has been done by NavigationView
+            setTitle(menuItem.getTitle());  // Set action bar title
+            mDrawer.closeDrawers();
         }
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container_body, fragment).commit();
-
-        // Highlight the selected item has been done by NavigationView
-        menuItem.setChecked(true);
-        // Set action bar title
-        setTitle(menuItem.getTitle());
-        // Close the navigation drawer
         mDrawer.closeDrawers();
+    }
+
+    @Override
+    protected int getFragmentContainerResId() {
+        return R.id.container_body;
     }
 
 
