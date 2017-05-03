@@ -17,6 +17,11 @@ is stack of fragments. We will push and pop the fragment into corresponding stac
 public class BaseActivity extends AppCompatActivity {
     public Map<FragmentType, Stack<Fragment>> mStackMap;
     protected FragmentType mCurrentFragment = null;
+    private static StackListner stackListner = null;
+
+    public static void setStackListner(StackListner listner) {
+        stackListner = listner;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +45,8 @@ public class BaseActivity extends AppCompatActivity {
         while(stackFragment.size() > 2)
             stackFragment.pop();
         popFragment();
-
     }
+
     public void setCurrentFragment(FragmentType menuType) {
         mCurrentFragment = menuType;
     }
@@ -53,6 +58,8 @@ public class BaseActivity extends AppCompatActivity {
     public void pushFragment(Fragment fragment, boolean shouldAdd) {
         if (shouldAdd) {
             mStackMap.get(mCurrentFragment).push(fragment);
+            if (getCurrentStackSize() > 1)
+                stackListner.deepStack();
         }
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
@@ -64,6 +71,8 @@ public class BaseActivity extends AppCompatActivity {
     public void pushFragment(Fragment fragment, boolean shouldAdd, Bundle argBundle) {
         if (shouldAdd) {
             mStackMap.get(mCurrentFragment).push(fragment);
+            if (getCurrentStackSize() > 1)
+                stackListner.deepStack();
         }
         if (argBundle != null) {
             fragment.setArguments(argBundle);
@@ -80,6 +89,8 @@ public class BaseActivity extends AppCompatActivity {
         if (stackFragment.size() > 1) {
             Fragment fragment = stackFragment.elementAt(stackFragment.size() - 2);  // -1 for previous and -1 for index
             stackFragment.pop();
+            if (getCurrentStackSize() < 2)
+                stackListner.homeStack();
             if (fragment != null) {
                 FragmentManager manager = getSupportFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
@@ -95,7 +106,8 @@ public class BaseActivity extends AppCompatActivity {
         if (stackFragment.size() > 1) {
             Fragment fragment = stackFragment.elementAt(stackFragment.size() - 2);
             stackFragment.pop();
-
+            if (getCurrentStackSize() < 2)
+                stackListner.homeStack();
             if (fragment != null) {
                 if (argBundle != null) {
                     fragment.setArguments(argBundle);
@@ -117,5 +129,7 @@ public class BaseActivity extends AppCompatActivity {
             popFragment();
         }
     }
+
+
 
 }

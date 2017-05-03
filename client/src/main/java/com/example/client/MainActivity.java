@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
+import com.example.bonuslib.StackListner;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
@@ -31,7 +32,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements StackListner {
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
@@ -59,6 +60,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setStackListner(this);
         this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
         clearTables();
 
@@ -122,7 +124,7 @@ public class MainActivity extends BaseActivity {
         if (client_id == -1) {
             try {
                 client_id = HelperFactory.getHelper().getClientDAO().createClient(CLIENT_NAME, CLIENT_IDENTIFICATOR);
-                Log.d("MA, create",Integer.toString(client_id) );
+                Log.d("MA, create", Integer.toString(client_id));
                 this.getPreferences(MODE_PRIVATE).edit()
                         .putInt("client_id", client_id).apply();
                 setClient_id(client_id);
@@ -133,6 +135,7 @@ public class MainActivity extends BaseActivity {
             setClient_id(client_id);
         }
     }
+
     private void populateHosts() {
         Client client = null;
         try {
@@ -149,7 +152,7 @@ public class MainActivity extends BaseActivity {
         host = new Host("One bucks", "Sweety", "Tverskay");
         hostList.add(host);
         try {
-            for (Host item: hostList) {
+            for (Host item : hostList) {
                 HelperFactory.getHelper().getHostDAO().createHost(item);
                 HelperFactory.getHelper().getClientHostDAO().createClientHost(client, item, 5);
             }
@@ -158,6 +161,7 @@ public class MainActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
+
     /**
      * Initializing collapsing toolbar
      * Will show and hide the toolbar title on scroll
@@ -213,8 +217,8 @@ public class MainActivity extends BaseActivity {
     private void setupDrawerContent(final NavigationView navigationView) {
 
         Menu drawerMenu = navigationView.getMenu();
-        drawerMenu.add(0,MENUITEM_QR,0, "Показать QR-код");
-        drawerMenu.add(0,MENUITEM_LISTHOST,1, "Показать список заведений");
+        drawerMenu.add(0, MENUITEM_QR, 0, "Показать QR-код");
+        drawerMenu.add(0, MENUITEM_LISTHOST, 1, "Показать список заведений");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -232,24 +236,26 @@ public class MainActivity extends BaseActivity {
         for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
             item.setChecked(false);
-            }
+        }
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
-        Fragment fragment = null;
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
         switch (menuItem.getItemId()) {
             case MENUITEM_QR:
-                setCurrentFragment(FragmentType.QR);
                 fragment = new QRFragment();
+                pushFragment(fragment, true);
                 break;
             case MENUITEM_LISTHOST:
-                setCurrentFragment(FragmentType.ListHost);
-                fragment = new ListHostFragment();
+                if (fragment.getClass() != ListHostFragment.class) {
+                    setCurrentFragment(FragmentType.ListHost);
+                    fragment = new ListHostFragment();
+                    pushFragment(fragment, false);
+                }
                 break;
         }
         if (fragment != null) {
-            pushFragment(fragment, true);
             menuItem.setChecked(true);  // Highlight the selected item has been done by NavigationView
             setTitle(menuItem.getTitle());  // Set action bar title
             mDrawer.closeDrawers();
@@ -262,4 +268,28 @@ public class MainActivity extends BaseActivity {
     }
 
 
+    @Override
+    public void deepStack() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    @Override
+    public void homeStack() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false); // hide back button
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        drawerToggle.syncState();
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawer.openDrawer(GravityCompat.START);
+            }
+        });
+    }
 }
