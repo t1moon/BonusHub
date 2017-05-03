@@ -143,6 +143,7 @@ public class StartFragment extends Fragment {
                         Host host = new Host(title, description, address);
                         host.setTime_open(open_hour * 60 + open_minute);
                         host.setTime_close(close_hour * 60 + close_minute);
+                        host.setProfile_image(null);
                         host_id = HelperFactory.getHelper().getHostDAO().createHost(host);
                     } catch (SQLException e) {
                         e.printStackTrace();
