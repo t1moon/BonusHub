@@ -73,8 +73,7 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Host host = null;
         try {
-            host = HelperFactory.getHelper().getHostDAO().getHostById(clientHostList.get(position).getHost().getId()
-            );
+            host = HelperFactory.getHelper().getHostDAO().getHostById(clientHostList.get(position).getHost().getId());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -92,5 +91,9 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
     @Override
     public int getItemCount() {
         return clientHostList.size();
+    }
+
+    public ClientHost getItemByPosition(int position) {
+        return clientHostList.get(position);
     }
 }

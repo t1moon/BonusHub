@@ -125,7 +125,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/ic_pin_drop_black_24dp"
-                    android:text="Время работы"
+                    android:text="Адрес"
                     android:textColor="@color/black"
                     android:textSize="20dp" />
 

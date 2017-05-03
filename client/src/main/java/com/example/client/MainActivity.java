@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                                     onBackPressed();
                                 }
                             });
-                            appBarLayout.setExpanded(false);
+//                            appBarLayout.setExpanded(false);
 
                         } else {
                             //show hamburger
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                                     mDrawer.openDrawer(GravityCompat.START);
                                 }
                             });
-                            appBarLayout.setExpanded(true);
+//                            appBarLayout.setExpanded(true);
                         }
                     }
                 }

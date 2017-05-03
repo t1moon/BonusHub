@@ -67,11 +67,10 @@ public class ListHostFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
         recyclerView.setAdapter(mAdapter);
-
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                goToHostFragment();
+                goToHostFragment(position);
             }
 
             @Override
@@ -103,9 +102,17 @@ public class ListHostFragment extends Fragment {
 
     }
 
-    public void goToHostFragment() {
+    public void goToHostFragment(int position) {
+        final Bundle bundle = new Bundle();
+
+        int host_id = mAdapter.getItemByPosition(position).getHost().getId();
+
+        bundle.putInt("host_id", host_id);
+        Fragment fragment = new HostFragment();
+        fragment.setArguments(bundle);
+
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.container_body, new HostFragment(), "");
+        ft.replace(R.id.container_body, fragment, "");
         ft.addToBackStack(null);
         ft.commit();
     }
@@ -130,7 +137,6 @@ public class ListHostFragment extends Fragment {
         for (ClientHost item : clientHosts) {
             clientHostsList.add(item);
         }
-
 
         mAdapter.notifyDataSetChanged();
 
