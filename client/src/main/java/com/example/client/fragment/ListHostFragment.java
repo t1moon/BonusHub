@@ -16,12 +16,10 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.bonuslib.client.Client;
+import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.client.DividerItemDecoration;
@@ -36,14 +34,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.Context.MODE_PRIVATE;
-import static com.example.client.MainActivity.CLIENT_ID;
 import static com.example.client.MainActivity.getClientId;
 
 
 public class ListHostFragment extends Fragment {
-
-    private List<Host> hostList = new ArrayList<>();
+    private List<ClientHost> clientHostsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private HostAdapter mAdapter;
     private TextView profileName;
@@ -66,7 +61,7 @@ public class ListHostFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_list_host, container, false);
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        mAdapter = new HostAdapter(getActivity(), hostList);
+        mAdapter = new HostAdapter(getActivity(), clientHostsList);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -107,6 +102,7 @@ public class ListHostFragment extends Fragment {
         }
 
     }
+
     public void goToHostFragment() {
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.container_body, new HostFragment(), "");
@@ -123,16 +119,18 @@ public class ListHostFragment extends Fragment {
             e.printStackTrace();
         }
 
-        List<Host> hosts = new ArrayList<>();
+        List<ClientHost> clientHosts = new ArrayList<>();
         try {
-            hosts = HelperFactory.getHelper().getClientHostDAO().lookupHostForClient(client);
+            clientHosts = HelperFactory.getHelper().getClientHostDAO().lookupHostForClient(client);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        for (Host item: hosts) {
-            hostList.add(item);
+
+        for (ClientHost item : clientHosts) {
+            clientHostsList.add(item);
         }
+
 
         mAdapter.notifyDataSetChanged();
 
@@ -148,6 +146,7 @@ public class ListHostFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
     }
+
     /**
      * Converting dp to pixel
      */

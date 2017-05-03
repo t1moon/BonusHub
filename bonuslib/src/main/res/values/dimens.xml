@@ -14,6 +14,7 @@
     <dimen name="card_host_radius">0dp</dimen>
     <dimen name="host_cover_height">160dp</dimen>
     <dimen name="host_title_padding">10dp</dimen>
-    <dimen name="host_title">15dp</dimen>
-    <dimen name="bonus_count">10dp</dimen>
+    <dimen name="host_title">15sp</dimen>
+    <dimen name="host_description">10sp</dimen>
+    <dimen name="bonus_count">15sp</dimen>
 </resources>

@@ -10,26 +10,31 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "host")
 public class Host{
 
-    public final static String HOST_NAME_FIELD_NAME = "title";
+    public final static String HOST_ID_FIELD_NAME = "host_id";
+    public final static String HOST_TITLE_FIELD_NAME = "title";
+    public final static String HOST_DESCRIPTION_FIELD_NAME = "description";
+    public final static String HOST_ADDRESS_FIELD_NAME = "address";
+    public final static String HOST_TIMEOPEN_FIELD_NAME = "time_open";
+    public final static String HOST_TIMECLOSE_FIELD_NAME = "time_close";
 
-    @DatabaseField(generatedId = true)
+    @DatabaseField(generatedId = true, columnName = HOST_ID_FIELD_NAME)
     private int Id;
 
-    @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = "title")
+    @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = HOST_TITLE_FIELD_NAME)
     private String title;
 
-    @DatabaseField(columnName = "description")
+    @DatabaseField(columnName = HOST_DESCRIPTION_FIELD_NAME)
     private String description;
 
-    @DatabaseField(columnName = "address")
+    @DatabaseField(columnName = HOST_ADDRESS_FIELD_NAME)
     private String address;
 
     // in minutes
-    @DatabaseField(columnName = "time_open", dataType = DataType.INTEGER)
+    @DatabaseField(columnName = HOST_TIMEOPEN_FIELD_NAME, dataType = DataType.INTEGER)
     private int time_open;
 
     // in minutes
-    @DatabaseField(columnName = "time_close", dataType = DataType.INTEGER)
+    @DatabaseField(columnName = HOST_TIMECLOSE_FIELD_NAME, dataType = DataType.INTEGER)
     private int time_close;
 
 

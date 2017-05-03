@@ -27,29 +27,11 @@ public class ClientHostDao extends BaseDaoImpl<ClientHost, Integer> {
         super(connectionSource, dataClass);
     }
 
-    private PreparedQuery<Host> hostsForClientQuery = null;
-
-    public List<Host> lookupHostForClient(Client client) throws SQLException, java.sql.SQLException {
-        if (hostsForClientQuery == null) {
-            hostsForClientQuery = makeHostsForClientQuery(client);
-        }
-        return HelperFactory.getHelper().getHostDAO().query(hostsForClientQuery);
-//
-//        QueryBuilder<ClientHost, Integer> queryBuilder = this.queryBuilder();
-//        queryBuilder.selectColumns("host_id").where().eq("client_id", client);
-//        return HelperFactory.getHelper().getHostDAO().queryBuilder().where().in("Id", queryBuilder).query();
+    public List<ClientHost> lookupHostForClient(Client client) throws SQLException, java.sql.SQLException {
+        List<ClientHost> clientHosts = this.queryBuilder().where().eq(ClientHost.CLIENTHOST_CLIENT_FIELD_NAME, client).query();
+        return clientHosts;
     }
 
-    private PreparedQuery<Host> makeHostsForClientQuery(Client client) throws SQLException, java.sql.SQLException {
-        QueryBuilder<ClientHost, Integer> clientHostQb = this.queryBuilder();
-
-        clientHostQb.selectColumns("host_id");
-        clientHostQb.where().eq("client_id", client);
-        QueryBuilder<Host, Integer> hostQb = HelperFactory.getHelper().getHostDAO().queryBuilder();
-        hostQb.where().in("Id", clientHostQb);
-        return hostQb.prepare();
-
-    }
     public void createClientHost(Client client, Host host, int points) throws java.sql.SQLException {
         ClientHost clientHost= new ClientHost(client, host, points);
         this.create(clientHost);

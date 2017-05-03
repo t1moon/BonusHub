@@ -36,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
 
-
-    public static int CLIENT_ID = 7;
     public static String CLIENT_NAME = "Timur";
     public static String CLIENT_IDENTIFICATOR = "QfgnJKEGNRojer";
 
@@ -57,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
-
         clearTables();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -140,14 +137,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         List<Host> hostList = new ArrayList<>();
-        Host host = new Host("Surf coffee", "Best", "Baumanskaya");
+        Host host = new Host("Surf coffee", "Best Coffee in The World and bla bla lba" +
+                "lalalkeglergishfogjhdosfhgosirhgoridhgseiuhgdkfjnkjdngkjnflkjbnsdlkfnlksdfnvlksdfn" +
+                "dlkbnldkvnbldknbonfdvlbknfvb", "Baumanskaya");
         hostList.add(host);
         host = new Host("One bucks", "Sweety", "Tverskay");
         hostList.add(host);
         try {
             for (Host item: hostList) {
                 HelperFactory.getHelper().getHostDAO().createHost(item);
-                HelperFactory.getHelper().getClientHostDAO().createClientHost(client, item, 0);
+                HelperFactory.getHelper().getClientHostDAO().createClientHost(client, item, 5);
             }
 
         } catch (SQLException e) {

@@ -10,13 +10,17 @@ import com.j256.ormlite.field.DatabaseField;
 
 public class ClientHost {
 
+    public final static String CLIENTHOST_CLIENT_FIELD_NAME = "client_id";
+    public final static String CLIENTHOST_HOST_FIELD_NAME = "host_id";
+    public final static String CLIENTHOST_POINTS_FIELD_NAME = "points";
+
     @DatabaseField(generatedId = true)
     private int Id;
-    @DatabaseField(foreign = true, columnName = "client_id")
+    @DatabaseField(foreign = true, foreignAutoRefresh=true, columnName = CLIENTHOST_CLIENT_FIELD_NAME)
     private Client client;
-    @DatabaseField(foreign = true, columnName = "host_id")
+    @DatabaseField(foreign = true, foreignAutoRefresh=true, columnName = CLIENTHOST_HOST_FIELD_NAME)
     private Host host;
-    @DatabaseField(canBeNull = true, columnName = "points")
+    @DatabaseField(columnName = CLIENTHOST_POINTS_FIELD_NAME)
     private int points;
 
     public ClientHost() {

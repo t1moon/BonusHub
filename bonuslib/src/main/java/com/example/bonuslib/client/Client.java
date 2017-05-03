@@ -10,13 +10,16 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "client")
 public class Client {
 
-    @DatabaseField(generatedId = true)
+    public final static String CLIENT_ID_FIELD_NAME = "client_id";
+    public final static String CLIENT_NAME_FIELD_NAME = "name";
+    public final static String CLIENT_IDENTIFICATOR_FIELD_NAME = "identificator";
+    @DatabaseField(generatedId = true, columnName = CLIENT_ID_FIELD_NAME)
     private int Id;
 
-    @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = "title")
+    @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = CLIENT_NAME_FIELD_NAME)
     private String name;
 
-    @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = "identificator")
+    @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = CLIENT_IDENTIFICATOR_FIELD_NAME)
     private String identificator;
 
     public Client() {
