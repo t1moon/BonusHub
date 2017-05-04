@@ -16,6 +16,7 @@ public class Host{
     public final static String HOST_ADDRESS_FIELD_NAME = "address";
     public final static String HOST_TIMEOPEN_FIELD_NAME = "time_open";
     public final static String HOST_TIMECLOSE_FIELD_NAME = "time_close";
+    public final static String HOST_IMAGE_FIELD_NAME = "profile_image";
 
     @DatabaseField(generatedId = true, columnName = HOST_ID_FIELD_NAME)
     private int Id;
@@ -36,6 +37,9 @@ public class Host{
     // in minutes
     @DatabaseField(columnName = HOST_TIMECLOSE_FIELD_NAME, dataType = DataType.INTEGER)
     private int time_close;
+
+    @DatabaseField(columnName = HOST_IMAGE_FIELD_NAME, dataType = DataType.STRING)
+    private String profile_image;
 
 
     public Host() {
@@ -89,5 +93,13 @@ public class Host{
 
     public int getId() {
         return Id;
+    }
+
+    public String getProfile_image() {
+        return profile_image;
+    }
+
+    public void setProfile_image(String profile_image) {
+        this.profile_image = profile_image;
     }
 }
