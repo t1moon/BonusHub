@@ -60,7 +60,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
-        
+
         setupStartFragment();
     }
 
