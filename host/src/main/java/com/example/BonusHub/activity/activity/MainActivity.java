@@ -1,6 +1,7 @@
 package com.example.BonusHub.activity.activity;
 
 import android.content.res.Configuration;
+import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
@@ -32,6 +33,17 @@ public class MainActivity extends BaseActivity implements StackListner {
     public final static int MENUITEM_READ_QR = 0;
     public final static int MENUITEM_SHOW_PROFILE = 1;
 
+
+    static {
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectActivityLeaks()
+                .penaltyLog()
+                .penaltyDeath()
+                .build()
+        );
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,37 +60,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
-
-
-        // Setup behaviour for back home button, hamburger etc.
-        getSupportFragmentManager().addOnBackStackChangedListener(
-                new FragmentManager.OnBackStackChangedListener() {
-                    @Override
-                    public void onBackStackChanged() {
-                        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
-                            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    onBackPressed();
-                                }
-                            });
-//                            appBarLayout.setExpanded(false);
-                        } else {
-                            //show hamburger
-                            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                            drawerToggle.syncState();
-                            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    mDrawer.openDrawer(GravityCompat.START);
-                                }
-                            });
-//                            appBarLayout.setExpanded(true);
-                        }
-                    }
-                }
-        );
+        
         setupStartFragment();
     }
 

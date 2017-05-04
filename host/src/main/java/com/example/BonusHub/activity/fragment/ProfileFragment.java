@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -47,6 +48,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class ProfileFragment extends Fragment {
 
+    private final static String TAG = ProfileFragment.class.getSimpleName();
+
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 12500;
     private TextView host_open_time_tv;
     private TextView host_close_time_tv;
@@ -55,7 +58,6 @@ public class ProfileFragment extends Fragment {
     private TextView host_address;
     private Button loadImageBtn;
     private int host_id;
-    private  String imageUri;
     private MainActivity mainActivity;
     private static int RESULT_LOAD_IMG = 1;
 
@@ -68,8 +70,20 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
-    }
 
+        if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
+
+        GetHostInfoExecutor.getInstance().setCallback(new GetHostInfoExecutor.Callback() {
+            @Override
+            public void onLoaded(Host host) {
+                onHostInfoLoaded(host);
+            }
+        });
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,14 +91,12 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
-
         host_title = (TextView) rootView.findViewById(R.id.host_title_tv);
         host_description = (TextView) rootView.findViewById(R.id.host_description_tv);
         host_address = (TextView) rootView.findViewById(R.id.host_address_tv);
         host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
         host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
         loadImageBtn = (Button) rootView.findViewById(R.id.buttonLoadPicture);
-        setInfo();
 
         final TextView edit = (TextView) rootView.findViewById(R.id.edit);
 
@@ -103,13 +115,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        // Here I can add logo on appbar
-//        LinearLayout logoLinearLayout = (LinearLayout)getActivity().findViewById(R.id.logo_layout);
-//        CircleImageView logoView = new CircleImageView(getActivity());
-//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(500, 500);
-//        logoView.setLayoutParams(params);
-//        logoView.setImageResource(R.drawable.bonus_logo);
-//        logoLinearLayout.addView(logoView);
         return rootView;
     }
 
@@ -169,51 +174,14 @@ public class ProfileFragment extends Fragment {
         super.onDetach();
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void setInfo() {
+    @Override
+    public void onResume() {
+        super.onResume();
         host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
-        Log.d("host", Integer.toString(host_id));
-        Host host = null;
-        try {
-            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if (host != null) {
-            String title = host.getTitle();
-            String description = host.getDescription();
-            String address = host.getAddress();
-            int open_hour = host.getTime_open() / 60;
-            int open_minute = host.getTime_open() % 60;
-            int close_hour = host.getTime_close() / 60;
-            int close_minute = host.getTime_close() % 60;
-
-            host_title.setText(title);
-            host_description.setText(description);
-            host_address.setText(address);
-            if (open_minute != 0)
-                host_open_time_tv.setText(open_hour + ":" + open_minute);
-            else
-                host_open_time_tv.setText(open_hour + ":" + "00");
-            if (close_minute != 0)
-                host_close_time_tv.setText(close_hour + ":" + close_minute);
-            else
-                host_close_time_tv.setText(close_hour + ":" + "00");
-
-            imageUri = host.getProfile_image();
-            if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                return;
-            } else {
-                showImage();
-            }
-
-        }
+        GetHostInfoExecutor.getInstance().loadInfo(host_id);
     }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -222,31 +190,53 @@ public class ProfileFragment extends Fragment {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    showImage();
-
+                    Log.d("Permission", "READ_EXTERNAL_STORAGE permission granted");
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
-                return;
             }
         }
     }
 
-    private void showImage() {
+
+    private void onHostInfoLoaded(Host host) {
+        Log.d(TAG, "InfoHostSuccessfuly loaded");
+        String title = host.getTitle();
+        String description = host.getDescription();
+        String address = host.getAddress();
+        int open_hour = host.getTime_open() / 60;
+        int open_minute = host.getTime_open() % 60;
+        int close_hour = host.getTime_close() / 60;
+        int close_minute = host.getTime_close() % 60;
+        String imageUriString = host.getProfile_image();
+        host_title.setText(title);
+        host_description.setText(description);
+        host_address.setText(address);
+        if (open_minute != 0)
+            host_open_time_tv.setText(open_hour + ":" + open_minute);
+        else
+            host_open_time_tv.setText(open_hour + ":" + "00");
+        if (close_minute != 0)
+            host_close_time_tv.setText(close_hour + ":" + close_minute);
+        else
+            host_close_time_tv.setText(close_hour + ":" + "00");
+
+        // setImage
         ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-        if(imageUri != null){
+        if(imageUriString != null){
             Bitmap bitmap = null;
             try {
                 bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
-                        .openInputStream(Uri.parse(imageUri)));
+                        .openInputStream(Uri.parse(imageUriString)));
                 BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
                 imgView.setBackground(bdrawable);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
         }
     }
+
+
+
+
+
 }
