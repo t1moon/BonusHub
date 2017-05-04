@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.executors.CreateHostExecutor;
+import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
 import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
@@ -39,7 +41,7 @@ public class StartFragment extends Fragment {
     private EditText host_title;
     private EditText host_description;
     private EditText host_address;
-    private int host_id;
+    private static int host_id;
     private MainActivity mainActivity;
 
     View rootView;
@@ -52,7 +54,16 @@ public class StartFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
+
+        CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
+            @Override
+            public void onCreated(int host_id) {
+                onHostCreated(host_id);
+            }
+        });
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -131,7 +142,6 @@ public class StartFragment extends Fragment {
                 String title = host_title.getText().toString();
                 String description = host_description.getText().toString();
                 String address = host_address.getText().toString();
-
                 if (title.equals(""))
                     host_title.setError("Введите название");
                 else if (description.equals(""))
@@ -139,18 +149,11 @@ public class StartFragment extends Fragment {
                 else if (address.equals(""))
                     host_address.setError("Введите адрес");
                 else {
-                    try {
-                        Host host = new Host(title, description, address);
-                        host.setTime_open(open_hour * 60 + open_minute);
-                        host.setTime_close(close_hour * 60 + close_minute);
-                        host.setProfile_image(null);
-                        host_id = HelperFactory.getHelper().getHostDAO().createHost(host);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putInt("host_id", host_id).apply();
+                    Host host = new Host(title, description, address);
+                    host.setTime_open(open_hour * 60 + open_minute);
+                    host.setTime_close(close_hour * 60 + close_minute);
+                    host.setProfile_image(null);
+                    CreateHostExecutor.getInstance().createHost(host);
 
                     goToProfileFragment();
 
@@ -164,5 +167,12 @@ public class StartFragment extends Fragment {
         inflater.inflate(R.menu.start_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
+
+    private void onHostCreated(int host_id) {
+        getActivity().getPreferences(MODE_PRIVATE).edit()
+                .putInt("host_id", host_id).apply();
+    }
+
+
 
 }
