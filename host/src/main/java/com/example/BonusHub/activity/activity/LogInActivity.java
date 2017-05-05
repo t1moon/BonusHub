@@ -7,15 +7,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.BonusHub.activity.threadManager.LoginThreadManager;
+import com.example.BonusHub.activity.LoginResult;
+import com.example.BonusHub.activity.Loginner;
+import com.example.BonusHub.activity.Login;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.timur.BonusHub.R;
+
+import retrofit2.Call;
+
+import static com.example.BonusHub.activity.RetrofitFactory.retrofitBarmen;
 
 /**
  * Created by mike on 15.04.17.
  */
 
 public class LogInActivity extends AppCompatActivity {
-    private static LoginThreadManager loginer;
     private Button logInButton;
     private EditText loginInput;
     private EditText passwordInput;
@@ -25,21 +31,14 @@ public class LogInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         loginInput = (EditText) findViewById(R.id.login_input);
-        loginInput = (EditText) findViewById(R.id.password_input);
+        passwordInput = (EditText) findViewById(R.id.password_input);
         logInButton = (Button) findViewById(R.id.btn_login);
         logInButton.setOnClickListener(onLogInClickListener);
-        loginer = LoginThreadManager.getInstance();
-        loginer.setCallback(new LoginThreadManager.Callback() {
-            @Override
-            public void onLoaded(boolean result) {
-                onLoginResult(result);
-            }
-        });
     }
 
     @Override
     protected void onDestroy() {
-        loginer.setCallback(null);
+        //loginer.setCallback(null);
         super.onDestroy();
     }
 
@@ -51,8 +50,24 @@ public class LogInActivity extends AppCompatActivity {
     };
 
     private void logIn() {
-        loginer.load(this);
+        final String login = loginInput.getText().toString();
+        final String password = passwordInput.getText().toString();
+        final Loginner loginner = retrofitBarmen().create(Loginner.class);
+        final Call<LoginResult> call = loginner.login(new Login(login,password));
+        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult result) {
+                if (result.getCode() == 0){
+                    onLoginResult(Boolean.TRUE);
+                }
 
+            }
+
+            @Override
+            public void onError(Exception ex) {
+
+            }
+        });
     }
 
     public void onLoginResult(boolean success) {
