@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/card_margin"
+        android:elevation="4dp"
+        card_view:cardCornerRadius="@dimen/card_host_radius">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/host_cover_height"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:scaleType="fitXY" />
+
+            <TextView
+                android:id="@+id/rv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/thumbnail"
+                android:paddingLeft="@dimen/host_title_padding"
+                android:paddingRight="@dimen/host_title_padding"
+                android:paddingTop="@dimen/host_title_padding"
+                android:textColor="#000"
+                android:textSize="@dimen/host_title" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rv_title">
+                <TextView
+                    android:id="@+id/rv_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/host_title_padding"
+                    android:paddingLeft="@dimen/host_title_padding"
+                    android:paddingRight="@dimen/host_title_padding"
+                    android:textSize="@dimen/host_description"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:layout_weight="0.75"/>
+                <TextView
+                    android:id="@+id/rv_points"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/bonus_count"
+                    android:paddingBottom="@dimen/host_title_padding"
+                    android:paddingLeft="@dimen/host_title_padding"
+                    android:paddingRight="@dimen/host_title_padding"
+                    android:layout_weight="0.25"/>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+</LinearLayout>

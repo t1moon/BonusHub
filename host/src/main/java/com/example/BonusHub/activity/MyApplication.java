@@ -2,6 +2,7 @@ package com.example.BonusHub.activity;
 
 import android.app.Application;
 
+import com.example.bonuslib.db.DatabaseHelper;
 import com.example.bonuslib.db.HelperFactory;
 
 /**

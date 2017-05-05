@@ -5,8 +5,12 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.example.bonuslib.model.Host;
-import com.example.bonuslib.dao.HostDao;
+import com.example.bonuslib.client.Client;
+import com.example.bonuslib.client.ClientDao;
+import com.example.bonuslib.client_host.ClientHost;
+import com.example.bonuslib.client_host.ClientHostDao;
+import com.example.bonuslib.host.Host;
+import com.example.bonuslib.host.HostDao;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -22,13 +26,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME ="bonus.db";
 
     //с каждым увеличением версии, при нахождении в устройстве БД с предыдущей версией будет выполнен метод onUpgrade();
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 13;
 
     //ссылки на DAO соответсвующие сущностям, хранимым в БД
     private HostDao hostDao = null;
+    private ClientDao clientDao = null;
+    private ClientHostDao clientHostDao = null;
 
     public DatabaseHelper(Context context){
         super(context,DATABASE_NAME, null, DATABASE_VERSION);
+//        context.deleteDatabase("bonus.db");
     }
 
     //Выполняется, когда файл с БД не найден на устройстве
@@ -37,6 +44,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try
         {
             TableUtils.createTable(connectionSource, Host.class);
+            TableUtils.createTable(connectionSource, Client.class);
+            TableUtils.createTable(connectionSource, ClientHost.class);
         }
         catch (SQLException e){
             Log.e(TAG, "error creating DB " + DATABASE_NAME);
@@ -46,31 +55,54 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+
     //Выполняется, когда БД имеет версию отличную от текущей
     @Override
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVer,
-                          int newVer){
-        try{
+                          int newVer) {
+        try {
             //Так делают ленивые, гораздо предпочтительнее не удаляя БД аккуратно вносить изменения
             TableUtils.dropTable(connectionSource, Host.class, true);
-            onCreate(db, connectionSource);
-        }
-        catch (SQLException e){
-            Log.e(TAG,"error upgrading db "+DATABASE_NAME+"from ver "+oldVer);
-            throw new RuntimeException(e);
+            TableUtils.dropTable(connectionSource, Client.class, true);
+            TableUtils.dropTable(connectionSource, ClientHost.class, true);
+            this.onCreate(db, connectionSource);
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
     }
 
-    //синглтон для GoalDAO
+    public void clearTables(ConnectionSource connectionSource) {
+        try {
+            TableUtils.clearTable(connectionSource, Host.class);
+            TableUtils.clearTable(connectionSource, Client.class);
+            TableUtils.clearTable(connectionSource, ClientHost.class);
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+        //синглтон для HostDAO
     public HostDao getHostDAO() throws SQLException, java.sql.SQLException {
         if(hostDao == null){
             hostDao = new HostDao(getConnectionSource(), Host.class);
         }
         return hostDao;
     }
-
+    //синглтон для ClientDAO
+    public ClientDao getClientDAO() throws SQLException, java.sql.SQLException {
+        if(clientDao == null){
+            clientDao = new ClientDao(getConnectionSource(), Client.class);
+        }
+        return clientDao;
+    }
+    //синглтон для ClientHostDAO
+    public ClientHostDao getClientHostDAO() throws SQLException, java.sql.SQLException {
+        if(clientHostDao == null){
+            clientHostDao = new ClientHostDao(getConnectionSource(), ClientHost.class);
+        }
+        return clientHostDao;
+    }
 
     //выполняется при закрытии приложения
     @Override
