@@ -2,6 +2,7 @@ package com.example.BonusHub.activity.fragment;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.CreateHostExecutor;
 import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
@@ -42,7 +44,7 @@ public class StartFragment extends Fragment {
     private EditText host_description;
     private EditText host_address;
     private static int host_id;
-    private MainActivity mainActivity;
+    private LogInActivity logInActivity;
 
     View rootView;
 
@@ -53,7 +55,7 @@ public class StartFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivity = (MainActivity) getActivity();
+        //logInActivity = (LogInActivity) getActivity();
 
         CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
             @Override
@@ -96,9 +98,9 @@ public class StartFragment extends Fragment {
         return rootView;
     }
 
-    public void goToProfileFragment() {
-        mainActivity.setCurrentFragment(FragmentType.ProfileHost);
-        mainActivity.pushFragment(new ProfileFragment(), true);
+    public void goToMainActivity() {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        startActivity(intent);
     }
 
     private void pickTime(final View v) {
@@ -155,7 +157,7 @@ public class StartFragment extends Fragment {
                     host.setProfile_image(null);
                     CreateHostExecutor.getInstance().createHost(host);
 
-                    goToProfileFragment();
+                    goToMainActivity();
 
                 }
         }

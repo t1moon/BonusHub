@@ -61,7 +61,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
-        setupStartFragment();
+        setupProfileFragment();
     }
 
     private void initCollapsingToolbar() {
@@ -92,16 +92,10 @@ public class MainActivity extends BaseActivity implements StackListner {
         });
     }
 
-    private void setupStartFragment() {
+    private void setupProfileFragment() {
         Fragment fragment;
-        int host_id = this.getPreferences(MODE_PRIVATE).getInt("host_id", -1);
-        if (host_id != -1) {
-            setCurrentFragment(FragmentType.ProfileHost);
-            fragment = new ProfileFragment();
-        } else {
-            setCurrentFragment(FragmentType.StartHost);
-            fragment = new StartFragment();
-        }
+        setCurrentFragment(FragmentType.ProfileHost);
+        fragment = new ProfileFragment();
         pushFragment(fragment, true);
     }
 
