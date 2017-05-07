@@ -182,6 +182,9 @@ public class EditFragment extends Fragment {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case R.id.continue_btn:
+                //hide keyboard
+                InputMethodManager imm = (InputMethodManager) mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mainActivity.getCurrentFocus().getWindowToken(), 0);
 
                 Host host = new Host();
                 host.setTitle(host_title_et.getText().toString());
