@@ -122,13 +122,13 @@ public class MainActivity extends BaseActivity implements StackListner {
 
     private void setupDrawerContent(final NavigationView navigationView) {
         Menu drawerMenu = navigationView.getMenu();
-        drawerMenu.add(0, 0, 0, "Считать QR-код");
-        drawerMenu.add(0, 1, 1, "Профиль заведения");
+        drawerMenu.add(0, MENUITEM_READ_QR, 0, "Считать QR-код");
+        drawerMenu.add(0, MENUITEM_SHOW_PROFILE, 1, "Профиль заведения");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        public boolean onNavigationItemSelected(MenuItem menuItem) {
                         uncheckAllMenuItems(navigationView);
                         selectDrawerItem(menuItem);
                         return true;
@@ -197,5 +197,11 @@ public class MainActivity extends BaseActivity implements StackListner {
                 mDrawer.openDrawer(GravityCompat.START);
             }
         });
+        uncheckAllMenuItems(nvDrawer);
+        if (getCurrentFragment() == FragmentType.ProfileHost) {
+            nvDrawer.getMenu().getItem(MENUITEM_SHOW_PROFILE).setChecked(true);
+        }
+
+
     }
 }
