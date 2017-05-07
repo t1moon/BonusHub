@@ -291,5 +291,9 @@ public class MainActivity extends BaseActivity implements StackListner {
                 mDrawer.openDrawer(GravityCompat.START);
             }
         });
+        uncheckAllMenuItems(nvDrawer);
+        if (getCurrentFragment() == FragmentType.ProfileHost) {
+            nvDrawer.getMenu().getItem(MENUITEM_LISTHOST).setChecked(true);
+        }
     }
 }
