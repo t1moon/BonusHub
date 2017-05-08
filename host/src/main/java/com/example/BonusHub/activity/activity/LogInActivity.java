@@ -1,22 +1,20 @@
 package com.example.BonusHub.activity.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 
+import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.fragment.LogInFragment;
-import com.example.BonusHub.activity.fragment.ProfileFragment;
-import com.example.BonusHub.activity.fragment.ScanQrFragment;
+import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.StackListner;
@@ -27,13 +25,12 @@ import com.example.timur.BonusHub.R;
  */
 
 public class LogInActivity extends BaseActivity implements StackListner {
+    private static final String LOGIN_PREFERENCES = "LoginData";
+    private final static String TAG = LogInActivity.class.getSimpleName();
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
-    private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
-    public final static int MENUITEM_READ_QR = 0;
-    public final static int MENUITEM_SHOW_PROFILE = 1;
 
     static {
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -57,11 +54,15 @@ public class LogInActivity extends BaseActivity implements StackListner {
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawer.addDrawerListener(drawerToggle);
-        nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
-        // Setup drawer view
-        setupDrawerContent(nvDrawer);
-
-        setupLogInFragment();
+        Log.d("Login", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
+        if (!AuthUtils.isAuthorized(this)) {
+            setupLogInFragment();
+            Log.d("Login go logfrag", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
+        }
+        else if (!AuthUtils.isHosted(this)) {
+            setupStartFragment();
+            Log.d("Login go start", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
+        }
     }
 
     private void initCollapsingToolbar() {
@@ -92,63 +93,19 @@ public class LogInActivity extends BaseActivity implements StackListner {
         });
     }
 
-    private void setupDrawerContent(final NavigationView navigationView) {
-        Menu drawerMenu = navigationView.getMenu();
-        drawerMenu.add(0, 0, 0, "Считать QR-код");
-        drawerMenu.add(0, 1, 1, "Профиль заведения");
-
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        uncheckAllMenuItems(navigationView);
-                        selectDrawerItem(menuItem);
-                        return true;
-                    }
-                });
-    }
-
-    private void uncheckAllMenuItems(NavigationView navigationView) {
-        final Menu menu = navigationView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            item.setChecked(false);
-        }
-    }
-
-    public void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the fragment to show based on nav item clicked
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
-        switch (menuItem.getItemId()) {
-            case MENUITEM_READ_QR:
-                fragment = new ScanQrFragment();
-                pushFragment(fragment, true);
-                break;
-            case MENUITEM_SHOW_PROFILE:
-                if (fragment.getClass() != ProfileFragment.class) {
-                    setCurrentFragment(FragmentType.ProfileHost);
-                    fragment = new ProfileFragment();
-                    pushFragment(fragment, false);
-                }
-                break;
-        }
-        if (fragment != null) {
-            menuItem.setChecked(true);  // Highlight the selected item has been done by NavigationView
-            setTitle(menuItem.getTitle());  // Set action bar title
-            mDrawer.closeDrawers();
-        }
-
-    }
-
     @Override
     protected void onDestroy() {
-        //loginer.setCallback(null);
         super.onDestroy();
     }
 
     private void setupLogInFragment() {
         setCurrentFragment(FragmentType.LogInFragment);
         pushFragment(new LogInFragment(), false);
+    }
+
+    private void setupStartFragment() {
+        setCurrentFragment(FragmentType.StartHost);
+        pushFragment(new StartFragment(), false);
     }
 
     @Override

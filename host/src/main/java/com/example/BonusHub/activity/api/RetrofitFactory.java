@@ -1,4 +1,4 @@
-package com.example.BonusHub.activity;
+package com.example.BonusHub.activity.api;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -13,7 +13,7 @@ public class RetrofitFactory {
     }
 
     private final static Retrofit BARMEN_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://romvanocouponserver.pythonanywhere.com/api/")
+            .baseUrl("http://burmistrovm.pythonanywhere.com/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

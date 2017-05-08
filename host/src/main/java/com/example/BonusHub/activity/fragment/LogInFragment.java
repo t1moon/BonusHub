@@ -1,41 +1,33 @@
 package com.example.BonusHub.activity.fragment;
 
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.Login;
-import com.example.BonusHub.activity.LoginResult;
-import com.example.BonusHub.activity.Loginner;
+import com.example.BonusHub.activity.api.login.LoginResult;
+import com.example.BonusHub.activity.api.login.Loginner;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.executors.CreateHostExecutor;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.FragmentType;
-import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import retrofit2.Call;
+import retrofit2.Response;
 
-import static android.content.Context.MODE_PRIVATE;
-import static com.example.BonusHub.activity.RetrofitFactory.retrofitBarmen;
-
-/**
- * Created by mike on 05.05.17.
- */
+import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 
 public class LogInFragment extends Fragment {
+    private static final String LOGIN_PREFERENCES = "LoginData";
     private LogInActivity logInActivity;
 
     private Button logInButton;
@@ -82,6 +74,12 @@ public class LogInFragment extends Fragment {
         logInActivity.pushFragment(new StartFragment(), false);
     }
 
+    public void goToMainActivity() {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
     private final View.OnClickListener onLogInClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -99,26 +97,46 @@ public class LogInFragment extends Fragment {
     private void logIn() {
         final String login = loginInput.getText().toString();
         final String password = passwordInput.getText().toString();
+
         final Loginner loginner = retrofitBarmen().create(Loginner.class);
         final Call<LoginResult> call = loginner.login(new Login(login,password));
+
         NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult result) {
-                if (result.getCode() == 0){
-                    onLoginResult(Boolean.TRUE);
-                }
+            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+                String cookie = response.headers().get("Set-Cookie");
+                AuthUtils.setCookie(getActivity(), cookie);
+                Log.d("кука", "кука0");
+            }
 
+            @Override
+            public void onFailure(Call<LoginResult> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                Log.d("кука", "кука1");
+            }
+
+            @Override
+            public void onSuccess(LoginResult result) {
+                onLoginResult(result);
             }
 
             @Override
             public void onError(Exception ex) {
-
+                Log.d("кука", "кука3");
             }
         });
     }
 
-    public void onLoginResult(boolean success) {
-        Toast.makeText(getActivity(), "успех", Toast.LENGTH_SHORT).show();
-        goToStartFragment();
+    public void onLoginResult(LoginResult result) {
+        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+        if (result.isHosted() == false && result.getCode() == 0) {
+            AuthUtils.setAuthorized(getActivity());
+            goToStartFragment();
+        }
+        else if (result.getCode() == 0){
+            AuthUtils.setAuthorized(getActivity());
+            AuthUtils.setHosted(getActivity());
+            goToMainActivity();
+        }
     }
 }

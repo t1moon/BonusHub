@@ -7,8 +7,12 @@ import java.util.concurrent.Executors;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.api.login.LoginResult;
+
 import retrofit2.Call;
 import retrofit2.Response;
+import retrofit2.Callback;
 
 
 public class NetworkThread {
@@ -34,6 +38,7 @@ public class NetworkThread {
                         uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
+                                callback.onResponse(call, response);
                                 callback.onSuccess(response.body());
                             }
                         });
@@ -53,9 +58,15 @@ public class NetworkThread {
         });
     }
 
-    public interface ExecuteCallback<T> {
+    public interface ExecuteCallback<T> extends Callback<T> {
+        @Override
+        void onResponse(Call<T> call, Response<T> response);
+        @Override
+        void onFailure(Call<T> call, Throwable t);
         void onSuccess(T result);
 
         void onError(Exception ex);
+
+
     }
 }

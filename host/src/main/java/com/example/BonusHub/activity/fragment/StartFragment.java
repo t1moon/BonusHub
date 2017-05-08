@@ -1,14 +1,10 @@
 package com.example.BonusHub.activity.fragment;
 
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,25 +13,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.CreateHostExecutor;
-import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
-import com.example.bonuslib.FragmentType;
-import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
-import com.j256.ormlite.stmt.UpdateBuilder;
-
-import java.sql.SQLException;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class StartFragment extends Fragment {
+    private static final String LOGIN_PREFERENCES = "LoginData";
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private Button open_time_btn;
@@ -55,7 +45,6 @@ public class StartFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //logInActivity = (LogInActivity) getActivity();
 
         CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
             @Override
@@ -101,6 +90,7 @@ public class StartFragment extends Fragment {
     public void goToMainActivity() {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
+        getActivity().finish();
     }
 
     private void pickTime(final View v) {
@@ -139,7 +129,6 @@ public class StartFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
             case R.id.continue_btn:
                 String title = host_title.getText().toString();
                 String description = host_description.getText().toString();
@@ -157,8 +146,8 @@ public class StartFragment extends Fragment {
                     host.setProfile_image(null);
                     CreateHostExecutor.getInstance().createHost(host);
 
+                    AuthUtils.setHosted(getActivity());
                     goToMainActivity();
-
                 }
         }
         return super.onOptionsItemSelected(item);

@@ -1,4 +1,6 @@
-package com.example.BonusHub.activity;
+package com.example.BonusHub.activity.api.login;
+import com.example.BonusHub.activity.Login;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Headers;

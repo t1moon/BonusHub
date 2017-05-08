@@ -1,4 +1,6 @@
-package com.example.BonusHub.activity;
+package com.example.BonusHub.activity.api.login;
+
+import android.util.Log;
 
 /**
  * Created by mike on 16.04.17.
@@ -6,6 +8,8 @@ package com.example.BonusHub.activity;
 
 public class LoginResult {
     private int code;
+
+    private boolean isHosted;
 
     private String message;
 
@@ -15,5 +19,9 @@ public class LoginResult {
 
     public String getMessage() {
         return message;
+    }
+
+    public boolean isHosted() {
+        return isHosted;
     }
 }
