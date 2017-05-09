@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.BonusHub.activity.fragment.OwnerSettingsFragment;
 import com.example.BonusHub.activity.fragment.ProfileFragment;
 import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
@@ -31,6 +32,7 @@ public class MainActivity extends BaseActivity implements StackListner {
     private AppBarLayout appBarLayout;
     public final static int MENUITEM_READ_QR = 0;
     public final static int MENUITEM_SHOW_PROFILE = 1;
+    public final static int MENUITEM_OWNER_SETTINGS = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +144,8 @@ public class MainActivity extends BaseActivity implements StackListner {
         Menu drawerMenu = navigationView.getMenu();
         drawerMenu.add(0, 0, 0, "Считать QR-код");
         drawerMenu.add(0, 1, 1, "Профиль заведения");
+        drawerMenu.add(0, 2, 2, "Параметры акций");
+
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -175,6 +179,13 @@ public class MainActivity extends BaseActivity implements StackListner {
                     setCurrentFragment(FragmentType.ProfileHost);
                     fragment = new ProfileFragment();
                     pushFragment(fragment, false);
+                }
+                break;
+            case MENUITEM_OWNER_SETTINGS:
+                if (fragment.getClass() != OwnerSettingsFragment.class) {
+                    setCurrentFragment(FragmentType.OwnerSettings);
+                    fragment = new OwnerSettingsFragment();
+                    pushFragment(fragment, true);
                 }
                 break;
         }

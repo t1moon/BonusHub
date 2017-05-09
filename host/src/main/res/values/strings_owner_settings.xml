@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bonus_system_header">Тип бонусной системы</string>
+    <string-array name="bonus_system">
+        <item>N-ая покупка в подарок</item>
+        <item>Накопление баллов</item>
+        <item>Скидка по сумме покупок</item>
+    </string-array>
+    <integer-array name="bonus_system_type">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </integer-array>
+</resources>

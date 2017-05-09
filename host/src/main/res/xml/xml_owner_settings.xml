@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Основное">
+        <ListPreference
+            android:title="@string/bonus_system_header"
+            android:entries="@array/bonus_system"
+            android:entryValues="@array/bonus_system_type"
+            android:defaultValue="@string/bonus_system_header">
+        </ListPreference>
+        <EditTextPreference
+            android:title="fdsf"
+            android:numeric="decimal"></EditTextPreference>
+    </PreferenceCategory>
+</PreferenceScreen>
