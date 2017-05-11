@@ -1,4 +1,4 @@
-package com.example.client.fragment;
+package com.example.client.host;
 
 import android.content.Context;
 import android.os.Bundle;

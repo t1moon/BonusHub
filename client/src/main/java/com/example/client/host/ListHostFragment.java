@@ -1,4 +1,4 @@
-package com.example.client.fragment;
+package com.example.client.host;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -17,11 +17,8 @@ import android.widget.TextView;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
-import com.example.client.GridSpacingItemDecoration;
-import com.example.client.HostAdapter;
 import com.example.client.MainActivity;
 import com.example.client.R;
-import com.example.client.RecyclerTouchListener;
 
 
 import java.sql.SQLException;

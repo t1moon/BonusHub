@@ -1,4 +1,4 @@
-package com.example.client.fragment;
+package com.example.client.qr;
 
 import android.content.Context;
 import android.graphics.Bitmap;

@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.client.host;
 
 import android.content.Context;
 import android.content.res.Resources;

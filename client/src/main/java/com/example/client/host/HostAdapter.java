@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.client.host;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -9,15 +9,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-import com.bumptech.glide.Glide;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
+import com.example.client.R;
 
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Timur on 29-Apr-17.
