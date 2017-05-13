@@ -21,6 +21,7 @@ import com.google.zxing.integration.android.IntentResult;
  */
 public class ScanQrFragment extends Fragment {
 
+    private static Fragment fragmentInstance;
     public ScanQrFragment() {
         // Required empty public constructor
     }
@@ -37,10 +38,13 @@ public class ScanQrFragment extends Fragment {
 
         // Inflate the layout for this fragment
         final Button scan_btn = (Button) rootView.findViewById(R.id.scan_btn);
+
+        fragmentInstance = this;
         scan_btn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                new IntentIntegrator(getActivity()).initiateScan();
+                IntentIntegrator.forSupportFragment(fragmentInstance).setPrompt("Some prompt").initiateScan();
+
             }
         });
 
