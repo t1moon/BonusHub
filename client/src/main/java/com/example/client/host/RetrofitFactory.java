@@ -8,13 +8,14 @@ class RetrofitFactory {
     private RetrofitFactory() {
     }
 
-    private final static Retrofit CLINET_INSTANCE = new Retrofit.Builder()
+    private final static Retrofit CLIENT_INSTANCE = new Retrofit.Builder()
             .baseUrl("http://10.0.3.2:5000/api/client/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
+    public final static String MEDIA_URL = "media/";
 
     static Retrofit retrofitClient() {
-        return CLINET_INSTANCE;
+        return CLIENT_INSTANCE;
     }
 }

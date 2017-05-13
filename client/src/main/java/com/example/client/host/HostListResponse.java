@@ -51,6 +51,9 @@ public class HostListResponse {
         @SerializedName("time_close")
         private int time_close;
 
+        @SerializedName("profile_image")
+        private String profile_image;
+
         @SerializedName("points")
         private int points;
 
@@ -100,6 +103,14 @@ public class HostListResponse {
 
         public void setPoints(int points) {
             this.points = points;
+        }
+
+        public String getProfile_image() {
+            return profile_image;
+        }
+
+        public void setProfile_image(String profile_image) {
+            this.profile_image = profile_image;
         }
     }
 

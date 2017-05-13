@@ -14,9 +14,12 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
@@ -60,7 +63,6 @@ public class ListHostFragment extends Fragment {
 
         setInfo();
         //prepareHostData();
-
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -157,7 +159,7 @@ public class ListHostFragment extends Fragment {
         swipeRefreshLayout.setRefreshing(true);
 
         final HostListFetcher hostListFetcher = RetrofitFactory.retrofitClient().create(HostListFetcher.class);
-        final Call<HostListResponse> call = hostListFetcher.listHosts(1);
+        final Call<HostListResponse> call = hostListFetcher.listHosts(new ClientPOJO(1));
         NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<HostListResponse>() {
             @Override
             public void onSuccess(HostListResponse result) {
@@ -184,6 +186,8 @@ public class ListHostFragment extends Fragment {
         for (HostListResponse.HostPoints hp : hostPoints) {
             Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
 
+            host.setProfile_image(hp.getProfile_image());
+
             Client client = null;
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
@@ -193,7 +197,7 @@ public class ListHostFragment extends Fragment {
             }
             clientHost = new ClientHost(client, host, hp.getPoints());
             clientHostsList.add(clientHost);
-            Toast.makeText(mainActivity.getApplicationContext(), hp.getTitle() + hp.getPoints(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainActivity.getApplicationContext(), hp.getTitle() + hp.getPoints()+ hp.getProfile_image(), Toast.LENGTH_SHORT).show();
         }
 
 

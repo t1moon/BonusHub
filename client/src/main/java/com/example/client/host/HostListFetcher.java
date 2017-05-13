@@ -20,5 +20,5 @@ interface HostListFetcher {
     @Headers({
             "Accept: application/json"
     })
-    Call<HostListResponse> listHosts(@Body int clientId);
+    Call<HostListResponse> listHosts(@Body ClientPOJO clientPOJO);
 }
