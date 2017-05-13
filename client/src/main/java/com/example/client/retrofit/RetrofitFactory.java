@@ -1,9 +1,9 @@
-package com.example.client.host;
+package com.example.client.retrofit;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-class RetrofitFactory {
+public class RetrofitFactory {
 
     private RetrofitFactory() {
     }
@@ -15,7 +15,7 @@ class RetrofitFactory {
 
     public final static String MEDIA_URL = "media/";
 
-    static Retrofit retrofitClient() {
+    public static Retrofit retrofitClient() {
         return CLIENT_INSTANCE;
     }
 }

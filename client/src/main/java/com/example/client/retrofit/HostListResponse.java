@@ -1,4 +1,4 @@
-package com.example.client.host;
+package com.example.client.retrofit;
 
 /**
  * Created by Timur on 12-May-17.

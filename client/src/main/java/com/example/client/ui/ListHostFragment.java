@@ -1,4 +1,4 @@
-package com.example.client.host;
+package com.example.client.ui;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -19,14 +19,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
-import com.example.client.ConnectivityReceiver;
-import com.example.client.MainActivity;
+import com.example.client.recycler.GridSpacingItemDecoration;
+import com.example.client.recycler.HostAdapter;
+import com.example.client.recycler.RecyclerTouchListener;
 import com.example.client.R;
+import com.example.client.retrofit.ClientPOJO;
+import com.example.client.retrofit.HostListFetcher;
+import com.example.client.retrofit.HostListResponse;
+import com.example.client.retrofit.NetworkThread;
+import com.example.client.retrofit.RetrofitFactory;
 
 
 import java.sql.SQLException;
@@ -35,7 +40,7 @@ import java.util.List;
 
 import retrofit2.Call;
 
-import static com.example.client.MainActivity.getClientId;
+import static com.example.client.ui.MainActivity.getClientId;
 
 
 public class ListHostFragment extends Fragment {
@@ -94,18 +99,23 @@ public class ListHostFragment extends Fragment {
 
             }
         }));
+
         if(mainActivity.hasConnection()) {
             prepareHostData();
         } else {
             getFromCache();
         }
-
-
-
         return rootView;
     }
 
     private void setInfo() {
+        ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
+        Glide
+                .with(getActivity().getApplicationContext())
+                .load(R.drawable.bonus_hub_logo)
+                .fitCenter()
+                .into(imgView);
+
         Client client = null;
         try {
             client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());

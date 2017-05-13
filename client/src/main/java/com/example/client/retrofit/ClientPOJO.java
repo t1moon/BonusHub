@@ -1,4 +1,4 @@
-package com.example.client.host;
+package com.example.client.retrofit;
 
 /**
  * Created by Timur on 13-May-17.
@@ -7,7 +7,7 @@ package com.example.client.host;
 public class ClientPOJO {
     private int client_id;
 
-    ClientPOJO(int client_id) {
+    public ClientPOJO(int client_id) {
         this.client_id = client_id;
     }
     public int getClient_id() {

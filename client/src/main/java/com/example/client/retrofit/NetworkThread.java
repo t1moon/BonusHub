@@ -1,4 +1,4 @@
-package com.example.client.host;
+package com.example.client.retrofit;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import retrofit2.Call;
 import retrofit2.Response;
 
-class NetworkThread {
+public class NetworkThread {
     private final static NetworkThread INSTANCE = new NetworkThread();
 
     private final Executor executor = Executors.newSingleThreadExecutor();
@@ -19,11 +19,11 @@ class NetworkThread {
     private NetworkThread() {
     }
 
-    static NetworkThread getInstance() {
+    public static NetworkThread getInstance() {
         return INSTANCE;
     }
 
-    <T> void execute(final Call<T> call, final ExecuteCallback<T> callback) {
+    public <T> void execute(final Call<T> call, final ExecuteCallback<T> callback) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -52,7 +52,7 @@ class NetworkThread {
         });
     }
 
-    interface ExecuteCallback<T> {
+    public interface ExecuteCallback<T> {
         void onSuccess(T result);
 
         void onError(Exception ex);

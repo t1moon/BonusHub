@@ -1,4 +1,4 @@
-package com.example.client.host;
+package com.example.client.recycler;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +14,7 @@ import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.client.R;
+import com.example.client.retrofit.RetrofitFactory;
 
 import java.sql.SQLException;
 import java.util.List;

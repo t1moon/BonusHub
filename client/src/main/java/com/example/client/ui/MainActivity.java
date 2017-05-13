@@ -1,10 +1,8 @@
-package com.example.client;
+package com.example.client.ui;
 
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -25,9 +23,10 @@ import com.example.bonuslib.StackListner;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
-import com.example.client.host.ListHostFragment;
+import com.example.client.ConnectivityReceiver;
+import com.example.client.MyApplication;
+import com.example.client.R;
 import com.example.client.qr.QRFragment;
-import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
