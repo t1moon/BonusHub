@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,10 +15,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
+import com.example.bonuslib.host.Host;
 import com.example.client.MainActivity;
 import com.example.client.R;
 
@@ -24,6 +28,8 @@ import com.example.client.R;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
 
 import static com.example.client.MainActivity.getClientId;
 
@@ -33,7 +39,7 @@ public class ListHostFragment extends Fragment {
     private RecyclerView recyclerView;
     private HostAdapter mAdapter;
     private MainActivity mainActivity;
-
+    private SwipeRefreshLayout swipeRefreshLayout;
     public ListHostFragment() {
         // Required empty public constructor
     }
@@ -51,6 +57,17 @@ public class ListHostFragment extends Fragment {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_list_host, container, false);
 
+        setInfo();
+        //prepareHostData();
+
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                prepareHostData();
+            }
+        });
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mAdapter = new HostAdapter(getActivity(), clientHostsList);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
@@ -70,8 +87,6 @@ public class ListHostFragment extends Fragment {
             }
         }));
 
-        setInfo();
-        prepareHostData();
 
         return rootView;
     }
@@ -101,27 +116,55 @@ public class ListHostFragment extends Fragment {
     }
 
     private void prepareHostData() {
-        Client client = null;
-        int client_id = getClientId();
-        try {
-            client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        final HostListFetcher hostListFetcher = RetrofitFactory.retrofitClient().create(HostListFetcher.class);
+        final Call<HostListResponse> call = hostListFetcher.listHosts(1);
+        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<HostListResponse>() {
+            @Override
+            public void onSuccess(HostListResponse result) {
+                showResponse(result);
+            }
 
+            @Override
+            public void onError(Exception ex) {
+                showError(ex);
+            }
+        });
+    }
+
+    private void showResponse(HostListResponse response) {
+
+        // clear tables
+        HelperFactory.getHelper().clearTablesForClient(HelperFactory.getHelper().getConnectionSource());
+        clientHostsList.clear();
+
+        List<HostListResponse.HostPoints> hostPoints = response.getHosts();
         List<ClientHost> clientHosts = new ArrayList<>();
-        try {
-            clientHosts = HelperFactory.getHelper().getClientHostDAO().lookupHostForClient(client);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        ClientHost clientHost = null;
+        for (HostListResponse.HostPoints hp : hostPoints) {
+            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+
+            Client client = null;
+            try {
+                HelperFactory.getHelper().getHostDAO().createHost(host);
+                client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            clientHost = new ClientHost(client, host, hp.getPoints());
+            clientHostsList.add(clientHost);
+            Toast.makeText(mainActivity.getApplicationContext(), hp.getTitle() + hp.getPoints(), Toast.LENGTH_SHORT).show();
         }
 
-
-        for (ClientHost item : clientHosts) {
-            clientHostsList.add(item);
-        }
 
         mAdapter.notifyDataSetChanged();
+        swipeRefreshLayout.setRefreshing(false);
+    }
+    private void showError(Throwable error) {
+        new AlertDialog.Builder(mainActivity)
+                .setTitle("Ошибка")
+                .setMessage(error.getMessage())
+                .setPositiveButton("OK", null)
+                .show();
 
     }
 

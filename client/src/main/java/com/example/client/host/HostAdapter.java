@@ -46,15 +46,6 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
 
     public HostAdapter(Context context,
                        List<ClientHost> clientHostList) {
-//        this.hostsList = hostsList;
-//        this.points = points;
-//
-//        Iterator<AboutHost> it1 = hostsList.iterator();
-//        Iterator<Integer> it2 = points.iterator();
-//
-//        while (it1.hasNext() && it2.hasNext()) {
-//            this.pointsToHost.put(it1.next(), it2.next());
-//        }
         this.clientHostList= clientHostList;
         this.context = context;
     }

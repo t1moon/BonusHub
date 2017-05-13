@@ -51,6 +51,13 @@ public class Host{
         this.address = address;
     }
 
+    public Host(String title, String description, String address, int time_open, int time_close){
+        this.title = title;
+        this.description = description;
+        this.address = address;
+        this.time_open = time_open;
+        this.time_close = time_close;
+    }
     public String getTitle() {
         return title;
     }

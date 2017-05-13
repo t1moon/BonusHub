@@ -60,7 +60,6 @@ public class MainActivity extends BaseActivity implements StackListner {
 
         setStackListner(this);
         this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
-        clearTables();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -109,11 +108,6 @@ public class MainActivity extends BaseActivity implements StackListner {
         populateHosts();
         setupStartFragment();
 
-    }
-
-    private void clearTables() {
-        ConnectionSource connectionSource = HelperFactory.getHelper().getConnectionSource();
-        HelperFactory.getHelper().clearTables(connectionSource);
     }
 
     private void setupClient() {
