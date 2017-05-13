@@ -1,9 +1,12 @@
 package com.example.client;
 
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -30,7 +33,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements StackListner {
+public class MainActivity extends BaseActivity implements StackListner, ConnectivityReceiver.ConnectivityReceiverListener {
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
@@ -288,4 +291,40 @@ public class MainActivity extends BaseActivity implements StackListner {
             nvDrawer.getMenu().getItem(MENUITEM_LISTHOST).setChecked(true);
         }
     }
+
+    // Method to manually check connection status
+    public boolean hasConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        if (!isConnected)
+            showSnack(false);
+        return isConnected;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
+
+    // Showing the status in Snackbar
+    private void showSnack(boolean isConnected) {
+        String message;
+
+        if (isConnected) {
+            message = "Connected to internet";
+        } else {
+            message = "Sorry! No connection to internet";
+        }
+
+        Snackbar snackbar = Snackbar
+                .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
 }

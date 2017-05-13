@@ -21,6 +21,7 @@ import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
+import com.example.client.ConnectivityReceiver;
 import com.example.client.MainActivity;
 import com.example.client.R;
 
@@ -60,12 +61,17 @@ public class ListHostFragment extends Fragment {
         setInfo();
         //prepareHostData();
 
+
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Refresh items
-                prepareHostData();
+                if (mainActivity.hasConnection()){
+                    prepareHostData();
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
             }
         });
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
@@ -86,6 +92,12 @@ public class ListHostFragment extends Fragment {
 
             }
         }));
+        if(mainActivity.hasConnection()) {
+            prepareHostData();
+        } else {
+            getFromCache();
+        }
+
 
 
         return rootView;
@@ -115,7 +127,35 @@ public class ListHostFragment extends Fragment {
         mainActivity.pushFragment(new HostFragment(), true, bundle);
     }
 
+    private void getFromCache() {
+        clientHostsList.clear();
+        Client client = null;
+        int client_id = getClientId();
+        try {
+            client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        List<ClientHost> clientHosts = new ArrayList<>();
+        try {
+            clientHosts = HelperFactory.getHelper().getClientHostDAO().lookupHostForClient(client);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        for (ClientHost item : clientHosts) {
+            clientHostsList.add(item);
+        }
+
+        mAdapter.notifyDataSetChanged();
+
+    }
     private void prepareHostData() {
+        // showing refresh animation before making http call
+        swipeRefreshLayout.setRefreshing(true);
+
         final HostListFetcher hostListFetcher = RetrofitFactory.retrofitClient().create(HostListFetcher.class);
         final Call<HostListResponse> call = hostListFetcher.listHosts(1);
         NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<HostListResponse>() {
@@ -127,6 +167,7 @@ public class ListHostFragment extends Fragment {
             @Override
             public void onError(Exception ex) {
                 showError(ex);
+
             }
         });
     }
@@ -166,6 +207,8 @@ public class ListHostFragment extends Fragment {
                 .setPositiveButton("OK", null)
                 .show();
 
+        // stopping swipe refresh
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 
