@@ -29,7 +29,7 @@ public class NetworkThread {
             public void run() {
                 try {
                     final Response<T> response = call.execute();
-                    if (response.isSuccessful()) {
+                    if (response.isSuccessful()) {                  // if code >200 and <300
                         uiHandler.post(new Runnable() {
                             @Override
                             public void run() {

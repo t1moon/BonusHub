@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class WithdrawResponse {
+public class UpdatePointsResponse {
 
     @SerializedName("code")
     private int code;
