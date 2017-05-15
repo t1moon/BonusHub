@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -95,6 +96,7 @@ public class MainActivity extends BaseActivity implements StackListner {
     private void initCollapsingToolbar() {
         final CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        final FloatingActionButton fab_edit = (FloatingActionButton) findViewById(R.id.fab_edit);
         collapsingToolbar.setTitle(" ");
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         appBarLayout.setExpanded(true);
@@ -110,10 +112,13 @@ public class MainActivity extends BaseActivity implements StackListner {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle(getString(R.string.app_name));
+//                    collapsingToolbar.setTitle(getString(R.string.app_name));
+                    fab_edit.hide();
+
                     isShow = true;
                 } else if (isShow) {
-                    collapsingToolbar.setTitle(" ");
+//                    collapsingToolbar.setTitle(" ");
+                    fab_edit.show();
                     isShow = false;
                 }
             }
