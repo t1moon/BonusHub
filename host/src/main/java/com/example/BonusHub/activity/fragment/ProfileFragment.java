@@ -156,25 +156,25 @@ public class ProfileFragment extends Fragment {
         if (open_minute != 0)
             host_open_time_tv.setText(open_hour + ":" + open_minute);
         else
-            host_open_time_tv.setText(open_hour + ":" + "00");
+            host_open_time_tv.setText(open_hour + "0:" + "00");
         if (close_minute != 0)
             host_close_time_tv.setText(close_hour + ":" + close_minute);
         else
-            host_close_time_tv.setText(close_hour + ":" + "00");
+            host_close_time_tv.setText(close_hour + "0:" + "00");
 
-        // setImage
-        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-        if (imageUriString != null) {
-            Bitmap bitmap = null;
-            try {
-                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
-                        .openInputStream(Uri.parse(imageUriString)));
-                BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
-                imgView.setBackground(bdrawable);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+//        // setImage
+//        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+//        if (imageUriString != null) {
+//            Bitmap bitmap = null;
+//            try {
+//                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
+//                        .openInputStream(Uri.parse(imageUriString)));
+//                BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
+//                imgView.setBackground(bdrawable);
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
 

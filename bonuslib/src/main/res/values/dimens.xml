@@ -17,4 +17,6 @@
     <dimen name="host_title">15sp</dimen>
     <dimen name="host_description">10sp</dimen>
     <dimen name="bonus_count">15sp</dimen>
+    <dimen name="profile_item">10sp</dimen>
+    <dimen name="profile_subitem">35sp</dimen>
 </resources>
