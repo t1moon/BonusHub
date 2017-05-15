@@ -19,11 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.BonusHub.activity.AuthUtils;
-import com.example.BonusHub.activity.Login;
-import com.example.BonusHub.activity.api.login.LoginResult;
-import com.example.BonusHub.activity.api.login.Loginner;
 import com.example.BonusHub.activity.api.login.LogoutResult;
 import com.example.BonusHub.activity.api.login.Logouter;
+import com.example.BonusHub.activity.fragment.EditFragment;
 import com.example.BonusHub.activity.fragment.ProfileFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
@@ -32,7 +30,6 @@ import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.StackListner;
 import com.example.timur.BonusHub.R;
 
-import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import retrofit2.Call;
@@ -48,6 +45,7 @@ public class MainActivity extends BaseActivity implements StackListner {
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
+    private FloatingActionButton fab;
     public final static int MENUITEM_READ_QR = 0;
     public final static int MENUITEM_SHOW_PROFILE = 1;
     public final static int MENUITEM_LOGOUT = 2;
@@ -84,6 +82,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         setupProfileFragment();
     }
 
@@ -96,8 +95,7 @@ public class MainActivity extends BaseActivity implements StackListner {
     private void initCollapsingToolbar() {
         final CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        final FloatingActionButton fab_edit = (FloatingActionButton) findViewById(R.id.fab_edit);
-        collapsingToolbar.setTitle(" ");
+        collapsingToolbar.setTitle(" ");                                        // necessary
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         appBarLayout.setExpanded(true);
 
@@ -113,12 +111,15 @@ public class MainActivity extends BaseActivity implements StackListner {
                 }
                 if (scrollRange + verticalOffset == 0) {
 //                    collapsingToolbar.setTitle(getString(R.string.app_name));
-                    fab_edit.hide();
+                    fab.hide();
 
                     isShow = true;
                 } else if (isShow) {
 //                    collapsingToolbar.setTitle(" ");
-                    fab_edit.show();
+                    Fragment fragment = getSupportFragmentManager().findFragmentById(getFragmentContainerResId());
+                    if (fragment instanceof ProfileFragment ||
+                            fragment instanceof EditFragment)
+                        fab.show();
                     isShow = false;
                 }
             }
@@ -216,6 +217,7 @@ public class MainActivity extends BaseActivity implements StackListner {
             menuItem.setChecked(true);  // Highlight the selected item has been done by NavigationView
             setTitle(menuItem.getTitle());  // Set action bar title
             mDrawer.closeDrawers();
+            fab.setVisibility(View.GONE);
         }
 
     }

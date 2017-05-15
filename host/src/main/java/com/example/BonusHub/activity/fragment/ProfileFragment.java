@@ -5,19 +5,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,25 +20,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
 import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
-import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
-import com.j256.ormlite.stmt.UpdateBuilder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.sql.SQLException;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
@@ -51,18 +37,13 @@ import static android.content.Context.MODE_PRIVATE;
 public class ProfileFragment extends Fragment {
     private final static String TAG = ProfileFragment.class.getSimpleName();
 
-    public static final int UPLOAD_RESULT_OK = 0;
-    public static final int UPLOAD_RESULT_FAIL = 1;
-    public static final int UPLOAD_RESULT_FILE_NOT_FOUND = 2;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 12500;
-    private static int RESULT_LOAD_IMG = 1;
-    
     private TextView host_open_time_tv;
     private TextView host_close_time_tv;
     private TextView host_title;
     private TextView host_description;
     private TextView host_address;
-    private Button loadImageBtn;
+    FloatingActionButton fab_edit;
     private int host_id;
     private MainActivity mainActivity;
     ProgressDialog progress;
@@ -91,12 +72,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        UploadHostPhotoExecutor.getInstance().setCallback(new UploadHostPhotoExecutor.Callback() {
-            @Override
-            public void onUploaded(int resultCode, BitmapDrawable bdrawable) {
-                onHostPhotoUploaded(resultCode, bdrawable);
-            }
-        });
+
     }
 
 
@@ -111,50 +87,21 @@ public class ProfileFragment extends Fragment {
         host_address = (TextView) rootView.findViewById(R.id.host_address_tv);
         host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
         host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
-        loadImageBtn = (Button) rootView.findViewById(R.id.buttonLoadPicture);
-        final TextView edit = (TextView) rootView.findViewById(R.id.edit);
+        fab_edit = (FloatingActionButton) mainActivity.findViewById(R.id.fab);
+        fab_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_black_24dp));
+        fab_edit.setVisibility(View.VISIBLE);
 
-        edit.setOnClickListener(new View.OnClickListener() {
+        fab_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mainActivity.pushFragment(new EditFragment(), true);
             }
         });
-        loadImageBtn.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                loadImagefromGallery(v);
-            }
-        });
         return rootView;
     }
 
-    public void loadImagefromGallery(View view) {
-        // Create intent to Open Image applications like Gallery, Google Photos
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        // Start the Intent
-        startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && null != data) {
-                // Get the Image from data
-                Uri targetUri = data.getData();
-                UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
-            } else {
-                Toast.makeText(mainActivity, "Вы не выбрали изображение", Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(mainActivity, "Что-то пошло не так", Toast.LENGTH_SHORT)
-                    .show();
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -231,19 +178,5 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    private void onHostPhotoUploaded(int resultCode, BitmapDrawable bdrawable) {
-        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-
-        if (resultCode == ProfileFragment.UPLOAD_RESULT_OK) {
-            Toast.makeText(mainActivity, "Изображение успешно загружено", Toast.LENGTH_SHORT).show();
-            imgView.setBackground(bdrawable);
-        }
-        if (resultCode == ProfileFragment.UPLOAD_RESULT_FILE_NOT_FOUND) {
-            Toast.makeText(mainActivity, "Файл не найден", Toast.LENGTH_SHORT).show();
-        }
-        if (resultCode == ProfileFragment.UPLOAD_RESULT_FAIL) {
-            Toast.makeText(mainActivity, "Произошла ошибка при загрузке изображения", Toast.LENGTH_SHORT).show();
-        }
-    }
 
 }

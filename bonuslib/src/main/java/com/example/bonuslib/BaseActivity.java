@@ -16,7 +16,7 @@ is stack of fragments. We will push and pop the fragment into corresponding stac
 
 public class BaseActivity extends AppCompatActivity {
     public Map<FragmentType, Stack<Fragment>> mStackMap;
-    protected FragmentType mCurrentFragment = null;
+    protected FragmentType mCurrentBaseFragment = null;
     private static StackListner stackListner = null;
 
     public static void setStackListner(StackListner listner) {
@@ -37,22 +37,22 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public int getCurrentStackSize() {
-        return mStackMap.get(mCurrentFragment).size();
+        return mStackMap.get(mCurrentBaseFragment).size();
     }
 
     public void popWholeStack() {
-        final Stack<Fragment> stackFragment = mStackMap.get(mCurrentFragment);
+        final Stack<Fragment> stackFragment = mStackMap.get(mCurrentBaseFragment);
         while(stackFragment.size() > 2)
             stackFragment.pop();
         popFragment();
     }
 
     public void setCurrentFragment(FragmentType menuType) {
-        mCurrentFragment = menuType;
+        mCurrentBaseFragment = menuType;
     }
 
     public FragmentType getCurrentFragment() {
-        return mCurrentFragment;
+        return mCurrentBaseFragment;
     }
 
     protected int getFragmentContainerResId() {
@@ -61,7 +61,7 @@ public class BaseActivity extends AppCompatActivity {
 
     public void pushFragment(Fragment fragment, boolean shouldAdd) {
         if (shouldAdd) {
-            mStackMap.get(mCurrentFragment).push(fragment);
+            mStackMap.get(mCurrentBaseFragment).push(fragment);
             if (getCurrentStackSize() > 1)
                 stackListner.deepStack();
         }
@@ -74,7 +74,7 @@ public class BaseActivity extends AppCompatActivity {
 
     public void pushFragment(Fragment fragment, boolean shouldAdd, Bundle argBundle) {
         if (shouldAdd) {
-            mStackMap.get(mCurrentFragment).push(fragment);
+            mStackMap.get(mCurrentBaseFragment).push(fragment);
             if (getCurrentStackSize() > 1)
                 stackListner.deepStack();
         }
@@ -89,7 +89,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void popFragment() {
-        final Stack<Fragment> stackFragment = mStackMap.get(mCurrentFragment);
+        final Stack<Fragment> stackFragment = mStackMap.get(mCurrentBaseFragment);
         if (stackFragment.size() > 1) {
             Fragment fragment = stackFragment.elementAt(stackFragment.size() - 2);  // -1 for previous and -1 for index
             stackFragment.pop();
@@ -106,7 +106,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void popFragment(Bundle argBundle) {
-        final Stack<Fragment> stackFragment = mStackMap.get(mCurrentFragment);
+        final Stack<Fragment> stackFragment = mStackMap.get(mCurrentBaseFragment);
         if (stackFragment.size() > 1) {
             Fragment fragment = stackFragment.elementAt(stackFragment.size() - 2);
             stackFragment.pop();
@@ -127,7 +127,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (mStackMap.get(mCurrentFragment).size() <= 1) {
+        if (mStackMap.get(mCurrentBaseFragment).size() <= 1) {
             super.onBackPressed(); // or call finish..
         } else {
             popFragment();
