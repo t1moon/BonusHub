@@ -35,10 +35,12 @@ import static android.app.Activity.RESULT_OK;
 
 public class EditFragment extends Fragment {
 
+
     public static final int UPLOAD_RESULT_OK = 0;
     public static final int UPLOAD_RESULT_FAIL = 1;
     public static final int UPLOAD_RESULT_FILE_NOT_FOUND = 2;
     private static int RESULT_LOAD_IMG = 1;
+
 
     public static final int RESULT_OK = 0;
     public static final int RESULT_FAIL = 1;
@@ -68,13 +70,14 @@ public class EditFragment extends Fragment {
                 onHostInfoEdited(resultCode);
             }
         });
-
         UploadHostPhotoExecutor.getInstance().setCallback(new UploadHostPhotoExecutor.Callback() {
             @Override
             public void onUploaded(int resultCode, BitmapDrawable bdrawable) {
                 onHostPhotoUploaded(resultCode, bdrawable);
             }
         });
+
+
     }
 
     private void onHostInfoEdited(int resultCode) {
@@ -228,7 +231,6 @@ public class EditFragment extends Fragment {
         inflater.inflate(R.menu.start_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
-
     public void loadImagefromGallery(View view) {
         // Create intent to Open Image applications like Gallery, Google Photos
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
@@ -237,12 +239,13 @@ public class EditFragment extends Fragment {
         startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && null != data) {
+            if (requestCode == RESULT_LOAD_IMG  && null != data) {
                 // Get the Image from data
                 Uri targetUri = data.getData();
                 UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
