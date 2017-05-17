@@ -1,49 +1,68 @@
 package com.example.bonuslib.preferenceExtensions;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceDialogFragmentCompat;
 import android.view.View;
 import android.widget.NumberPicker;
+
+import com.example.bonuslib.R;
 
 /**
  * Created by ivan on 5/9/17.
  */
 
 public class NumberPickerPreferenceDialog extends PreferenceDialogFragmentCompat implements android.support.v7.preference.DialogPreference.TargetFragment {
+    private final static String ARG_KEY = "key";
+    private NumberPickerExtended picker = null;
 
-    // declare number params
-    protected NumberPicker picker = null;
-    private int minValue = 1;
-    private int maxValue = 1000;
-    private int defaultValue = 6;
-
-    @Override
-    protected View onCreateDialogView(Context context)
-    {
-        picker = new NumberPicker(context);
-        return picker;
+    public static NumberPickerPreferenceDialog newInstance(String key) {
+        final NumberPickerPreferenceDialog fragment = new NumberPickerPreferenceDialog();
+        final Bundle b = new Bundle(1);
+        b.putString(ARG_KEY, key);
+        fragment.setArguments(b);
+        return fragment;
     }
 
     @Override
-    protected void onBindDialogView(View v)
-    {
-        super.onBindDialogView(v);
-        picker.setMaxValue(1000);
-        picker.setMinValue(1);
-        NumberPreference pref = (NumberPreference) getPreference();
-        // TODO
-        picker.setValue(5);
+    protected void onBindDialogView(View view) {
+        super.onBindDialogView(view);
+        picker = (NumberPickerExtended) view.findViewById(R.id.number_picker_pref);
+
+        if (picker == null) {
+            throw new IllegalStateException("Dialog view must contain a NumberPicker with id" +
+                    "number_picker_pref");
+        }
+
+        // get the value from sp
+        Integer value = null;
+        DialogPreference preference = getPreference();
+        if (preference instanceof NumberPreference){
+            value = ((NumberPreference) preference).getValue();
+        }
+
+        // set value on screen
+        if (value != null) {
+            picker.setValue(value);
+        }
     }
 
+    // save value on dialog closed
     @Override
-    public void onDialogClosed(boolean positiveResult)
-    {
-        if (positiveResult)
-        {
-            NumberPreference pref = (NumberPreference) getPreference();
-            pref.value = picker.getValue();
-            int value = picker.getValue();
+    public void onDialogClosed(boolean positiveResult) {
+        if (!positiveResult) {
+            return;
+        }
+
+        int value = picker.getValue();
+        DialogPreference preference = getPreference();
+        if (preference instanceof NumberPreference) {
+            NumberPreference np = (NumberPreference) preference;
+            if (np.callChangeListener(value)) {
+                np.setValue(value);
+            }
         }
     }
 

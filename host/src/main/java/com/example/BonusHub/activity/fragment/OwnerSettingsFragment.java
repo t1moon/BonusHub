@@ -32,8 +32,13 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
     private SharedPreferences sp;
     protected final String THIS_FRAGMENT = "android.support.v7.preference.PreferenceFragment.DIALOG";
     protected final int BONUS_SYSTEM_KEY_ADDRESS = R.string.bonus_system_key;
-//    protected final CharSequence TYPED_SETTINGS_KEY_ADDRESS = R.string.typed_settings_key;
-    protected final int typedSettings[] = {R.xml.xml_nfree_settings, 999, 999};
+    protected final int TYPED_SETTINGS_KEY = R.string.typed_settings_key;
+    protected final int TYPED_SETTINGS[] = {
+            R.xml.xml_nfree_settings,
+            R.xml.xml_bonus_account_settings,
+            R.xml.xml_total_discout_settings
+    };
+    protected int bst = -1; // bonus system type
 
     public OwnerSettingsFragment() {
         // Required empty public constructor
@@ -51,41 +56,56 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
         // find preferences for chosen bonus type
     }
 
+    // register listener for bonus type change
     @Override
     public void onResume() {
         super.onResume();
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
-        // TRY
-//        sp.registerOnSharedPreferenceChangeListener(this);
+        sp.registerOnSharedPreferenceChangeListener(this);
+        // update bonus system type
+        bst = Integer.parseInt(sp.getString(getString(BONUS_SYSTEM_KEY_ADDRESS), ""));
+        render();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getPreferenceScreen().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
-        // TRY
-//        sp.unregisterOnSharedPreferenceChangeListener(this);
+        sp.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     // list of actions perfomed depending on a certain preference changed
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        // this if in order to use getString()
         if (!isAdded()) {
             Log.d(TAG, "onSharedPreferenceChanged: not added to activity");
             return;
         }
-        Preference preference = findPreference(key);
 
         if (getString(BONUS_SYSTEM_KEY_ADDRESS).equals(key)) {
-            int typeFromSharedPreferences = Integer.parseInt(sharedPreferences.getString(key, ""));
-            if (typeFromSharedPreferences == 0) {
-                this.addPreferencesFromResource(R.xml.xml_nfree_settings);
-            }
-            // TODO
-//            this.addPreferencesFromResource(typedSettings);
+            int bonusSystemType = Integer.parseInt(sharedPreferences.getString(key, ""));
+            bst = bonusSystemType;
+            render();
         }
+    }
+
+    // render settings screen
+    protected void render() {
+
+        // this if in order to use getString()
+        if (!isAdded()) {
+            Log.d(TAG, "render: not added to activity");
+            return;
+        }
+        // show bonus system type picker
+        setPreferencesFromResource(R.xml.xml_owner_settings, getString(R.string.owner_settings_screen));
+
+        if (bst >= TYPED_SETTINGS.length || bst < 0) {
+            Log.d(TAG, "render: bonus system type out of range");
+            return;
+        }
+
+        // show specialized settings
+        addPreferencesFromResource(TYPED_SETTINGS[bst]);
     }
 
     // needed for custom dialog preference to work
@@ -93,10 +113,7 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
     public void onDisplayPreferenceDialog(Preference preference) {
         DialogFragment dialogFragment = null;
         if (preference instanceof NumberPreference) {
-            dialogFragment = new NumberPickerPreferenceDialog();
-            Bundle bundle = new Bundle(1);
-            bundle.putString("key", preference.getKey());
-            dialogFragment.setArguments(bundle);
+            dialogFragment = NumberPickerPreferenceDialog.newInstance(preference.getKey());
         }
 
         if (dialogFragment != null) {

@@ -2,6 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <com.example.bonuslib.preferenceExtensions.NumberPreference
         android:key="free_n"
-        android:title="Номер бесплатной покупки">
+        android:title="Номер бесплатной покупки"
+        android:defaultValue="6">
     </com.example.bonuslib.preferenceExtensions.NumberPreference>
 </PreferenceScreen>

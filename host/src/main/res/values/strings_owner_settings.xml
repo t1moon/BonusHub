@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="owner_settings_screen">owner_settings_screen</string>
     <string name="bonus_system_header">Тип бонусной системы</string>
     <string name="typed_settings_key">typed_settings</string>
     <string name="bonus_system_key">bonus_system</string>
