@@ -1,22 +1,21 @@
-package com.example.client.fragment;
+package com.example.client.ui;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.client.R;
+import com.example.client.retrofit.RetrofitFactory;
 
 import java.sql.SQLException;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class HostFragment extends Fragment {
 
@@ -98,6 +97,14 @@ public class HostFragment extends Fragment {
                 host_close_time_tv.setText(close_hour + ":" + close_minute);
             else
                 host_close_time_tv.setText(close_hour + ":" + "00");
+
+            ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
+            String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
+            Glide
+                    .with(getActivity().getApplicationContext())
+                    .load(pathToImageProfile)
+                    .fitCenter()
+                    .into(imgView);
         }
     }
 }

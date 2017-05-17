@@ -2,36 +2,32 @@ package com.example.BonusHub.activity.fragment;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.bonuslib.FragmentType;
-import com.example.bonuslib.db.HelperFactory;
+import com.example.BonusHub.activity.executors.CreateHostExecutor;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
-import com.j256.ormlite.stmt.UpdateBuilder;
-
-import java.sql.SQLException;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class StartFragment extends Fragment {
+    private static final String LOGIN_PREFERENCES = "LoginData";
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private Button open_time_btn;
@@ -39,8 +35,8 @@ public class StartFragment extends Fragment {
     private EditText host_title;
     private EditText host_description;
     private EditText host_address;
-    private int host_id;
-    private MainActivity mainActivity;
+    private static int host_id;
+    private LogInActivity logInActivity;
 
     View rootView;
 
@@ -51,8 +47,17 @@ public class StartFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivity = (MainActivity) getActivity();
+        logInActivity = (LogInActivity) getActivity();
+        CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
+            @Override
+            public void onCreated(int host_id) {
+                onHostCreated(host_id);
+            }
+        });
+
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,9 +90,10 @@ public class StartFragment extends Fragment {
         return rootView;
     }
 
-    public void goToProfileFragment() {
-        mainActivity.setCurrentFragment(FragmentType.ProfileHost);
-        mainActivity.pushFragment(new ProfileFragment(), true);
+    public void goToMainActivity() {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        startActivity(intent);
+        getActivity().finish();
     }
 
     private void pickTime(final View v) {
@@ -126,12 +132,16 @@ public class StartFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
             case R.id.continue_btn:
+
+                //hide keyboard
+                InputMethodManager imm = (InputMethodManager) logInActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(logInActivity.getCurrentFocus().getWindowToken(), 0);
+
+
                 String title = host_title.getText().toString();
                 String description = host_description.getText().toString();
                 String address = host_address.getText().toString();
-
                 if (title.equals(""))
                     host_title.setError("Введите название");
                 else if (description.equals(""))
@@ -139,21 +149,14 @@ public class StartFragment extends Fragment {
                 else if (address.equals(""))
                     host_address.setError("Введите адрес");
                 else {
-                    try {
-                        Host host = new Host(title, description, address);
-                        host.setTime_open(open_hour * 60 + open_minute);
-                        host.setTime_close(close_hour * 60 + close_minute);
-                        host.setProfile_image(null);
-                        host_id = HelperFactory.getHelper().getHostDAO().createHost(host);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    Host host = new Host(title, description, address);
+                    host.setTime_open(open_hour * 60 + open_minute);
+                    host.setTime_close(close_hour * 60 + close_minute);
+                    host.setProfile_image(null);
+                    CreateHostExecutor.getInstance().createHost(host);
 
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putInt("host_id", host_id).apply();
-
-                    goToProfileFragment();
-
+                    AuthUtils.setHosted(logInActivity);
+                    goToMainActivity();
                 }
         }
         return super.onOptionsItemSelected(item);
@@ -164,5 +167,12 @@ public class StartFragment extends Fragment {
         inflater.inflate(R.menu.start_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
+
+    private void onHostCreated(int host_id) {
+        getActivity().getPreferences(MODE_PRIVATE).edit()
+                .putInt("host_id", host_id).apply();
+    }
+
+
 
 }

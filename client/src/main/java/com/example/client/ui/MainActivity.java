@@ -1,22 +1,21 @@
-package com.example.client;
+package com.example.client.ui;
 
 import android.content.res.Configuration;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
@@ -24,15 +23,16 @@ import com.example.bonuslib.StackListner;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
-import com.example.client.fragment.ListHostFragment;
-import com.example.client.fragment.QRFragment;
-import com.j256.ormlite.support.ConnectionSource;
+import com.example.client.ConnectivityReceiver;
+import com.example.client.MyApplication;
+import com.example.client.R;
+import com.example.client.qr.QRFragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements StackListner {
+public class MainActivity extends BaseActivity implements StackListner, ConnectivityReceiver.ConnectivityReceiverListener {
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
@@ -62,7 +62,6 @@ public class MainActivity extends BaseActivity implements StackListner {
 
         setStackListner(this);
         this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
-        clearTables();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -111,11 +110,6 @@ public class MainActivity extends BaseActivity implements StackListner {
         populateHosts();
         setupStartFragment();
 
-    }
-
-    private void clearTables() {
-        ConnectionSource connectionSource = HelperFactory.getHelper().getConnectionSource();
-        HelperFactory.getHelper().clearTables(connectionSource);
     }
 
     private void setupClient() {
@@ -291,5 +285,45 @@ public class MainActivity extends BaseActivity implements StackListner {
                 mDrawer.openDrawer(GravityCompat.START);
             }
         });
+        uncheckAllMenuItems(nvDrawer);
+        if (getCurrentFragment() == FragmentType.ProfileHost) {
+            nvDrawer.getMenu().getItem(MENUITEM_LISTHOST).setChecked(true);
+        }
     }
+
+    // Method to manually check connection status
+    public boolean hasConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        if (!isConnected)
+            showSnack(false);
+        return isConnected;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
+
+    // Showing the status in Snackbar
+    private void showSnack(boolean isConnected) {
+        String message;
+
+        if (isConnected) {
+            message = "Connected to internet";
+        } else {
+            message = "Sorry! No connection to internet";
+        }
+
+        Snackbar snackbar = Snackbar
+                .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
 }

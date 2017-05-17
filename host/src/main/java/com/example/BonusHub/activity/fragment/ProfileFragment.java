@@ -1,6 +1,7 @@
 package com.example.BonusHub.activity.fragment;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,6 +31,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
+import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -46,8 +49,14 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 public class ProfileFragment extends Fragment {
+    private final static String TAG = ProfileFragment.class.getSimpleName();
 
+    public static final int UPLOAD_RESULT_OK = 0;
+    public static final int UPLOAD_RESULT_FAIL = 1;
+    public static final int UPLOAD_RESULT_FILE_NOT_FOUND = 2;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 12500;
+    private static int RESULT_LOAD_IMG = 1;
+    
     private TextView host_open_time_tv;
     private TextView host_close_time_tv;
     private TextView host_title;
@@ -55,9 +64,9 @@ public class ProfileFragment extends Fragment {
     private TextView host_address;
     private Button loadImageBtn;
     private int host_id;
-    private  String imageUri;
     private MainActivity mainActivity;
-    private static int RESULT_LOAD_IMG = 1;
+    ProgressDialog progress;
+
 
 
     public ProfileFragment() {
@@ -68,6 +77,26 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
+
+        if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
+
+        GetHostInfoExecutor.getInstance().setCallback(new GetHostInfoExecutor.Callback() {
+            @Override
+            public void onLoaded(Host host) {
+                onHostInfoLoaded(host);
+            }
+        });
+
+        UploadHostPhotoExecutor.getInstance().setCallback(new UploadHostPhotoExecutor.Callback() {
+            @Override
+            public void onUploaded(int resultCode, BitmapDrawable bdrawable) {
+                onHostPhotoUploaded(resultCode, bdrawable);
+            }
+        });
     }
 
 
@@ -77,15 +106,12 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
-
         host_title = (TextView) rootView.findViewById(R.id.host_title_tv);
         host_description = (TextView) rootView.findViewById(R.id.host_description_tv);
         host_address = (TextView) rootView.findViewById(R.id.host_address_tv);
         host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
         host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
         loadImageBtn = (Button) rootView.findViewById(R.id.buttonLoadPicture);
-        setInfo();
-
         final TextView edit = (TextView) rootView.findViewById(R.id.edit);
 
         edit.setOnClickListener(new View.OnClickListener() {
@@ -94,7 +120,6 @@ public class ProfileFragment extends Fragment {
                 mainActivity.pushFragment(new EditFragment(), true);
             }
         });
-
         loadImageBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -102,14 +127,6 @@ public class ProfileFragment extends Fragment {
                 loadImagefromGallery(v);
             }
         });
-
-        // Here I can add logo on appbar
-//        LinearLayout logoLinearLayout = (LinearLayout)getActivity().findViewById(R.id.logo_layout);
-//        CircleImageView logoView = new CircleImageView(getActivity());
-//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(500, 500);
-//        logoView.setLayoutParams(params);
-//        logoView.setImageResource(R.drawable.bonus_logo);
-//        logoLinearLayout.addView(logoView);
         return rootView;
     }
 
@@ -126,36 +143,16 @@ public class ProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
-                    && null != data) {
+            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && null != data) {
                 // Get the Image from data
-
                 Uri targetUri = data.getData();
-                Bitmap bitmap;
-                ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(targetUri));
-                BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
-                imgView.setBackground(bdrawable);
-                updateImage(targetUri.toString());
+                UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
             } else {
-                Toast.makeText(mainActivity, "You haven't picked Image", Toast.LENGTH_LONG).show();
+                Toast.makeText(mainActivity, "Вы не выбрали изображение", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(mainActivity, "Something went wrong", Toast.LENGTH_LONG)
+            Toast.makeText(mainActivity, "Что-то пошло не так", Toast.LENGTH_SHORT)
                     .show();
-        }
-
-    }
-
-    private void updateImage(String targetUri) {
-        try {
-            UpdateBuilder<Host, Integer> updateBuilder = HelperFactory.getHelper().
-                    getHostDAO().updateBuilder();
-            updateBuilder.where().eq(Host.HOST_ID_FIELD_NAME, host_id);
-            updateBuilder.updateColumnValue(Host.HOST_IMAGE_FIELD_NAME, targetUri);
-            updateBuilder.update();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -167,53 +164,18 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        progress.dismiss();
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void setInfo() {
+    @Override
+    public void onResume() {
+        super.onResume();
         host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
-        Log.d("host", Integer.toString(host_id));
-        Host host = null;
-        try {
-            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if (host != null) {
-            String title = host.getTitle();
-            String description = host.getDescription();
-            String address = host.getAddress();
-            int open_hour = host.getTime_open() / 60;
-            int open_minute = host.getTime_open() % 60;
-            int close_hour = host.getTime_close() / 60;
-            int close_minute = host.getTime_close() % 60;
-
-            host_title.setText(title);
-            host_description.setText(description);
-            host_address.setText(address);
-            if (open_minute != 0)
-                host_open_time_tv.setText(open_hour + ":" + open_minute);
-            else
-                host_open_time_tv.setText(open_hour + ":" + "00");
-            if (close_minute != 0)
-                host_close_time_tv.setText(close_hour + ":" + close_minute);
-            else
-                host_close_time_tv.setText(close_hour + ":" + "00");
-
-            imageUri = host.getProfile_image();
-            if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                return;
-            } else {
-                showImage();
-            }
-
-        }
+        progress = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
+        GetHostInfoExecutor.getInstance().loadInfo(host_id);
     }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -222,31 +184,66 @@ public class ProfileFragment extends Fragment {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    showImage();
-
+                    Log.d("Permission", "READ_EXTERNAL_STORAGE permission granted");
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
-                return;
             }
         }
     }
 
-    private void showImage() {
+
+    private void onHostInfoLoaded(Host host) {
+        Log.d(TAG, "InfoHostSuccessfuly loaded");
+        progress.dismiss();
+        String title = host.getTitle();
+        String description = host.getDescription();
+        String address = host.getAddress();
+        int open_hour = host.getTime_open() / 60;
+        int open_minute = host.getTime_open() % 60;
+        int close_hour = host.getTime_close() / 60;
+        int close_minute = host.getTime_close() % 60;
+        String imageUriString = host.getProfile_image();
+        host_title.setText(title);
+        host_description.setText(description);
+        host_address.setText(address);
+        if (open_minute != 0)
+            host_open_time_tv.setText(open_hour + ":" + open_minute);
+        else
+            host_open_time_tv.setText(open_hour + ":" + "00");
+        if (close_minute != 0)
+            host_close_time_tv.setText(close_hour + ":" + close_minute);
+        else
+            host_close_time_tv.setText(close_hour + ":" + "00");
+
+        // setImage
         ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-        if(imageUri != null){
+        if (imageUriString != null) {
             Bitmap bitmap = null;
             try {
                 bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
-                        .openInputStream(Uri.parse(imageUri)));
+                        .openInputStream(Uri.parse(imageUriString)));
                 BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
                 imgView.setBackground(bdrawable);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
         }
     }
+
+
+    private void onHostPhotoUploaded(int resultCode, BitmapDrawable bdrawable) {
+        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+
+        if (resultCode == ProfileFragment.UPLOAD_RESULT_OK) {
+            Toast.makeText(mainActivity, "Изображение успешно загружено", Toast.LENGTH_SHORT).show();
+            imgView.setBackground(bdrawable);
+        }
+        if (resultCode == ProfileFragment.UPLOAD_RESULT_FILE_NOT_FOUND) {
+            Toast.makeText(mainActivity, "Файл не найден", Toast.LENGTH_SHORT).show();
+        }
+        if (resultCode == ProfileFragment.UPLOAD_RESULT_FAIL) {
+            Toast.makeText(mainActivity, "Произошла ошибка при загрузке изображения", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

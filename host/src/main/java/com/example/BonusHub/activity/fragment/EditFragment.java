@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.executors.EditHostInfoExecutor;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -33,6 +35,8 @@ import java.sql.SQLException;
 
 public class EditFragment extends Fragment {
 
+    public static final int RESULT_OK = 0;
+    public static final int RESULT_FAIL = 1;
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private boolean set_open_time = false, set_close_time = false;
     private Button open_time_btn;
@@ -52,6 +56,21 @@ public class EditFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
+        EditHostInfoExecutor.getInstance().setCallback(new EditHostInfoExecutor.Callback() {
+            @Override
+            public void onEdited(int resultCode) {
+                onHostInfoEdited(resultCode);
+            }
+        });
+    }
+
+    private void onHostInfoEdited(int resultCode) {
+        if (resultCode == RESULT_FAIL) {
+            Toast.makeText(mainActivity, "Произошла ошибка при изменении данных", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mainActivity, "Данные были успешно изменены", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
@@ -144,7 +163,7 @@ public class EditFragment extends Fragment {
                             set_open_time = true;
                         } else {
                             close_time_btn.setTextSize(20);
-                            if (minute !=0)
+                            if (minute != 0)
                                 close_time_btn.setText(hourOfDay + ":" + minute);
                             else
                                 close_time_btn.setText(hourOfDay + ":" + "00");
@@ -163,26 +182,20 @@ public class EditFragment extends Fragment {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case R.id.continue_btn:
-                try {
+                //hide keyboard
+                InputMethodManager imm = (InputMethodManager) mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mainActivity.getCurrentFocus().getWindowToken(), 0);
 
-                    UpdateBuilder<Host, Integer> updateBuilder = HelperFactory.getHelper().
-                            getHostDAO().updateBuilder();
+                Host host = new Host();
+                host.setTitle(host_title_et.getText().toString());
+                host.setDescription(host_description_et.getText().toString());
+                host.setAddress(host_address_et.getText().toString());
+                if (set_open_time)
+                    host.setTime_open(open_hour * 60 + open_minute);
+                if (set_close_time)
+                    host.setTime_close(close_hour * 60 + close_minute);
 
-                    updateBuilder.where().eq("host_id", host_id);
-                    updateBuilder.updateColumnValue("title", host_title_et.getText());
-                    updateBuilder.updateColumnValue("description", host_description_et.getText());
-                    updateBuilder.updateColumnValue("address", host_address_et.getText());
-                    if (set_open_time)
-                        updateBuilder.updateColumnValue("time_open", open_hour * 60 + open_minute);
-                    if (set_close_time)
-                        updateBuilder.updateColumnValue("time_close", close_hour * 60 + close_minute);
-
-                    updateBuilder.update();
-
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                EditHostInfoExecutor.getInstance().editInfo(host_id, host);
                 mainActivity.popFragment();
                 return true;
         }

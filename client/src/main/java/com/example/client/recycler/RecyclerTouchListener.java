@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.client.recycler;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

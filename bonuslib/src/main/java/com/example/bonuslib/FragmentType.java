@@ -5,5 +5,5 @@ package com.example.bonuslib;
  */
 
 public enum FragmentType {
-    QR, ListHost, AboutHost, ProfileHost, StartHost, OwnerSettings
+    QR, ListHost, AboutHost, ProfileHost, StartHost, RegisterFragment, LogInFragment, OwnerSettings
 }

@@ -1,4 +1,4 @@
-package com.example.client.fragment;
+package com.example.client.qr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.example.client.MainActivity;
+import com.example.client.ui.MainActivity;
 import com.example.client.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -46,7 +46,6 @@ public class QRFragment extends Fragment {
             @Override
             public void run() {
                 try {
-
                     bitmap = TextToImageEncode(MainActivity.CLIENT_IDENTIFICATOR);
                     imageView.post(new Runnable() {
                         @Override
@@ -81,11 +80,18 @@ public class QRFragment extends Fragment {
         int bitMatrixHeight = bitMatrix.getHeight();
         int[] pixels = new int[bitMatrixWidth * bitMatrixHeight];
 
+
+        int black = 0;
+        int white = 0;
+        if (isAdded()) {
+            black = getResources().getColor(R.color.black);
+            white = getResources().getColor(R.color.white);
+        }
+
         for (int y = 0; y < bitMatrixHeight; y++) {
             int offset = y * bitMatrixWidth;
             for (int x = 0; x < bitMatrixWidth; x++) {
-                pixels[offset + x] = bitMatrix.get(x, y) ?
-                        getResources().getColor(R.color.black) : getResources().getColor(R.color.white);
+                pixels[offset + x] = bitMatrix.get(x, y) ? black : white;
             }
         }
         Bitmap bitmap = Bitmap.createBitmap(bitMatrixWidth, bitMatrixHeight, Bitmap.Config.ARGB_4444);

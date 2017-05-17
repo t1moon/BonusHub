@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.client.recycler;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -13,11 +13,11 @@ import com.bumptech.glide.Glide;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
+import com.example.client.R;
+import com.example.client.retrofit.RetrofitFactory;
 
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Timur on 29-Apr-17.
@@ -48,15 +48,6 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
 
     public HostAdapter(Context context,
                        List<ClientHost> clientHostList) {
-//        this.hostsList = hostsList;
-//        this.points = points;
-//
-//        Iterator<AboutHost> it1 = hostsList.iterator();
-//        Iterator<Integer> it2 = points.iterator();
-//
-//        while (it1.hasNext() && it2.hasNext()) {
-//            this.pointsToHost.put(it1.next(), it2.next());
-//        }
         this.clientHostList= clientHostList;
         this.context = context;
     }
@@ -80,10 +71,17 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
 
         int point = clientHostList.get(position).getPoints();
 
+        String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
+
         holder.title.setText(host.getTitle());
         holder.descrpition.setText(host.getDescription());
         holder.points.setText(Integer.toString(point));
         // loading album cover using Glide library
+                    Glide
+                    .with(context)
+                    .load(pathToImageProfile)
+                    .into(holder.thumbnail);
+
 //        Glide.with(context).load(host.getThumbnail()).into(holder.thumbnail);
 
     }

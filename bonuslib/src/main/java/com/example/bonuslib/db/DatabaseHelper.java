@@ -71,11 +71,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public void clearTables(ConnectionSource connectionSource) {
+    public void clearTablesForClient(ConnectionSource connectionSource) {
         try {
-            TableUtils.clearTable(connectionSource, Host.class);
-            TableUtils.clearTable(connectionSource, Client.class);
-            TableUtils.clearTable(connectionSource, ClientHost.class);
+            TableUtils.dropTable(connectionSource, Host.class, true);
+            TableUtils.dropTable(connectionSource, ClientHost.class, true);
+            TableUtils.createTable(connectionSource, Host.class);
+            TableUtils.createTable(connectionSource, ClientHost.class);
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }

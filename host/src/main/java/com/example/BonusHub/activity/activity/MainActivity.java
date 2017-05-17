@@ -1,30 +1,48 @@
 package com.example.BonusHub.activity.activity;
 
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.Login;
+import com.example.BonusHub.activity.api.login.LoginResult;
+import com.example.BonusHub.activity.api.login.Loginner;
+import com.example.BonusHub.activity.api.login.LogoutResult;
+import com.example.BonusHub.activity.api.login.Logouter;
 import com.example.BonusHub.activity.fragment.OwnerSettingsFragment;
 import com.example.BonusHub.activity.fragment.ProfileFragment;
-import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.StackListner;
 import com.example.timur.BonusHub.R;
 
+import android.content.SharedPreferences;
+import android.widget.Toast;
+
+import retrofit2.Call;
+import retrofit2.Response;
+
+import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
+
 public class MainActivity extends BaseActivity implements StackListner {
+    private static final String LOGIN_PREFERENCES = "LoginData";
+    private final static String TAG = MainActivity.class.getSimpleName();
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
@@ -33,13 +51,28 @@ public class MainActivity extends BaseActivity implements StackListner {
     public final static int MENUITEM_READ_QR = 0;
     public final static int MENUITEM_SHOW_PROFILE = 1;
     public final static int MENUITEM_OWNER_SETTINGS = 2;
+    public final static int MENUITEM_LOGOUT = 3;
+
+
+    static {
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectActivityLeaks()
+                .penaltyLog()
+                .penaltyDeath()
+                .build()
+        );
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setStackListner(this);
+        Log.d("Main", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
+        if (!AuthUtils.isAuthorized(this) || !AuthUtils.isHosted(this)) {
+            goToLogIn();
+            return;
+        }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -51,37 +84,13 @@ public class MainActivity extends BaseActivity implements StackListner {
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
+        setupProfileFragment();
+    }
 
-        // Setup behaviour for back home button, hamburger etc.
-        getSupportFragmentManager().addOnBackStackChangedListener(
-                new FragmentManager.OnBackStackChangedListener() {
-                    @Override
-                    public void onBackStackChanged() {
-                        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
-                            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    onBackPressed();
-                                }
-                            });
-//                            appBarLayout.setExpanded(false);
-                        } else {
-                            //show hamburger
-                            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                            drawerToggle.syncState();
-                            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    mDrawer.openDrawer(GravityCompat.START);
-                                }
-                            });
-//                            appBarLayout.setExpanded(true);
-                        }
-                    }
-                }
-        );
-        setupStartFragment();
+    private void goToLogIn() {
+        Intent intent = new Intent(this, LogInActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void initCollapsingToolbar() {
@@ -112,16 +121,10 @@ public class MainActivity extends BaseActivity implements StackListner {
         });
     }
 
-    private void setupStartFragment() {
+    private void setupProfileFragment() {
         Fragment fragment;
-        int host_id = this.getPreferences(MODE_PRIVATE).getInt("host_id", -1);
-        if (host_id != -1) {
-            setCurrentFragment(FragmentType.ProfileHost);
-            fragment = new ProfileFragment();
-        } else {
-            setCurrentFragment(FragmentType.StartHost);
-            fragment = new StartFragment();
-        }
+        setCurrentFragment(FragmentType.ProfileHost);
+        fragment = new ProfileFragment();
         pushFragment(fragment, true);
     }
 
@@ -142,15 +145,16 @@ public class MainActivity extends BaseActivity implements StackListner {
 
     private void setupDrawerContent(final NavigationView navigationView) {
         Menu drawerMenu = navigationView.getMenu();
-        drawerMenu.add(0, 0, 0, "Считать QR-код");
-        drawerMenu.add(0, 1, 1, "Профиль заведения");
-        drawerMenu.add(0, 2, 2, "Параметры акций");
 
+        drawerMenu.add(0, MENUITEM_READ_QR, 0, "Считать QR-код");
+        drawerMenu.add(0, MENUITEM_SHOW_PROFILE, 1, "Профиль заведения");
+        drawerMenu.add(0, MENUITEM_OWNER_SETTINGS, 2, "Параметры акций");
+        drawerMenu.add(0, MENUITEM_LOGOUT, 3, "Выход");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        public boolean onNavigationItemSelected(MenuItem menuItem) {
                         uncheckAllMenuItems(navigationView);
                         selectDrawerItem(menuItem);
                         return true;
@@ -181,12 +185,36 @@ public class MainActivity extends BaseActivity implements StackListner {
                     pushFragment(fragment, false);
                 }
                 break;
+
             case MENUITEM_OWNER_SETTINGS:
                 if (fragment.getClass() != OwnerSettingsFragment.class) {
                     setCurrentFragment(FragmentType.OwnerSettings);
                     fragment = new OwnerSettingsFragment();
                     pushFragment(fragment, true);
                 }
+            case MENUITEM_LOGOUT:
+                Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
+                final Logouter logouter = retrofitBarmen().create(Logouter.class);
+                final Call<LogoutResult> call = logouter.logout(AuthUtils.getCookie(this));
+                NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<LogoutResult>() {
+                    @Override
+                    public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
+                    }
+
+                    @Override
+                    public void onFailure(Call<LogoutResult> call, Throwable t) {
+                    }
+
+                    @Override
+                    public void onSuccess(LogoutResult result) {
+                        onLogoutResult();
+                    }
+
+                    @Override
+                    public void onError(Exception ex) {
+                        Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
         }
         if (fragment != null) {
@@ -226,5 +254,17 @@ public class MainActivity extends BaseActivity implements StackListner {
                 mDrawer.openDrawer(GravityCompat.START);
             }
         });
+        uncheckAllMenuItems(nvDrawer);
+        if (getCurrentFragment() == FragmentType.ProfileHost) {
+            nvDrawer.getMenu().getItem(MENUITEM_SHOW_PROFILE).setChecked(true);
+        }
+
+
+    }
+
+    private void onLogoutResult() {
+        Toast.makeText(this, "You are logged out", Toast.LENGTH_SHORT).show();
+        AuthUtils.logout(this);
+        goToLogIn();
     }
 }
