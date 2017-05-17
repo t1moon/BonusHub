@@ -1,4 +1,4 @@
-package com.example.BonusHub.activity.retrofit;
+package com.example.BonusHub.activity.retrofit.updatePoints;
 
 /**
  * Created by Timur on 13-May-17.

@@ -1,0 +1,56 @@
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="com.example.BonusHub.activity.fragment.StatisticFragment">
+
+        <TableLayout
+            android:id="@+id/statistic_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:gravity="center"
+                    android:padding="18dip"
+                    android:text="Дата"
+                    android:textColor="#000000" />
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:gravity="center"
+                    android:padding="18dip"
+                    android:text="Средний чек"
+                    android:textColor="#000000" />
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:gravity="center"
+                    android:padding="18dip"
+                    android:text="Общий приход"
+                    android:textColor="#000000" />
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:gravity="center"
+                    android:padding="18dip"
+                    android:text="Общий расход"
+                    android:textColor="#000000" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

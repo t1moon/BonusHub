@@ -24,6 +24,7 @@ import com.example.BonusHub.activity.api.login.Logouter;
 import com.example.BonusHub.activity.fragment.EditFragment;
 import com.example.BonusHub.activity.fragment.ProfileFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
+import com.example.BonusHub.activity.fragment.StatisticFragment;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
@@ -48,7 +49,9 @@ public class MainActivity extends BaseActivity implements StackListner {
     private FloatingActionButton fab;
     public final static int MENUITEM_READ_QR = 0;
     public final static int MENUITEM_SHOW_PROFILE = 1;
-    public final static int MENUITEM_LOGOUT = 2;
+    public final static int MENUITEM_STATISTIC = 3;
+    public final static int MENUITEM_LOGOUT = 4;
+
 
 
     static {
@@ -152,7 +155,8 @@ public class MainActivity extends BaseActivity implements StackListner {
         Menu drawerMenu = navigationView.getMenu();
         drawerMenu.add(0, MENUITEM_READ_QR, 0, "Считать QR-код");
         drawerMenu.add(0, MENUITEM_SHOW_PROFILE, 1, "Профиль заведения");
-        drawerMenu.add(0, MENUITEM_LOGOUT, 2, "Выход");
+        drawerMenu.add(0, MENUITEM_STATISTIC, 2, "Статистика");
+        drawerMenu.add(0, MENUITEM_LOGOUT, 3, "Выход");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -179,6 +183,10 @@ public class MainActivity extends BaseActivity implements StackListner {
         switch (menuItem.getItemId()) {
             case MENUITEM_READ_QR:
                 fragment = new ScanQrFragment();
+                pushFragment(fragment, true);
+                break;
+            case MENUITEM_STATISTIC:
+                fragment = new StatisticFragment();
                 pushFragment(fragment, true);
                 break;
             case MENUITEM_SHOW_PROFILE:

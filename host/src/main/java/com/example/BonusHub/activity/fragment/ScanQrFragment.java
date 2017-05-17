@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,16 +15,13 @@ import android.widget.Toast;
 
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
-import com.example.BonusHub.activity.retrofit.ClientResponse;
 import com.example.BonusHub.activity.retrofit.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
-import com.example.BonusHub.activity.retrofit.UpdatePointsPojo;
-import com.example.BonusHub.activity.retrofit.UpdatePointsResponse;
+import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
+import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsResponse;
 import com.example.timur.BonusHub.R;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-
-import java.util.concurrent.Callable;
 
 import retrofit2.Call;
 
