@@ -7,9 +7,9 @@ public class RetrofitFactory {
 
     private RetrofitFactory() {
     }
-
+//    192.168.31.122
     private final static Retrofit CLIENT_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://10.0.3.2:5000/api/client/")
+            .baseUrl("http://192.168.31.122:5000/api/client/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
