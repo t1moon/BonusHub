@@ -35,7 +35,7 @@ import retrofit2.Response;
 
 import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 
-public class MainActivity extends BaseActivity implements StackListner {
+public class MainActivity extends BaseActivity implements StackListner, NetworkThread.ExecuteCallback<LogoutResult> {
     private static final String LOGIN_PREFERENCES = "LoginData";
     private final static String TAG = MainActivity.class.getSimpleName();
     private Toolbar mToolbar;
@@ -66,6 +66,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         Log.d("Main", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
         if (!AuthUtils.isAuthorized(this) || !AuthUtils.isHosted(this)) {
             goToLogIn();
+            return;
         }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -79,6 +80,12 @@ public class MainActivity extends BaseActivity implements StackListner {
         setupDrawerContent(nvDrawer);
 
         setupProfileFragment();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        NetworkThread.getInstance().setCallback(null);
     }
 
     private void goToLogIn() {
@@ -139,14 +146,14 @@ public class MainActivity extends BaseActivity implements StackListner {
 
     private void setupDrawerContent(final NavigationView navigationView) {
         Menu drawerMenu = navigationView.getMenu();
-        drawerMenu.add(0, 0, 0, "Считать QR-код");
-        drawerMenu.add(0, 1, 1, "Профиль заведения");
-        drawerMenu.add(0, 2, 2, "Выход");
+        drawerMenu.add(0, MENUITEM_READ_QR, 0, "Считать QR-код");
+        drawerMenu.add(0, MENUITEM_SHOW_PROFILE, 1, "Профиль заведения");
+        drawerMenu.add(0, MENUITEM_LOGOUT, 2, "Выход");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        public boolean onNavigationItemSelected(MenuItem menuItem) {
                         uncheckAllMenuItems(navigationView);
                         selectDrawerItem(menuItem);
                         return true;
@@ -181,25 +188,8 @@ public class MainActivity extends BaseActivity implements StackListner {
                 Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
                 final Logouter logouter = retrofitBarmen().create(Logouter.class);
                 final Call<LogoutResult> call = logouter.logout(AuthUtils.getCookie(this));
-                NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<LogoutResult>() {
-                    @Override
-                    public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
-                    }
-
-                    @Override
-                    public void onFailure(Call<LogoutResult> call, Throwable t) {
-                    }
-
-                    @Override
-                    public void onSuccess(LogoutResult result) {
-                        onLogoutResult();
-                    }
-
-                    @Override
-                    public void onError(Exception ex) {
-                        Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                NetworkThread.getInstance().setCallback(this);
+                NetworkThread.getInstance().execute(call);
                 break;
         }
         if (fragment != null) {
@@ -239,11 +229,35 @@ public class MainActivity extends BaseActivity implements StackListner {
                 mDrawer.openDrawer(GravityCompat.START);
             }
         });
+        uncheckAllMenuItems(nvDrawer);
+        if (getCurrentFragment() == FragmentType.ProfileHost) {
+            nvDrawer.getMenu().getItem(MENUITEM_SHOW_PROFILE).setChecked(true);
+        }
+
+
     }
 
     private void onLogoutResult() {
         Toast.makeText(this, "You are logged out", Toast.LENGTH_SHORT).show();
         AuthUtils.logout(this);
         goToLogIn();
+    }
+
+    @Override
+    public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
+    }
+
+    @Override
+    public void onFailure(Call<LogoutResult> call, Throwable t) {
+    }
+
+    @Override
+    public void onSuccess(LogoutResult result) {
+        onLogoutResult();
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
     }
 }

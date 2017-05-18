@@ -51,6 +51,10 @@ public class BaseActivity extends AppCompatActivity {
         mCurrentFragment = menuType;
     }
 
+    public FragmentType getCurrentFragment() {
+        return mCurrentFragment;
+    }
+
     protected int getFragmentContainerResId() {
         return 0;
     }

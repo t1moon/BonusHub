@@ -1,5 +1,6 @@
 package com.example.BonusHub.activity.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.api.login.LoginResult;
 import com.example.BonusHub.activity.api.login.Loginner;
 import com.example.BonusHub.activity.activity.LogInActivity;
+import com.example.BonusHub.activity.api.login.LogoutResult;
 import com.example.BonusHub.activity.api.registration.RegistrationResult;
 import com.example.BonusHub.activity.api.registration.Registrator;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
@@ -35,7 +37,9 @@ import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 public class RegisterFragment extends Fragment {
     private LogInActivity logInActivity;
 
-    private Button logInButton;
+    private static NetworkThread.ExecuteCallback<RegistrationResult> registrationCallback;
+    private static NetworkThread.ExecuteCallback<LoginResult> loginCallback;
+
     private Button registrationButton;
     private EditText loginInput;
     private EditText passwordInput;
@@ -49,9 +53,14 @@ public class RegisterFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logInActivity = (LogInActivity) getActivity();
+        prepareCallbacks();
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        NetworkThread.getInstance().setCallback(null);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,9 +69,7 @@ public class RegisterFragment extends Fragment {
 
         loginInput = (EditText) rootView.findViewById(R.id.login_input);
         passwordInput = (EditText) rootView.findViewById(R.id.password_input);
-        logInButton = (Button) rootView.findViewById(R.id.btn_login);
-        logInButton.setOnClickListener(onLogInClickListener);
-        registrationButton = (Button) rootView.findViewById(R.id.btn_registrate);
+        registrationButton = (Button) rootView.findViewById(R.id.btn_register);
         registrationButton.setOnClickListener(onRegistrationClickListener);
         setHasOptionsMenu(true);
 
@@ -86,13 +93,6 @@ public class RegisterFragment extends Fragment {
         getActivity().finish();
     }
 
-    private final View.OnClickListener onLogInClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            goToLoginFragment();
-        }
-    };
-
     private final View.OnClickListener onRegistrationClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -103,9 +103,66 @@ public class RegisterFragment extends Fragment {
     private void registrate() {
         final String login = loginInput.getText().toString();
         final String password = passwordInput.getText().toString();
+
+        if (!validate())
+            return;
+
         final Registrator registrator = retrofitBarmen().create(Registrator.class);
         final Call<RegistrationResult> call = registrator.registrate(new Login(login,password));
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<RegistrationResult>() {
+        NetworkThread.getInstance().setCallback(registrationCallback);
+        NetworkThread.getInstance().execute(call);
+    }
+
+    public void onRegistrationResult(RegistrationResult result) {
+        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+        if (result.getCode() == 0) {
+            logIn();
+        }
+    }
+    private void logIn() {
+        final String login = loginInput.getText().toString();
+        final String password = passwordInput.getText().toString();
+        final Loginner loginner = retrofitBarmen().create(Loginner.class);
+        final Call<LoginResult> call = loginner.login(new Login(login,password));
+        NetworkThread.getInstance().setCallback(loginCallback);
+        NetworkThread.getInstance().execute(call);
+    }
+
+    public void onLoginResult(LoginResult result) {
+        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+        if (result.isHosted() == false && result.getCode() == 0) {
+            AuthUtils.setAuthorized(getActivity());
+            Log.d("LogFrag go start", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + result.isHosted());
+            goToStartFragment();
+        }
+        else if (result.getCode() == 0){
+            AuthUtils.setAuthorized(getActivity());
+            AuthUtils.setHosted(getActivity());
+            Log.d("LogFrag go main", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + AuthUtils.isHosted(getActivity()));
+            goToMainActivity();
+        }
+    }
+
+    public boolean validate() {
+        boolean valid = true;
+
+        final String login = loginInput.getText().toString();
+        final String password = passwordInput.getText().toString();
+
+        if (login.isEmpty()) {
+            loginInput.setError("Введите логин");
+            valid = false;
+        }
+
+        if (password.isEmpty() || password.length() <= 5 ) {
+            passwordInput.setError("Не менее 5 символов");
+            valid = false;
+        }
+        return valid;
+    }
+
+    private void prepareCallbacks() {
+        registrationCallback = new NetworkThread.ExecuteCallback<RegistrationResult>() {
             @Override
             public void onResponse(Call<RegistrationResult> call, Response<RegistrationResult> response) {
                 okhttp3.Headers headers = response.headers();
@@ -130,21 +187,9 @@ public class RegisterFragment extends Fragment {
             public void onError(Exception ex) {
 
             }
-        });
-    }
+        };
 
-    public void onRegistrationResult(RegistrationResult result) {
-        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
-        if (result.getCode() == 0) {
-            logIn();
-        }
-    }
-    private void logIn() {
-        final String login = loginInput.getText().toString();
-        final String password = passwordInput.getText().toString();
-        final Loginner loginner = retrofitBarmen().create(Loginner.class);
-        final Call<LoginResult> call = loginner.login(new Login(login,password));
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<LoginResult>() {
+        loginCallback = new NetworkThread.ExecuteCallback<LoginResult>() {
             @Override
             public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
                 okhttp3.Headers headers = response.headers();
@@ -166,21 +211,6 @@ public class RegisterFragment extends Fragment {
             public void onError(Exception ex) {
                 Toast.makeText(getActivity(), "Возникли проблемы с авторизацией, попробуйте позже", Toast.LENGTH_SHORT).show();
             }
-        });
-    }
-
-    public void onLoginResult(LoginResult result) {
-        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
-        if (result.isHosted() == false && result.getCode() == 0) {
-            AuthUtils.setAuthorized(getActivity());
-            Log.d("LogFrag go start", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + result.isHosted());
-            goToStartFragment();
-        }
-        else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity());
-            AuthUtils.setHosted(getActivity());
-            Log.d("LogFrag go main", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + AuthUtils.isHosted(getActivity()));
-            goToMainActivity();
-        }
+        };
     }
 }

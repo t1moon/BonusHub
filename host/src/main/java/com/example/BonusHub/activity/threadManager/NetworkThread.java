@@ -17,6 +17,11 @@ public class NetworkThread {
 
     private final Executor executor = Executors.newSingleThreadExecutor();
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private ExecuteCallback callback;
+
+    public void setCallback(ExecuteCallback newCallback) {
+        callback = newCallback;
+    }
 
     private NetworkThread() {
     }
@@ -25,13 +30,13 @@ public class NetworkThread {
         return INSTANCE;
     }
 
-    public <T> void execute(final Call<T> call, final ExecuteCallback<T> callback) {
+    public <T> void execute(final Call<T> call) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     final Response<T> response = call.execute();
-                    if (response.isSuccessful()) {
+                    if (response.isSuccessful() && callback != null) {
                         uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -39,7 +44,7 @@ public class NetworkThread {
                                 callback.onSuccess(response.body());
                             }
                         });
-                    } else {
+                    } else if (callback != null) {
                         final String error = response.errorBody().string();
                         throw new IOException(error);
                     }
@@ -63,7 +68,5 @@ public class NetworkThread {
         void onSuccess(T result);
 
         void onError(Exception ex);
-
-
     }
 }

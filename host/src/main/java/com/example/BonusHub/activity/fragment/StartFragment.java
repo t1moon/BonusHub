@@ -1,29 +1,44 @@
 package com.example.BonusHub.activity.fragment;
 
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.Login;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.api.host.HostResult;
+import com.example.BonusHub.activity.api.host.Hoster;
+import com.example.BonusHub.activity.api.login.LoginResult;
+import com.example.BonusHub.activity.api.login.Loginner;
 import com.example.BonusHub.activity.executors.CreateHostExecutor;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
-import static android.content.Context.MODE_PRIVATE;
+import retrofit2.Call;
+import retrofit2.Response;
 
-public class StartFragment extends Fragment {
+import static android.content.Context.MODE_PRIVATE;
+import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
+
+public class StartFragment extends Fragment implements NetworkThread.ExecuteCallback <HostResult> {
     private static final String LOGIN_PREFERENCES = "LoginData";
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
@@ -34,6 +49,7 @@ public class StartFragment extends Fragment {
     private EditText host_address;
     private static int host_id;
     private LogInActivity logInActivity;
+    private ProgressDialog progressDialog;
 
     View rootView;
 
@@ -44,13 +60,20 @@ public class StartFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        logInActivity = (LogInActivity) getActivity();
         CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
             @Override
             public void onCreated(int host_id) {
                 onHostCreated(host_id);
             }
         });
+
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        NetworkThread.getInstance().setCallback(null);
     }
 
 
@@ -129,6 +152,12 @@ public class StartFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.continue_btn:
+
+                //hide keyboard
+                InputMethodManager imm = (InputMethodManager) logInActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(logInActivity.getCurrentFocus().getWindowToken(), 0);
+
+
                 String title = host_title.getText().toString();
                 String description = host_description.getText().toString();
                 String address = host_address.getText().toString();
@@ -145,8 +174,15 @@ public class StartFragment extends Fragment {
                     host.setProfile_image(null);
                     CreateHostExecutor.getInstance().createHost(host);
 
-                    AuthUtils.setHosted(getActivity());
-                    goToMainActivity();
+                    progressDialog = new ProgressDialog(logInActivity);
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setMessage("Загрузка информации на сервер...");
+                    progressDialog.show();
+
+                    final Hoster hoster = retrofitBarmen().create(Hoster.class);
+                    final Call<HostResult> call = hoster.login(host, AuthUtils.getCookie(getActivity()));
+                    NetworkThread.getInstance().setCallback(this);
+                    NetworkThread.getInstance().execute(call);
                 }
         }
         return super.onOptionsItemSelected(item);
@@ -163,6 +199,25 @@ public class StartFragment extends Fragment {
                 .putInt("host_id", host_id).apply();
     }
 
+    @Override
+    public void onResponse(Call<HostResult> call, Response<HostResult> response) {
+        progressDialog.dismiss();
+    }
 
+    @Override
+    public void onFailure(Call<HostResult> call, Throwable t) {
+        Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccess(HostResult result) {
+        AuthUtils.setHosted(logInActivity);
+        goToMainActivity();
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        Log.d("LoginExeption", ex.getMessage());
+    }
 
 }

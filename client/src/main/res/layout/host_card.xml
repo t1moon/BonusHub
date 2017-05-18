@@ -51,7 +51,7 @@
                     android:textSize="@dimen/host_description"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_weight="0.75"/>
+                    android:layout_weight="0.95"/>
                 <TextView
                     android:id="@+id/rv_points"
                     android:layout_width="wrap_content"
@@ -60,7 +60,7 @@
                     android:paddingBottom="@dimen/host_title_padding"
                     android:paddingLeft="@dimen/host_title_padding"
                     android:paddingRight="@dimen/host_title_padding"
-                    android:layout_weight="0.25"/>
+                    android:layout_weight="0.05"/>
 
 
             </LinearLayout>

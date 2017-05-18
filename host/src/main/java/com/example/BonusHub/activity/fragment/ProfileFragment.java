@@ -1,6 +1,7 @@
 package com.example.BonusHub.activity.fragment;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -49,6 +50,7 @@ public class ProfileFragment extends Fragment {
     private Button loadImageBtn;
     private int host_id;
     private MainActivity mainActivity;
+    ProgressDialog progress;
 
 
 
@@ -147,12 +149,14 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        progress.dismiss();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
+        progress = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
         GetHostInfoExecutor.getInstance().loadInfo(host_id);
     }
 
@@ -175,6 +179,7 @@ public class ProfileFragment extends Fragment {
 
     private void onHostInfoLoaded(Host host) {
         Log.d(TAG, "InfoHostSuccessfuly loaded");
+        progress.dismiss();
         String title = host.getTitle();
         String description = host.getDescription();
         String address = host.getAddress();
