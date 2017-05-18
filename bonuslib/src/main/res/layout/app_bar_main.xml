@@ -34,7 +34,7 @@
                     android:id="@+id/backdrop"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/detail_backdrop_height"
-                    android:src="@drawable/test"
+                    android:background="@drawable/test"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax" />
@@ -51,6 +51,16 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/ic_edit_black_24dp"
+        app:layout_anchor="@id/collapsing_toolbar"
+        app:layout_anchorGravity="bottom|right|end"
+        android:visibility="gone"/>
 
         <FrameLayout
             android:id="@+id/container_body"

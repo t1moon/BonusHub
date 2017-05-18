@@ -2,14 +2,12 @@ package com.example.BonusHub.activity.fragment;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,20 +18,29 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.EditHostInfoExecutor;
+import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
-import com.j256.ormlite.stmt.UpdateBuilder;
 
 import java.sql.SQLException;
 
+import static android.app.Activity.RESULT_OK;
+
 public class EditFragment extends Fragment {
+
+
+    public static final int UPLOAD_RESULT_OK = 0;
+    public static final int UPLOAD_RESULT_FAIL = 1;
+    public static final int UPLOAD_RESULT_FILE_NOT_FOUND = 2;
+    private static int RESULT_LOAD_IMG = 1;
+
 
     public static final int RESULT_OK = 0;
     public static final int RESULT_FAIL = 1;
@@ -44,6 +51,7 @@ public class EditFragment extends Fragment {
     private EditText host_title_et;
     private EditText host_description_et;
     private EditText host_address_et;
+    private FloatingActionButton fab_upload;
     View rootView;
     int host_id;
     MainActivity mainActivity;
@@ -62,6 +70,14 @@ public class EditFragment extends Fragment {
                 onHostInfoEdited(resultCode);
             }
         });
+        UploadHostPhotoExecutor.getInstance().setCallback(new UploadHostPhotoExecutor.Callback() {
+            @Override
+            public void onUploaded(int resultCode, BitmapDrawable bdrawable) {
+                onHostPhotoUploaded(resultCode, bdrawable);
+            }
+        });
+
+
     }
 
     private void onHostInfoEdited(int resultCode) {
@@ -88,7 +104,15 @@ public class EditFragment extends Fragment {
         host_address_et = (EditText) rootView.findViewById(R.id.edit_host_address_et);
         open_time_btn = (Button) rootView.findViewById(R.id.edit_open_time_btn);
         close_time_btn = (Button) rootView.findViewById(R.id.edit_close_time_btn);
+        fab_upload = (FloatingActionButton) mainActivity.findViewById(R.id.fab);
+        fab_upload.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_a_photo_black_24dp));
+        fab_upload.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                loadImagefromGallery(v);
+            }
+        });
         setHasOptionsMenu(true);
 
         setInfo();
@@ -207,5 +231,47 @@ public class EditFragment extends Fragment {
         inflater.inflate(R.menu.start_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
+    public void loadImagefromGallery(View view) {
+        // Create intent to Open Image applications like Gallery, Google Photos
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        // Start the Intent
+        startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            // When an Image is picked
+            if (requestCode == RESULT_LOAD_IMG  && null != data) {
+                // Get the Image from data
+                Uri targetUri = data.getData();
+                UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
+            } else {
+                Toast.makeText(mainActivity, "Вы не выбрали изображение", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(mainActivity, "Что-то пошло не так", Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    private void onHostPhotoUploaded(int resultCode, BitmapDrawable bdrawable) {
+        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+
+        if (resultCode == EditFragment.UPLOAD_RESULT_OK) {
+            Toast.makeText(mainActivity, "Изображение успешно загружено", Toast.LENGTH_SHORT).show();
+            imgView.setBackground(bdrawable);
+        }
+        if (resultCode == EditFragment.UPLOAD_RESULT_FILE_NOT_FOUND) {
+            Toast.makeText(mainActivity, "Файл не найден", Toast.LENGTH_SHORT).show();
+        }
+        if (resultCode == EditFragment.UPLOAD_RESULT_FAIL) {
+            Toast.makeText(mainActivity, "Произошла ошибка при загрузке изображения", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 }

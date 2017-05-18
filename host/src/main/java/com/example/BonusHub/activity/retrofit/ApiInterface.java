@@ -1,5 +1,10 @@
 package com.example.BonusHub.activity.retrofit;
 
+import com.example.BonusHub.activity.retrofit.getInfo.GetInfoResponse;
+import com.example.BonusHub.activity.retrofit.statistic.StatisticResponse;
+import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
+import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsResponse;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -20,6 +25,18 @@ public interface ApiInterface {
             "Accept: application/json"
     })
     Call<ClientResponse> getPoints(@Path("host_id") int host_id, @Path("identificator") String identificator);
+
+    @GET("{host_id}/statistic/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<StatisticResponse> getStatistic(@Path("host_id") int host_id);
+
+    @GET("{host_id}/info/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<GetInfoResponse> getInfo(@Path("host_id") int host_id);
 
 
 }

@@ -51,7 +51,7 @@ public class UploadHostPhotoExecutor {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                int result_code = ProfileFragment.UPLOAD_RESULT_OK;
+                int result_code = EditFragment.UPLOAD_RESULT_OK;
                 if (host_id != -1) {
                     UpdateBuilder<Host, Integer> updateBuilder = null;
                     BitmapDrawable bdrawable = null;
@@ -60,7 +60,7 @@ public class UploadHostPhotoExecutor {
                             Bitmap bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(targetUri));
                             bdrawable = new BitmapDrawable(context.getResources(), bitmap);
                         } catch (FileNotFoundException e) {
-                            result_code = ProfileFragment.UPLOAD_RESULT_FILE_NOT_FOUND;
+                            result_code = EditFragment.UPLOAD_RESULT_FILE_NOT_FOUND;
                         }
 
                         updateBuilder = HelperFactory.getHelper().
@@ -70,7 +70,7 @@ public class UploadHostPhotoExecutor {
                         updateBuilder.update();
 
                     } catch (SQLException e) {
-                       result_code = ProfileFragment.UPLOAD_RESULT_FAIL;
+                       result_code = EditFragment.UPLOAD_RESULT_FAIL;
                     }
                     notifyEdited(result_code, bdrawable);
                 }

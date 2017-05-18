@@ -11,11 +11,12 @@ import com.example.bonuslib.db.HelperFactory;
 
 
 public class MyApplication extends Application {
-
+    private static MyApplication mInstance;
     @Override
     public void onCreate() {
         super.onCreate();
         HelperFactory.setHelper(getApplicationContext());
+        mInstance = this;
     }
 
     @Override
@@ -23,5 +24,9 @@ public class MyApplication extends Application {
         HelperFactory.releaseHelper();
         super.onTerminate();
     }
+    public static synchronized MyApplication getInstance() {
+        return mInstance;
+    }
+
 }
 

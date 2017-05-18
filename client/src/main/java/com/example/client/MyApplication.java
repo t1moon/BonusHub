@@ -28,9 +28,6 @@ public class MyApplication extends Application {
     public static synchronized MyApplication getInstance() {
         return mInstance;
     }
-    public void setConnectivityListener(ConnectivityReceiver.ConnectivityReceiverListener listener) {
-        ConnectivityReceiver.connectivityReceiverListener = listener;
-    }
 
 }
 

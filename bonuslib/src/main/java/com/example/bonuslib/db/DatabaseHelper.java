@@ -82,6 +82,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
 
     }
+    public void clearHostTable(ConnectionSource connectionSource) {
+        try {
+            TableUtils.dropTable(connectionSource, Host.class, true);
+            TableUtils.createTable(connectionSource, Host.class);
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
 
         //синглтон для HostDAO
     public HostDao getHostDAO() throws SQLException, java.sql.SQLException {
