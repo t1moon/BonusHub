@@ -23,11 +23,8 @@ import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.MyApplication;
 import com.example.BonusHub.activity.api.login.LogoutResult;
 import com.example.BonusHub.activity.api.login.Logouter;
-<<<<<<< HEAD
 import com.example.BonusHub.activity.fragment.OwnerSettingsFragment;
-=======
 import com.example.BonusHub.activity.fragment.EditFragment;
->>>>>>> master
 import com.example.BonusHub.activity.fragment.ProfileFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
 import com.example.BonusHub.activity.fragment.StatisticFragment;
@@ -209,6 +206,8 @@ public class MainActivity extends BaseActivity implements StackListner {
                     fragment = new OwnerSettingsFragment();
                     pushFragment(fragment, true);
                 }
+                break;
+
             case MENUITEM_LOGOUT:
                 Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
                 final Logouter logouter = retrofitBarmen().create(Logouter.class);
