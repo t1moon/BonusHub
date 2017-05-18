@@ -7,6 +7,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.MyApplication;
 import com.example.BonusHub.activity.api.login.LogoutResult;
 import com.example.BonusHub.activity.api.login.Logouter;
 import com.example.BonusHub.activity.fragment.EditFragment;
@@ -271,5 +273,29 @@ public class MainActivity extends BaseActivity implements StackListner {
         Toast.makeText(this, "You are logged out", Toast.LENGTH_SHORT).show();
         AuthUtils.logout(this);
         goToLogIn();
+    }
+
+    // Method to manually check connection status
+    public boolean hasConnection() {
+        boolean isConnected = BaseActivity.isConnected(MyApplication.getInstance());
+        if (!isConnected)
+            showSnack(false);
+        return isConnected;
+    }
+
+
+    // Showing the status in Snackbar
+    private void showSnack(boolean isConnected) {
+        String message;
+
+        if (isConnected) {
+            message = "Connected to internet";
+        } else {
+            message = "Sorry! No connection to internet";
+        }
+
+        Snackbar snackbar = Snackbar
+                .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 }

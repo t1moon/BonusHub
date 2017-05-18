@@ -23,7 +23,6 @@ import com.example.bonuslib.StackListner;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
-import com.example.client.ConnectivityReceiver;
 import com.example.client.MyApplication;
 import com.example.client.R;
 import com.example.client.qr.QRFragment;
@@ -32,7 +31,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements StackListner, ConnectivityReceiver.ConnectivityReceiverListener {
+public class MainActivity extends BaseActivity implements StackListner {
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
@@ -293,23 +292,12 @@ public class MainActivity extends BaseActivity implements StackListner, Connecti
 
     // Method to manually check connection status
     public boolean hasConnection() {
-        boolean isConnected = ConnectivityReceiver.isConnected();
+        boolean isConnected = BaseActivity.isConnected(MyApplication.getInstance());
         if (!isConnected)
             showSnack(false);
         return isConnected;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // register connection status listener
-        MyApplication.getInstance().setConnectivityListener(this);
-    }
-
-    @Override
-    public void onNetworkConnectionChanged(boolean isConnected) {
-        showSnack(isConnected);
-    }
 
     // Showing the status in Snackbar
     private void showSnack(boolean isConnected) {

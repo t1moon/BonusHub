@@ -19,7 +19,7 @@ public class RetrofitFactory {
             .baseUrl("http://192.168.31.122:5000/api/host/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
-
+    public final static String MEDIA_URL = "media/";
 
     public static Retrofit retrofitHost() {
         return HOST_INSTANCE;
