@@ -2,6 +2,8 @@ package com.example.BonusHub.activity.fragment;
 
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -28,9 +30,17 @@ import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsResponse;
 import com.example.timur.BonusHub.R;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+import com.jjoe64.graphview.helper.StaticLabelsFormatter;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -46,6 +56,7 @@ public class StatisticFragment extends Fragment {
 
     MainActivity mainActivity;
     TableLayout tl;
+    GraphView graph;
 
     public StatisticFragment() {
         // Required empty public constructor
@@ -62,6 +73,7 @@ public class StatisticFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_statistic, container, false);
 
+        graph = (GraphView) rootView.findViewById(R.id.graph);
         tl = (TableLayout) rootView.findViewById(R.id.statistic_table);
 
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
@@ -88,22 +100,48 @@ public class StatisticFragment extends Fragment {
 
     private void showResponse(StatisticResponse result) {
 
+        List<DataPoint> pointList = new ArrayList<>();
+        List<String> dates = new ArrayList<>();
         List<StatisticResponse.Operation> operationList = result.getOperationList();
         for (StatisticResponse.Operation operation : operationList) {
-            String date = getDate(operation.getDate());
-//            Toast.makeText(mainActivity.getApplicationContext(), operation.getClient_id() + ", " + date, Toast.LENGTH_SHORT).show();
 
-            makeTableRow(date, operation.getAvgBill(), operation.getIncome(), operation.getOutcome());
+            Calendar calendar = getDate(operation.getDate());
+//            Date dateGraph = getDateFromString(date);
+            Date d = calendar.getTime();
+            dates.add(Integer.toString(d.getDate()));
+
+//            Toast.makeText(mainActivity.getApplicationContext(), date, Toast.LENGTH_SHORT).show();
+//            makeTableRow(date, operation.getAvgBill(), operation.getIncome(), operation.getOutcome());
+            pointList.add(new DataPoint(d.getDate(), operation.getAvgBill()));
         }
+        DataPoint[] dataPoints = new DataPoint[pointList.size()];
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(pointList.toArray(dataPoints));
+        graph.addSeries(series);
 
+        // set date label formatter
+//        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
 
-//        if (result.() == 0) {
-//            Toast.makeText(getActivity().getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
-//        } else {
-//            // if something went wrong
-//            Toast.makeText(getActivity().getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
-//        }
+        String[] axisX = new String[dates.size()];
+        axisX = dates.toArray(axisX);
+        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
+        staticLabelsFormatter.setHorizontalLabels(axisX);
+        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
 
+        graph.getViewport().setMinX(Integer.parseInt(dates.get(0)));
+        graph.getViewport().setMaxX(Integer.parseInt(dates.get(dates.size() - 1)));
+        graph.getViewport().setXAxisBoundsManual(true);
+
+    }
+
+    private Date getDateFromString(String date) {
+        SimpleDateFormat src = new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
+        Date newDate = null;
+        try {
+            newDate = src.parse(date);
+        } catch (ParseException e) {
+            Log.d("Exception", e.getMessage());
+        }
+        return newDate;
     }
 
     private void makeTableRow(String date, float avgBill, int income, int outcome) {
@@ -124,21 +162,29 @@ public class StatisticFragment extends Fragment {
         date_tv.setLayoutParams(new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
                 TableLayout.LayoutParams.WRAP_CONTENT, 1f));
         date_tv.setGravity(Gravity.CENTER);
+        date_tv.setTextColor(Color.BLACK);
+        date_tv.setWidth(0);
 
         avg_bill_tv.setText(String.format("%.2f", avgBill));
         avg_bill_tv.setLayoutParams(new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
                 TableLayout.LayoutParams.WRAP_CONTENT, 1f));
         avg_bill_tv.setGravity(Gravity.CENTER);
+        avg_bill_tv.setTextColor(Color.BLACK);
+        avg_bill_tv.setWidth(0);
 
         income_tv.setText(Integer.toString(income));
         income_tv.setLayoutParams(new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
                 TableLayout.LayoutParams.WRAP_CONTENT, 1f));
         income_tv.setGravity(Gravity.CENTER);
+        income_tv.setTextColor(Color.BLACK);
+        income_tv.setWidth(0);
 
         outcome_tv.setText(Integer.toString(outcome));
         outcome_tv.setLayoutParams(new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
                 TableLayout.LayoutParams.WRAP_CONTENT, 1f));
         outcome_tv.setGravity(Gravity.CENTER);
+        outcome_tv.setTextColor(Color.BLACK);
+        outcome_tv.setWidth(0);
 
         tr.addView(date_tv);
         tr.addView(avg_bill_tv);
@@ -157,15 +203,16 @@ public class StatisticFragment extends Fragment {
 
     }
 
-    public String getDate(String dateString) {
-        SimpleDateFormat src = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
-        SimpleDateFormat dest = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+    public Calendar getDate(String dateString) {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
         Date date = null;
+        Calendar calendar = Calendar.getInstance();
         try {
-            date = src.parse(dateString);
+            date = sdf.parse(dateString);
+            calendar.setTime(date);
         } catch (ParseException e) {
-            Log.d("Exception", e.getMessage());
+            e.printStackTrace();
         }
-        return dest.format(date);
+        return calendar;
     }
 }
