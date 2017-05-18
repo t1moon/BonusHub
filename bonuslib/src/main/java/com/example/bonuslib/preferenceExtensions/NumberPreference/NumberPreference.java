@@ -1,4 +1,4 @@
-package com.example.bonuslib.preferenceExtensions;
+package com.example.bonuslib.preferenceExtensions.NumberPreference;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -17,6 +17,7 @@ public class NumberPreference extends DialogPreference {
 
     public NumberPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        setSummary(String.valueOf(getValue()));
     }
 
     public NumberPreference(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -38,6 +39,7 @@ public class NumberPreference extends DialogPreference {
     public void setValue(int value) {
         this.value = value;
         persistInt(value); // save to sp
+        setSummary(String.valueOf(value));
     }
 
     @Override

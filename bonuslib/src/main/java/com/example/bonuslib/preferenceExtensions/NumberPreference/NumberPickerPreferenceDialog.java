@@ -1,12 +1,10 @@
-package com.example.bonuslib.preferenceExtensions;
+package com.example.bonuslib.preferenceExtensions.NumberPreference;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceDialogFragmentCompat;
 import android.view.View;
-import android.widget.NumberPicker;
 
 import com.example.bonuslib.R;
 

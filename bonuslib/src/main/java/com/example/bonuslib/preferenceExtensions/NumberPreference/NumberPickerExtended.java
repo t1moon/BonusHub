@@ -1,4 +1,4 @@
-package com.example.bonuslib.preferenceExtensions;
+package com.example.bonuslib.preferenceExtensions.NumberPreference;
 
 import android.content.Context;
 import android.util.AttributeSet;

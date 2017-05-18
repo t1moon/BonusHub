@@ -7,16 +7,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.preference.PreferenceGroup;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
-import com.example.bonuslib.preferenceExtensions.NumberPickerPreferenceDialog;
-import com.example.bonuslib.preferenceExtensions.NumberPreference;
+import com.example.bonuslib.preferenceExtensions.NumberPreference.NumberPickerPreferenceDialog;
+import com.example.bonuslib.preferenceExtensions.NumberPreference.NumberPreference;
 import com.example.timur.BonusHub.R;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -104,6 +101,9 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
             return;
         }
 
+        //set bonus system type summary
+        findPreference(getString(BONUS_SYSTEM_KEY_ADDRESS)).setSummary(
+                        getResources().getStringArray(R.array.bonus_system)[bst]);
         // show specialized settings
         addPreferencesFromResource(TYPED_SETTINGS[bst]);
     }
