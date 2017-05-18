@@ -13,7 +13,7 @@ public class RetrofitFactory {
     }
 
     private final static Retrofit BARMEN_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://burmistrovm.pythonanywhere.com/api/")
+            .baseUrl("http://romvanocouponserver.pythonanywhere.com/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
