@@ -4,7 +4,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -27,13 +26,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.DbExecutorService;
-import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.retrofit.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.editInfo.EditPojo;
 import com.example.BonusHub.activity.retrofit.editInfo.EditResponse;
-import com.example.BonusHub.activity.retrofit.editInfo.UploadPojo;
 import com.example.BonusHub.activity.retrofit.editInfo.UploadResponse;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -43,16 +40,10 @@ import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 
 public class EditFragment extends Fragment {
-
-
-    public static final int UPLOAD_RESULT_OK = 0;
-    public static final int UPLOAD_RESULT_FAIL = 1;
-    public static final int UPLOAD_RESULT_FILE_NOT_FOUND = 2;
     private static int RESULT_LOAD_IMG = 1;
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
@@ -74,14 +65,6 @@ public class EditFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
-
-//        UploadHostPhotoExecutor.getInstance().setCallback(new UploadHostPhotoExecutor.Callback() {
-//            @Override
-//            public void onUploaded(int resultCode, BitmapDrawable bdrawable) {
-//                onHostPhotoUploaded(resultCode, bdrawable);
-//            }
-//        });
-
     }
 
     @Override
@@ -206,17 +189,7 @@ public class EditFragment extends Fragment {
                 host.setAddress(host_address_et.getText().toString());
                 host.setTime_open(open_hour * 60 + open_minute);
                 host.setTime_close(close_hour * 60 + close_minute);
-//                DbExecutorService.getInstance().editInfo(host_id, host, new DbExecutorService.DbExecutorCallback() {
-//                    @Override
-//                    public void onSuccess(Map<String, ?> result) {
-//                        Toast.makeText(mainActivity, "Данные в кэше были успешно изменены", Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                    @Override
-//                    public void onError(Exception ex) {
-//                        Toast.makeText(mainActivity, "Произошла ошибка при изменении данных в кеше", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+
                 final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
                 Call<EditResponse> call = apiInterface.editHost(new EditPojo(host_id, host));
                 NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<EditResponse>() {
@@ -273,7 +246,7 @@ public class EditFragment extends Fragment {
             // When an Image is picked
             if (requestCode == RESULT_LOAD_IMG && null != data) {
                 // Get the Image from data
-                Uri targetUri = data.getData();
+                final Uri targetUri = data.getData();
 
                 String path = getRealPathFromURI(mainActivity, targetUri);
                 final ApiInterface apiInterface = RetrofitFactory.retrofitHost().   create(ApiInterface.class);
@@ -284,20 +257,24 @@ public class EditFragment extends Fragment {
                 // MultipartBody.Part is used to send also the actual file name
                 MultipartBody.Part body =
                         MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
-                RequestBody filename = RequestBody.create(MediaType.parse("text/plain"), file.getName());
-
-                // add another part within the multipart request
-                //RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-//                RequestBody host_id_request =
-//                        RequestBody.create(
-//                                okhttp3.MultipartBody.FORM, host_id_string);
-
 
                 Call<UploadResponse> call = apiInterface.upload(body, host_id);
                 NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<UploadResponse>() {
                     @Override
                     public void onSuccess(UploadResponse result) {
                         Toast.makeText(mainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        DbExecutorService.getInstance().upload(getContext(), host_id, targetUri, new DbExecutorService.DbExecutorCallback() {
+                            @Override
+                            public void onSuccess(Map<String, ?> result) {
+                                onHostPhotoUploaded((String) result.get("image"));
+                            }
+                            @Override
+                            public void onError(Exception ex) {
+                                showError(ex);
+                            }
+                        });
+
                     }
 
                     @Override
@@ -307,21 +284,6 @@ public class EditFragment extends Fragment {
                 });
 
 
-
-
-
-                //UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
-                DbExecutorService.getInstance().upload(getContext(), host_id, targetUri, new DbExecutorService.DbExecutorCallback() {
-                    @Override
-                    public void onSuccess(Map<String, ?> result) {
-                        onHostPhotoUploaded((String) result.get("image"));
-                    }
-
-                    @Override
-                    public void onError(Exception ex) {
-
-                    }
-                });
             } else {
                 Toast.makeText(mainActivity, "Вы не выбрали изображение", Toast.LENGTH_SHORT).show();
             }
@@ -338,17 +300,6 @@ public class EditFragment extends Fragment {
                 .load(src)
                 .fitCenter()
                 .into(imgView);
-
-//        if (resultCode == EditFragment.UPLOAD_RESULT_OK) {
-//            Toast.makeText(mainActivity, "Изображение успешно загружено", Toast.LENGTH_SHORT).show();
-//            imgView.setBackground(bdrawable);
-//        }
-//        if (resultCode == EditFragment.UPLOAD_RESULT_FILE_NOT_FOUND) {
-//            Toast.makeText(mainActivity, "Файл не найден", Toast.LENGTH_SHORT).show();
-//        }
-//        if (resultCode == EditFragment.UPLOAD_RESULT_FAIL) {
-//            Toast.makeText(mainActivity, "Произошла ошибка при загрузке изображения", Toast.LENGTH_SHORT).show();
-//        }
     }
 
     public String getRealPathFromURI(Context context, Uri contentUri) {
