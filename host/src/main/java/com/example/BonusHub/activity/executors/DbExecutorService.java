@@ -1,5 +1,10 @@
 package com.example.BonusHub.activity.executors;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +16,7 @@ import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.j256.ormlite.stmt.UpdateBuilder;
 
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,6 +131,39 @@ public class DbExecutorService {
                         public void run() {
                             final Map<String, Integer> result = new HashMap<String, Integer>();
                             result.put("result_code", 0);
+                            callback.onSuccess(result);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void upload(final Context context, final int host_id, final Uri targetUri, final DbExecutorCallback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (host_id != -1) {
+                    UpdateBuilder<Host, Integer> updateBuilder = null;
+                    try {
+                        updateBuilder = HelperFactory.getHelper().
+                                getHostDAO().updateBuilder();
+                        updateBuilder.where().eq(Host.HOST_ID_FIELD_NAME, host_id);
+                        updateBuilder.updateColumnValue(Host.HOST_IMAGE_FIELD_NAME, targetUri.toString());
+                        updateBuilder.update();
+                    } catch (final SQLException e) {
+                        uiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onError(e);
+                            }
+                        });
+                    }
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Map<String, String> result = new HashMap<String, String>();
+                            result.put("image", targetUri.toString());
                             callback.onSuccess(result);
                         }
                     });

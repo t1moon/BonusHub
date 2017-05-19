@@ -3,11 +3,14 @@ package com.example.BonusHub.activity.fragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
@@ -29,9 +33,18 @@ import com.example.BonusHub.activity.retrofit.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.editInfo.EditPojo;
 import com.example.BonusHub.activity.retrofit.editInfo.EditResponse;
+import com.example.BonusHub.activity.retrofit.editInfo.UploadPojo;
+import com.example.BonusHub.activity.retrofit.editInfo.UploadResponse;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
+
+import java.io.File;
 import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 
 public class EditFragment extends Fragment {
@@ -62,12 +75,12 @@ public class EditFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
 
-        UploadHostPhotoExecutor.getInstance().setCallback(new UploadHostPhotoExecutor.Callback() {
-            @Override
-            public void onUploaded(int resultCode, BitmapDrawable bdrawable) {
-                onHostPhotoUploaded(resultCode, bdrawable);
-            }
-        });
+//        UploadHostPhotoExecutor.getInstance().setCallback(new UploadHostPhotoExecutor.Callback() {
+//            @Override
+//            public void onUploaded(int resultCode, BitmapDrawable bdrawable) {
+//                onHostPhotoUploaded(resultCode, bdrawable);
+//            }
+//        });
 
     }
 
@@ -193,7 +206,6 @@ public class EditFragment extends Fragment {
                 host.setAddress(host_address_et.getText().toString());
                 host.setTime_open(open_hour * 60 + open_minute);
                 host.setTime_close(close_hour * 60 + close_minute);
-
 //                DbExecutorService.getInstance().editInfo(host_id, host, new DbExecutorService.DbExecutorCallback() {
 //                    @Override
 //                    public void onSuccess(Map<String, ?> result) {
@@ -226,6 +238,12 @@ public class EditFragment extends Fragment {
 
     private void showError(Throwable error) {
         mainActivity.showSnack("Не удалось обновить информацию");
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Ошибка")
+                .setMessage(error.getMessage())
+                .setPositiveButton("OK", null)
+                .show();
+
     }
 
     private void showResponse(EditResponse result) {
@@ -256,7 +274,54 @@ public class EditFragment extends Fragment {
             if (requestCode == RESULT_LOAD_IMG && null != data) {
                 // Get the Image from data
                 Uri targetUri = data.getData();
-                UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
+
+                String path = getRealPathFromURI(mainActivity, targetUri);
+                final ApiInterface apiInterface = RetrofitFactory.retrofitHost().   create(ApiInterface.class);
+                File file = new File(path);
+                // create RequestBody instance from file
+                RequestBody requestFile =  RequestBody.create(MediaType.parse("*/*"), file);
+
+                // MultipartBody.Part is used to send also the actual file name
+                MultipartBody.Part body =
+                        MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
+                RequestBody filename = RequestBody.create(MediaType.parse("text/plain"), file.getName());
+
+                // add another part within the multipart request
+                //RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+//                RequestBody host_id_request =
+//                        RequestBody.create(
+//                                okhttp3.MultipartBody.FORM, host_id_string);
+
+
+                Call<UploadResponse> call = apiInterface.upload(body, host_id);
+                NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<UploadResponse>() {
+                    @Override
+                    public void onSuccess(UploadResponse result) {
+                        Toast.makeText(mainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(Exception ex) {
+                        showError(ex);
+                    }
+                });
+
+
+
+
+
+                //UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
+                DbExecutorService.getInstance().upload(getContext(), host_id, targetUri, new DbExecutorService.DbExecutorCallback() {
+                    @Override
+                    public void onSuccess(Map<String, ?> result) {
+                        onHostPhotoUploaded((String) result.get("image"));
+                    }
+
+                    @Override
+                    public void onError(Exception ex) {
+
+                    }
+                });
             } else {
                 Toast.makeText(mainActivity, "Вы не выбрали изображение", Toast.LENGTH_SHORT).show();
             }
@@ -266,20 +331,38 @@ public class EditFragment extends Fragment {
         }
     }
 
-    private void onHostPhotoUploaded(int resultCode, BitmapDrawable bdrawable) {
+    private void onHostPhotoUploaded(String src) {
         ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+        Glide
+                .with(getActivity().getApplicationContext())
+                .load(src)
+                .fitCenter()
+                .into(imgView);
 
-        if (resultCode == EditFragment.UPLOAD_RESULT_OK) {
-            Toast.makeText(mainActivity, "Изображение успешно загружено", Toast.LENGTH_SHORT).show();
-            imgView.setBackground(bdrawable);
-        }
-        if (resultCode == EditFragment.UPLOAD_RESULT_FILE_NOT_FOUND) {
-            Toast.makeText(mainActivity, "Файл не найден", Toast.LENGTH_SHORT).show();
-        }
-        if (resultCode == EditFragment.UPLOAD_RESULT_FAIL) {
-            Toast.makeText(mainActivity, "Произошла ошибка при загрузке изображения", Toast.LENGTH_SHORT).show();
-        }
+//        if (resultCode == EditFragment.UPLOAD_RESULT_OK) {
+//            Toast.makeText(mainActivity, "Изображение успешно загружено", Toast.LENGTH_SHORT).show();
+//            imgView.setBackground(bdrawable);
+//        }
+//        if (resultCode == EditFragment.UPLOAD_RESULT_FILE_NOT_FOUND) {
+//            Toast.makeText(mainActivity, "Файл не найден", Toast.LENGTH_SHORT).show();
+//        }
+//        if (resultCode == EditFragment.UPLOAD_RESULT_FAIL) {
+//            Toast.makeText(mainActivity, "Произошла ошибка при загрузке изображения", Toast.LENGTH_SHORT).show();
+//        }
     }
 
-
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 }
