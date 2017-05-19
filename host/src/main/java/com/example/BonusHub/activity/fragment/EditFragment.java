@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,11 +26,19 @@ import android.widget.Toast;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.EditHostInfoExecutor;
 import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
+import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.NetworkThread;
+import com.example.BonusHub.activity.retrofit.RetrofitFactory;
+import com.example.BonusHub.activity.retrofit.editInfo.EditPojo;
+import com.example.BonusHub.activity.retrofit.editInfo.EditResponse;
+import com.example.BonusHub.activity.retrofit.statistic.StatisticResponse;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
+
+import retrofit2.Call;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -220,10 +229,37 @@ public class EditFragment extends Fragment {
                     host.setTime_close(close_hour * 60 + close_minute);
 
                 EditHostInfoExecutor.getInstance().editInfo(host_id, host);
+                final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
+                Call<EditResponse> call = apiInterface.editHost(new EditPojo(host_id, host));
+                NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<EditResponse>() {
+                    @Override
+                    public void onSuccess(EditResponse result) {
+                        showResponse(result);
+                    }
+
+                    @Override
+                    public void onError(Exception ex) {
+                        showError(ex);
+                    }
+                });
                 mainActivity.popFragment();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showError(Throwable error) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Ошибка")
+                .setMessage(error.getMessage())
+                .setPositiveButton("OK", null)
+                .show();
+
+    }
+
+    private void showResponse(EditResponse result) {
+        Toast.makeText(mainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -231,6 +267,7 @@ public class EditFragment extends Fragment {
         inflater.inflate(R.menu.start_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
+
     public void loadImagefromGallery(View view) {
         // Create intent to Open Image applications like Gallery, Google Photos
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
@@ -245,7 +282,7 @@ public class EditFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG  && null != data) {
+            if (requestCode == RESULT_LOAD_IMG && null != data) {
                 // Get the Image from data
                 Uri targetUri = data.getData();
                 UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
