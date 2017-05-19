@@ -30,6 +30,7 @@ import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -231,14 +232,11 @@ public class ProfileFragment extends Fragment {
         host_title.setText(title);
         host_description.setText(description);
         host_address.setText(address);
-        if (open_minute != 0)
-            host_open_time_tv.setText(open_hour + ":" + open_minute);
-        else
-            host_open_time_tv.setText(open_hour + "0:" + "00");
-        if (close_minute != 0)
-            host_close_time_tv.setText(close_hour + ":" + close_minute);
-        else
-            host_close_time_tv.setText(close_hour + "0:" + "00");
+
+        String open_time = String.format("%02d:%02d", open_hour, open_minute);
+        String close_time = String.format("%02d:%02d", close_hour, close_minute);
+        host_open_time_tv.setText(open_time);
+        host_close_time_tv.setText(close_time);
 
         ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
         Glide

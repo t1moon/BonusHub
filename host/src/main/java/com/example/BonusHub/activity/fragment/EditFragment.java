@@ -8,8 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,13 +29,9 @@ import com.example.BonusHub.activity.retrofit.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.editInfo.EditPojo;
 import com.example.BonusHub.activity.retrofit.editInfo.EditResponse;
-import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
-
-import java.sql.SQLException;
 import java.util.Map;
-
 import retrofit2.Call;
 
 public class EditFragment extends Fragment {
@@ -49,7 +43,6 @@ public class EditFragment extends Fragment {
     private static int RESULT_LOAD_IMG = 1;
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
-    private boolean set_open_time = false, set_close_time = false;
     private Button open_time_btn;
     private Button close_time_btn;
     private EditText host_title_et;
@@ -84,9 +77,6 @@ public class EditFragment extends Fragment {
         // Inflate the layout for this fragment
 
         rootView = inflater.inflate(R.layout.fragment_edit, container, false);
-
-        set_open_time = false;
-        set_close_time = false;
 
         host_title_et = (EditText) rootView.findViewById(R.id.edit_host_title_et);
         host_description_et = (EditText) rootView.findViewById(R.id.edit_host_description_et);
@@ -131,6 +121,7 @@ public class EditFragment extends Fragment {
             public void onSuccess(Map<String, ?> result) {
                 onCacheLoaded((Host) result.get("host"));
             }
+
             @Override
             public void onError(Exception ex) {
                 Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
@@ -145,22 +136,21 @@ public class EditFragment extends Fragment {
             String title = host.getTitle();
             String description = host.getDescription();
             String address = host.getAddress();
-            int open_hour = host.getTime_open() / 60;
-            int open_minute = host.getTime_open() % 60;
-            int close_hour = host.getTime_close() / 60;
-            int close_minute = host.getTime_close() % 60;
+            open_hour = host.getTime_open() / 60;
+            open_minute = host.getTime_open() % 60;
+            close_hour = host.getTime_close() / 60;
+            close_minute = host.getTime_close() % 60;
 
             host_title_et.setText(title);
             host_description_et.setText(description);
             host_address_et.setText(address);
-            if (open_minute != 0)
-                open_time_btn.setText(open_hour + ":" + open_minute);
-            else
-                open_time_btn.setText(open_hour + ":" + "00");
-            if (close_minute != 0)
-                close_time_btn.setText(close_hour + ":" + close_minute);
-            else
-                close_time_btn.setText(close_hour + ":" + "00");
+
+            String open_time = String.format("%02d:%02d", open_hour, open_minute);
+            String close_time = String.format("%02d:%02d", close_hour, close_minute);
+            open_time_btn.setText(open_time);
+            close_time_btn.setText(close_time);
+
+
         }
     }
 
@@ -173,25 +163,16 @@ public class EditFragment extends Fragment {
                     public void onTimeSet(TimePicker view, int hourOfDay,
                                           int minute) {
                         if (v == open_time_btn) {
-                            open_time_btn.setTextSize(20);
-                            if (minute != 0)
-                                open_time_btn.setText(hourOfDay + ":" + minute);
-                            else
-                                open_time_btn.setText(hourOfDay + ":" + "00");
+                            String open_time = String.format("%02d:%02d", hourOfDay, minute);
+                            open_time_btn.setText(open_time);
                             open_hour = hourOfDay;
                             open_minute = minute;
-                            set_open_time = true;
                         } else {
-                            close_time_btn.setTextSize(20);
-                            if (minute != 0)
-                                close_time_btn.setText(hourOfDay + ":" + minute);
-                            else
-                                close_time_btn.setText(hourOfDay + ":" + "00");
+                            String close_time = String.format("%02d:%02d", hourOfDay, minute);
+                            close_time_btn.setText(close_time);
                             close_hour = hourOfDay;
                             close_minute = minute;
-                            set_close_time = true;
                         }
-
                     }
                 }, 0, 0, true);
         timePickerDialog.show();
@@ -210,10 +191,8 @@ public class EditFragment extends Fragment {
                 host.setTitle(host_title_et.getText().toString());
                 host.setDescription(host_description_et.getText().toString());
                 host.setAddress(host_address_et.getText().toString());
-                if (set_open_time)
-                    host.setTime_open(open_hour * 60 + open_minute);
-                if (set_close_time)
-                    host.setTime_close(close_hour * 60 + close_minute);
+                host.setTime_open(open_hour * 60 + open_minute);
+                host.setTime_close(close_hour * 60 + close_minute);
 
 //                DbExecutorService.getInstance().editInfo(host_id, host, new DbExecutorService.DbExecutorCallback() {
 //                    @Override
