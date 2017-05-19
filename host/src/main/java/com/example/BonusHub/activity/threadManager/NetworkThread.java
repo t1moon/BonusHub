@@ -67,6 +67,5 @@ public class NetworkThread {
 
         void onError(Exception ex);
 
-
     }
 }

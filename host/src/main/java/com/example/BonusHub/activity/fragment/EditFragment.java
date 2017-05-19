@@ -24,23 +24,21 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.executors.EditHostInfoExecutor;
+import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.retrofit.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.editInfo.EditPojo;
 import com.example.BonusHub.activity.retrofit.editInfo.EditResponse;
-import com.example.BonusHub.activity.retrofit.statistic.StatisticResponse;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import retrofit2.Call;
-
-import static android.app.Activity.RESULT_OK;
 
 public class EditFragment extends Fragment {
 
@@ -50,9 +48,6 @@ public class EditFragment extends Fragment {
     public static final int UPLOAD_RESULT_FILE_NOT_FOUND = 2;
     private static int RESULT_LOAD_IMG = 1;
 
-
-    public static final int RESULT_OK = 0;
-    public static final int RESULT_FAIL = 1;
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private boolean set_open_time = false, set_close_time = false;
     private Button open_time_btn;
@@ -73,28 +68,13 @@ public class EditFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
-        EditHostInfoExecutor.getInstance().setCallback(new EditHostInfoExecutor.Callback() {
-            @Override
-            public void onEdited(int resultCode) {
-                onHostInfoEdited(resultCode);
-            }
-        });
+
         UploadHostPhotoExecutor.getInstance().setCallback(new UploadHostPhotoExecutor.Callback() {
             @Override
             public void onUploaded(int resultCode, BitmapDrawable bdrawable) {
                 onHostPhotoUploaded(resultCode, bdrawable);
             }
         });
-
-
-    }
-
-    private void onHostInfoEdited(int resultCode) {
-        if (resultCode == RESULT_FAIL) {
-            Toast.makeText(mainActivity, "Произошла ошибка при изменении данных", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(mainActivity, "Данные были успешно изменены", Toast.LENGTH_SHORT).show();
-        }
 
     }
 
@@ -124,7 +104,7 @@ public class EditFragment extends Fragment {
         });
         setHasOptionsMenu(true);
 
-        setInfo();
+        getFromCache();
 
         open_time_btn.setOnClickListener(new View.OnClickListener() {
 
@@ -144,16 +124,23 @@ public class EditFragment extends Fragment {
         return rootView;
     }
 
-
-    public void setInfo() {
+    private void getFromCache() {
         host_id = getActivity().getPreferences(Context.MODE_PRIVATE).getInt("host_id", -1);
-        Log.d("host_Id", Integer.toString(host_id));
-        Host host = null;
-        try {
-            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        DbExecutorService.getInstance().loadInfo(host_id, new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onCacheLoaded((Host) result.get("host"));
+            }
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+
+    public void onCacheLoaded(Host host) {
         if (host != null) {
             String title = host.getTitle();
             String description = host.getDescription();
@@ -228,7 +215,17 @@ public class EditFragment extends Fragment {
                 if (set_close_time)
                     host.setTime_close(close_hour * 60 + close_minute);
 
-                EditHostInfoExecutor.getInstance().editInfo(host_id, host);
+//                DbExecutorService.getInstance().editInfo(host_id, host, new DbExecutorService.DbExecutorCallback() {
+//                    @Override
+//                    public void onSuccess(Map<String, ?> result) {
+//                        Toast.makeText(mainActivity, "Данные в кэше были успешно изменены", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void onError(Exception ex) {
+//                        Toast.makeText(mainActivity, "Произошла ошибка при изменении данных в кеше", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
                 final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
                 Call<EditResponse> call = apiInterface.editHost(new EditPojo(host_id, host));
                 NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<EditResponse>() {
@@ -249,12 +246,7 @@ public class EditFragment extends Fragment {
     }
 
     private void showError(Throwable error) {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Ошибка")
-                .setMessage(error.getMessage())
-                .setPositiveButton("OK", null)
-                .show();
-
+        mainActivity.showSnack("Не удалось обновить информацию");
     }
 
     private void showResponse(EditResponse result) {

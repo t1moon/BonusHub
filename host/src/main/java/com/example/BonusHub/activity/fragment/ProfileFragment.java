@@ -2,13 +2,7 @@ package com.example.BonusHub.activity.fragment;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,27 +20,20 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.executors.CreateHostExecutor;
-import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
-import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
+import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.retrofit.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.getInfo.GetInfoResponse;
-import com.example.bonuslib.client.Client;
-import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 public class ProfileFragment extends Fragment {
@@ -65,8 +51,6 @@ public class ProfileFragment extends Fragment {
     ProgressDialog progress;
     String pathToImageProfile;
 
-
-
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -81,22 +65,152 @@ public class ProfileFragment extends Fragment {
             ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
         }
+    }
 
-        GetHostInfoExecutor.getInstance().setCallback(new GetHostInfoExecutor.Callback() {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        final View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        host_title = (TextView) rootView.findViewById(R.id.host_title_tv);
+        host_description = (TextView) rootView.findViewById(R.id.host_description_tv);
+        host_address = (TextView) rootView.findViewById(R.id.host_address_tv);
+        host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
+        host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
+        fab_edit = (FloatingActionButton) mainActivity.findViewById(R.id.fab);
+        fab_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_black_24dp));
+        fab_edit.setVisibility(View.VISIBLE);
+
+        fab_edit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onLoaded(Host host) {
-                onHostInfoLoaded(host);
+            public void onClick(View v) {
+                mainActivity.pushFragment(new EditFragment(), true);
             }
         });
 
-        CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
+        host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
+
+        if(mainActivity.hasConnection())
+            getFromInternet();
+        else
+            getFromCache();
+
+        return rootView;
+    }
+
+    private void getFromCache() {
+        DbExecutorService.getInstance().loadInfo(host_id, new DbExecutorService.DbExecutorCallback() {
             @Override
-            public void onCreated(int host_id) {
-                onHostCreated(host_id);
+            public void onSuccess(Map<String, ?> result) {
+                onCacheLoaded((Host) result.get("host"));
+            }
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
+
             }
         });
+    }
 
+    private void getFromInternet() {
+        progress = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
 
+        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
+        final Call<GetInfoResponse> call = apiInterface.getInfo(1);
+        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<GetInfoResponse>() {
+            @Override
+            public void onSuccess(GetInfoResponse result) {
+                showResponse(result);
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                showError(ex);
+            }
+        });
+    }
+
+    private void showResponse(GetInfoResponse result) {
+        progress.dismiss();
+        // clear tables
+        HelperFactory.getHelper().clearHostTable(HelperFactory.getHelper().getConnectionSource());
+
+        Host host = new Host(
+                result.getTitle(),
+                result.getDescription(),
+                result.getAddress(),
+                result.getTime_open(),
+                result.getTime_close());
+
+        ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
+
+        pathToImageProfile = RetrofitFactory.retrofitHost().baseUrl() + RetrofitFactory.MEDIA_URL + result.getProfile_image();
+        Glide
+                .with(getActivity().getApplicationContext())
+                .load(pathToImageProfile)
+                .fitCenter()
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(imgView);
+
+        host.setProfile_image(pathToImageProfile);
+        // TO-DO: Выяснить как кешируется glide
+//        UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
+        DbExecutorService.getInstance().createHost(host, new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onHostCreated((Integer) result.get("host_id"));
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                new AlertDialog.Builder(mainActivity)
+                        .setTitle("Ошибка при записи в кэш")
+                        .setMessage(ex.getMessage())
+                        .setPositiveButton("OK", null)
+                        .show();
+            }
+        });
+    }
+
+    private void showError(Exception error) {
+        progress.dismiss();
+        new AlertDialog.Builder(mainActivity)
+                .setTitle("Ошибка при подключении к серверу")
+                .setMessage(error.getMessage())
+                .setPositiveButton("OK", null)
+                .show();
+
+    }
+
+    private void onCacheLoaded(Host host) {
+        String title = host.getTitle();
+        String description = host.getDescription();
+        String address = host.getAddress();
+        int open_hour = host.getTime_open() / 60;
+        int open_minute = host.getTime_open() % 60;
+        int close_hour = host.getTime_close() / 60;
+        int close_minute = host.getTime_close() % 60;
+        String imageUriString = host.getProfile_image();
+        host_title.setText(title);
+        host_description.setText(description);
+        host_address.setText(address);
+        if (open_minute != 0)
+            host_open_time_tv.setText(open_hour + ":" + open_minute);
+        else
+            host_open_time_tv.setText(open_hour + "0:" + "00");
+        if (close_minute != 0)
+            host_close_time_tv.setText(close_hour + ":" + close_minute);
+        else
+            host_close_time_tv.setText(close_hour + "0:" + "00");
+
+        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+        Glide
+                .with(getActivity().getApplicationContext())
+                .load(imageUriString)
+                .fitCenter()
+                .into(imgView);
+        Toast.makeText(mainActivity, "Информация загружена из кэша", Toast.LENGTH_SHORT).show();
     }
 
     private void onHostCreated(int host_id) {
@@ -132,125 +246,12 @@ public class ProfileFragment extends Fragment {
                 .load(imageUriString)
                 .fitCenter()
                 .into(imgView);
-        Toast.makeText(mainActivity.getApplicationContext(), "Информация обновлена", Toast.LENGTH_SHORT).show();
-////        // setImage
-//        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-//        if (imageUriString != null) {
-//            Bitmap bitmap = null;
-//            try {
-//                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
-//                        .openInputStream(Uri.parse(imageUriString)));
-//                BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
-//                imgView.setBackground(bdrawable);
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
-
-}
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        final View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
-
-        host_title = (TextView) rootView.findViewById(R.id.host_title_tv);
-        host_description = (TextView) rootView.findViewById(R.id.host_description_tv);
-        host_address = (TextView) rootView.findViewById(R.id.host_address_tv);
-        host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
-        host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
-        fab_edit = (FloatingActionButton) mainActivity.findViewById(R.id.fab);
-        fab_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_black_24dp));
-        fab_edit.setVisibility(View.VISIBLE);
-
-        fab_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainActivity.pushFragment(new EditFragment(), true);
-            }
-        });
-
-        host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
-        if(mainActivity.hasConnection()) {
-            prepareHostInfo();
-        } else {
-            getFromCache();
-        }
-
-
-        return rootView;
-    }
-
-    private void prepareHostInfo() {
-        progress = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
-
-        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-        final Call<GetInfoResponse> call = apiInterface.getInfo(1);
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<GetInfoResponse>() {
-            @Override
-            public void onSuccess(GetInfoResponse result) {
-                showResponse(result);
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                showError(ex);
-
-            }
-        });
-    }
-
-    private void showError(Exception error) {
-        progress.dismiss();
-        new AlertDialog.Builder(mainActivity)
-                .setTitle("Ошибка")
-                .setMessage(error.getMessage())
-                .setPositiveButton("OK", null)
-                .show();
+        mainActivity.showSnack(true);   // Say to user that info is up-to-date
 
     }
 
-    private void showResponse(GetInfoResponse result) {
-        progress.dismiss();
-        // clear tables
-        HelperFactory.getHelper().clearHostTable(HelperFactory.getHelper().getConnectionSource());
 
-        Host host = new Host(
-                result.getTitle(),
-                result.getDescription(),
-                result.getAddress(),
-                result.getTime_open(),
-                result.getTime_close());
-
-        ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
-
-        pathToImageProfile = RetrofitFactory.retrofitHost().baseUrl() + RetrofitFactory.MEDIA_URL + result.getProfile_image();
-        Glide
-                .with(getActivity().getApplicationContext())
-                .load(pathToImageProfile)
-                .fitCenter()
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .into(imgView);
-
-        host.setProfile_image(pathToImageProfile);
-//        UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
-        CreateHostExecutor.getInstance().createHost(host);
-
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -267,49 +268,5 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void onHostInfoLoaded(Host host) {
-        String title = host.getTitle();
-        String description = host.getDescription();
-        String address = host.getAddress();
-        int open_hour = host.getTime_open() / 60;
-        int open_minute = host.getTime_open() % 60;
-        int close_hour = host.getTime_close() / 60;
-        int close_minute = host.getTime_close() % 60;
-        String imageUriString = host.getProfile_image();
-        host_title.setText(title);
-        host_description.setText(description);
-        host_address.setText(address);
-        if (open_minute != 0)
-            host_open_time_tv.setText(open_hour + ":" + open_minute);
-        else
-            host_open_time_tv.setText(open_hour + "0:" + "00");
-        if (close_minute != 0)
-            host_close_time_tv.setText(close_hour + ":" + close_minute);
-        else
-            host_close_time_tv.setText(close_hour + "0:" + "00");
 
-////        // setImage
-//        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-//        if (imageUriString != null) {
-//            Bitmap bitmap = null;
-//            try {
-//                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
-//                        .openInputStream(Uri.parse(imageUriString)));
-//                BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
-//                imgView.setBackground(bdrawable);
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-        Glide
-                .with(getActivity().getApplicationContext())
-                .load(imageUriString)
-                .fitCenter()
-                .into(imgView);
-    }
-
-    private void getFromCache() {
-        GetHostInfoExecutor.getInstance().loadInfo(host_id);
-    }
 }
