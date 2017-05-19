@@ -12,8 +12,9 @@ public class RetrofitFactory {
     private RetrofitFactory() {
     }
 
+
     private final static Retrofit BARMEN_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://10.0.3.2:5000/api/")
+            .baseUrl("http://192.168.31.122:5000/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

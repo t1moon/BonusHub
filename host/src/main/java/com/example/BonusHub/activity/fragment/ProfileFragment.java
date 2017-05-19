@@ -237,7 +237,7 @@ public class ProfileFragment extends Fragment {
         String close_time = String.format("%02d:%02d", close_hour, close_minute);
         host_open_time_tv.setText(open_time);
         host_close_time_tv.setText(close_time);
-
+        
         ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
         Glide
                 .with(getActivity().getApplicationContext())

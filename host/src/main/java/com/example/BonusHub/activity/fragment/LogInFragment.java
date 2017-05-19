@@ -126,16 +126,19 @@ public class LogInFragment extends Fragment {
             public void onFailure(Call<LoginResult> call, Throwable t) {
                 Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 Log.d("кука", "кука1");
+                progressDialog.dismiss();
             }
 
             @Override
             public void onSuccess(LoginResult result) {
                 onLoginResult(result);
+                progressDialog.dismiss();
             }
 
             @Override
             public void onError(Exception ex) {
                 Log.d("кука", "кука3");
+                progressDialog.dismiss();
             }
         });
     }
