@@ -20,7 +20,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
-import com.example.BonusHub.activity.Login;
+import com.example.bonuslib.FragmentType;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.api.host.HostResult;
@@ -29,6 +29,7 @@ import com.example.BonusHub.activity.api.login.LoginResult;
 import com.example.BonusHub.activity.api.login.Loginner;
 import com.example.BonusHub.activity.executors.CreateHostExecutor;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
+import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
@@ -73,6 +74,8 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
     @Override
     public void onDestroy(){
         super.onDestroy();
+        if (progressDialog != null)
+            progressDialog.dismiss();
         NetworkThread.getInstance().setCallback(null);
     }
 
@@ -113,6 +116,11 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
         Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
         getActivity().finish();
+    }
+
+    private void goToLogin() {
+        logInActivity.setCurrentFragment(FragmentType.LogInFragment);
+        logInActivity.pushFragment(new LogInFragment(), true);
     }
 
     private void pickTime(final View v) {
@@ -176,11 +184,12 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
 
                     progressDialog = new ProgressDialog(logInActivity);
                     progressDialog.setIndeterminate(true);
-                    progressDialog.setMessage("Загрузка информации на сервер...");
+                    progressDialog.setMessage("Отправка информации на сервер...");
                     progressDialog.show();
 
                     final Hoster hoster = retrofitBarmen().create(Hoster.class);
                     final Call<HostResult> call = hoster.login(host, AuthUtils.getCookie(getActivity()));
+                    //final Call<HostResult> call = hoster.login(host, "no");
                     NetworkThread.getInstance().setCallback(this);
                     NetworkThread.getInstance().execute(call);
                 }
@@ -205,18 +214,26 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
     }
 
     @Override
-    public void onFailure(Call<HostResult> call, Throwable t) {
-        Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+    public void onFailure(Call<HostResult> call, Response<HostResult> response) {
+        progressDialog.dismiss();
+        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+        AuthUtils.setUnauthorized(getActivity());
+        goToLogin();
     }
 
     @Override
     public void onSuccess(HostResult result) {
-        AuthUtils.setHosted(logInActivity);
-        goToMainActivity();
+        if (result.getCode() == 0) {
+            AuthUtils.setHosted(logInActivity);
+            goToMainActivity();
+        }
+        else
+            Toast.makeText(getActivity(), "Ошибка заполнения", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onError(Exception ex) {
+        progressDialog.dismiss();
         Log.d("LoginExeption", ex.getMessage());
     }
 

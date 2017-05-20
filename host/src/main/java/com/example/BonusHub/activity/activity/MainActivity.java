@@ -248,7 +248,7 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
     }
 
     @Override
-    public void onFailure(Call<LogoutResult> call, Throwable t) {
+    public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
     }
 
     @Override

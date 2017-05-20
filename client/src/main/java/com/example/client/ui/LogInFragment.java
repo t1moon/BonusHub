@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.example.bonuslib.FragmentType;
 import com.example.client.AuthUtils;
-import com.example.client.MainActivity;
 import com.example.client.activity.MainActivity;
 import com.example.client.R;
 import com.example.client.retrofit.login.LoginResult;

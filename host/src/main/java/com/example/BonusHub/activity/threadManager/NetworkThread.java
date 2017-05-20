@@ -35,6 +35,11 @@ public class NetworkThread {
             @Override
             public void run() {
                 try {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     final Response<T> response = call.execute();
                     if (response.isSuccessful() && callback != null) {
                         uiHandler.post(new Runnable() {
@@ -45,8 +50,12 @@ public class NetworkThread {
                             }
                         });
                     } else if (callback != null) {
-                        final String error = response.errorBody().string();
-                        throw new IOException(error);
+                        uiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onFailure(call, response);
+                            }
+                        });
                     }
                 } catch (final IOException e) {
                     uiHandler.post(new Runnable() {
@@ -60,11 +69,9 @@ public class NetworkThread {
         });
     }
 
-    public interface ExecuteCallback<T> extends Callback<T> {
-        @Override
+    public interface ExecuteCallback<T> {
         void onResponse(Call<T> call, Response<T> response);
-        @Override
-        void onFailure(Call<T> call, Throwable t);
+        void onFailure(Call<T> call,  Response<T> response);
         void onSuccess(T result);
 
         void onError(Exception ex);

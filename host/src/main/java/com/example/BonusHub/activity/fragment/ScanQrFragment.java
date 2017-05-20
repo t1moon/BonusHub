@@ -158,8 +158,8 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     }
 
     @Override
-    public void onFailure(Call<UpdatePointsResponse> call, Throwable t) {
-        Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+    public void onFailure(Call<UpdatePointsResponse> call, Response<UpdatePointsResponse> response) {
+        //Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
     }
 
     @Override

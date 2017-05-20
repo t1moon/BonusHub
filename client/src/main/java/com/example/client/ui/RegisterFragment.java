@@ -19,7 +19,6 @@ import com.example.BonusHub.activity.api.registration.RegistrationResult;
 import com.example.BonusHub.activity.api.registration.Registrator;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.FragmentType;
-import com.example.client.MainActivity;
 import com.example.client.activity.MainActivity;
 import com.example.client.R;
 

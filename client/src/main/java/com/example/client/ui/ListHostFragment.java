@@ -23,7 +23,6 @@ import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
-import com.example.client.MainActivity;
 import com.example.client.recycler.GridSpacingItemDecoration;
 import com.example.client.recycler.HostAdapter;
 import com.example.client.recycler.RecyclerTouchListener;
@@ -41,7 +40,7 @@ import java.util.List;
 
 import retrofit2.Call;
 
-import static com.example.client.MainActivity.getClientId;
+import static com.example.client.ui.MainActivity.getClientId;
 
 
 public class ListHostFragment extends Fragment {

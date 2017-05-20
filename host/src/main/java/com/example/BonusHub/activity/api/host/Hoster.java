@@ -1,7 +1,5 @@
 package com.example.BonusHub.activity.api.host;
 
-import com.example.BonusHub.activity.Login;
-import com.example.BonusHub.activity.api.login.LoginResult;
 import com.example.bonuslib.host.Host;
 
 import retrofit2.Call;

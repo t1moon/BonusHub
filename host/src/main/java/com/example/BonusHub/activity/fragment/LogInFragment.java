@@ -51,6 +51,8 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (progressDialog != null)
+            progressDialog.dismiss();
         NetworkThread.getInstance().setCallback(null);
     }
 
@@ -147,8 +149,9 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
     }
 
     @Override
-    public void onFailure(Call<LoginResult> call, Throwable t) {
-        Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+    public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+        progressDialog.dismiss();
+        Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -158,7 +161,8 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
 
     @Override
     public void onError(Exception ex) {
-        Log.d("LoginExeption", ex.getMessage());
+        progressDialog.dismiss();
+        Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
     }
 
     public void onLoginResult(LoginResult result) {

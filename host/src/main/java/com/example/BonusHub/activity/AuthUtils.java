@@ -29,6 +29,14 @@ public class AuthUtils {
                 .apply();
     }
 
+    public static void setUnauthorized(Context context)
+    {
+        context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(PREFERENCES_AUTHORIZED_KEY, false)
+                .apply();
+    }
+
     public static void setHosted(Context context)
     {
         context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)

@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.client.ui;
 
 import android.content.res.Configuration;
 import android.support.design.widget.AppBarLayout;
@@ -23,8 +23,10 @@ import com.example.bonuslib.StackListner;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
+import com.example.client.ConnectivityReceiver;
+import com.example.client.MyApplication;
+import com.example.client.R;
 import com.example.client.qr.QRFragment;
-import com.example.client.ui.ListHostFragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
