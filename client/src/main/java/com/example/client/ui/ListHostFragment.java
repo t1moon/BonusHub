@@ -23,6 +23,7 @@ import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
+import com.example.client.AuthUtils;
 import com.example.client.recycler.GridSpacingItemDecoration;
 import com.example.client.recycler.HostAdapter;
 import com.example.client.recycler.RecyclerTouchListener;
@@ -30,7 +31,8 @@ import com.example.client.R;
 import com.example.client.retrofit.ClientPOJO;
 import com.example.client.retrofit.hosts.HostListFetcher;
 import com.example.client.retrofit.hosts.HostListResponse;
-import com.example.client.NetworkThread;
+import com.example.client.retrofit.login.LoginResult;
+import com.example.client.threadManager.NetworkThread;
 import com.example.client.retrofit.RetrofitFactory;
 
 
@@ -39,11 +41,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Response;
 
 import static com.example.client.ui.MainActivity.getClientId;
 
 
-public class ListHostFragment extends Fragment {
+public class ListHostFragment extends Fragment implements NetworkThread.ExecuteCallback<HostListResponse> {
     private List<ClientHost> clientHostsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private HostAdapter mAdapter;
@@ -170,18 +173,8 @@ public class ListHostFragment extends Fragment {
 
         final HostListFetcher hostListFetcher = RetrofitFactory.retrofitClient().create(HostListFetcher.class);
         final Call<HostListResponse> call = hostListFetcher.listHosts(new ClientPOJO(1));
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<HostListResponse>() {
-            @Override
-            public void onSuccess(HostListResponse result) {
-                showResponse(result);
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                showError(ex);
-
-            }
-        });
+        NetworkThread.getInstance().setCallback(this);
+        NetworkThread.getInstance().execute(call);
     }
 
     private void showResponse(HostListResponse response) {
@@ -242,6 +235,28 @@ public class ListHostFragment extends Fragment {
     private int dpToPx(int dp) {
         Resources r = getActivity().getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    }
+
+    @Override
+    public void onResponse(Call<HostListResponse> call, Response<HostListResponse> response) {
+
+    }
+
+    @Override
+    public void onFailure(Call<HostListResponse> call, Response<HostListResponse> response) {
+        Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+        AuthUtils.logout(getActivity());
+        AuthUtils.setCookie(getActivity(), "");
+    }
+
+    @Override
+    public void onSuccess(HostListResponse result) {
+        showResponse(result);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        showError(ex);
     }
 
 }

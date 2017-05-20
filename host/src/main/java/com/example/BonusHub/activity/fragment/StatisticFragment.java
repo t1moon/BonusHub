@@ -20,9 +20,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
-import com.example.BonusHub.activity.retrofit.NetworkThread;
+import com.example.BonusHub.activity.retrofit.getInfo.GetInfoResponse;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.statistic.StatisticResponse;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
@@ -46,13 +49,14 @@ import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the { ScanQrFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class StatisticFragment extends Fragment {
+public class StatisticFragment extends Fragment implements NetworkThread.ExecuteCallback <StatisticResponse> {
 
     MainActivity mainActivity;
     TableLayout tl;
@@ -69,6 +73,12 @@ public class StatisticFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy(){
+        super.onDestroy();
+        NetworkThread.getInstance().setCallback(null);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_statistic, container, false);
@@ -78,18 +88,15 @@ public class StatisticFragment extends Fragment {
 
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
         Call<StatisticResponse> call = apiInterface.getStatistic(1);
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<StatisticResponse>() {
-            @Override
-            public void onSuccess(StatisticResponse result) {
-                showResponse(result);
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                showError(ex);
-            }
-        });
+        NetworkThread.getInstance().setCallback(this);
+        NetworkThread.getInstance().execute(call);
         return rootView;
+    }
+
+    private void goToLogin() {
+        Intent intent = new Intent(getActivity(), LogInActivity.class);
+        startActivity(intent);
+        getActivity().finish();
     }
 
     @Override
@@ -214,5 +221,26 @@ public class StatisticFragment extends Fragment {
             e.printStackTrace();
         }
         return calendar;
+    }
+
+    @Override
+    public void onResponse(Call<StatisticResponse> call, Response<StatisticResponse> response) {
+    }
+
+    @Override
+    public void onFailure(Call<StatisticResponse> call, Response<StatisticResponse> response) {
+        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+        AuthUtils.logout(getActivity());
+        goToLogin();
+    }
+
+    @Override
+    public void onSuccess(StatisticResponse result) {
+        showResponse(result);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        showError(ex);
     }
 }

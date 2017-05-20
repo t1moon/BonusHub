@@ -1,10 +1,9 @@
-package com.example.BonusHub.activity.fragment;
+package com.example.client.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,20 +12,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.BonusHub.activity.AuthUtils;
-import com.example.BonusHub.activity.Login;
-import com.example.BonusHub.activity.api.login.LoginResult;
-import com.example.BonusHub.activity.api.login.Loginner;
-import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.threadManager.NetworkThread;
+import com.example.client.AuthUtils;
+import com.example.client.retrofit.Login;
+import com.example.client.retrofit.login.LoginResult;
+import com.example.client.retrofit.login.Loginner;
+import com.example.client.threadManager.NetworkThread;
 import com.example.bonuslib.FragmentType;
-import com.example.timur.BonusHub.R;
+import com.example.client.R;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
+import static com.example.client.api.RetrofitFactory.retrofitClient;
 
 public class LogInFragment extends Fragment implements NetworkThread.ExecuteCallback<LoginResult> {
     private LogInActivity logInActivity;
@@ -101,10 +98,9 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
         progressDialog.setMessage("Аутентификация...");
         progressDialog.show();
 
-        final Loginner loginner = retrofitBarmen().create(Loginner.class);
+        final Loginner loginner = retrofitClient().create(Loginner.class);
         final Call<LoginResult> call = loginner.login(new Login(login,password));
         NetworkThread.getInstance().setCallback(this);
-
         NetworkThread.getInstance().execute(call);
     }
 
@@ -128,11 +124,6 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
 
     public void goToRegisterFragment() {
         logInActivity.pushFragment(new RegisterFragment(), true);
-    }
-
-    public void goToStartFragment() {
-        logInActivity.setCurrentFragment(FragmentType.StartHost);
-        logInActivity.pushFragment(new StartFragment(), false);
     }
 
     public void goToMainActivity() {
@@ -167,13 +158,8 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
 
     public void onLoginResult(LoginResult result) {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
-        if (result.isHosted() == false && result.getCode() == 0) {
+        if ( result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity());
-            goToStartFragment();
-        }
-        else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity());
-            AuthUtils.setHosted(getActivity());
             goToMainActivity();
         }
     }

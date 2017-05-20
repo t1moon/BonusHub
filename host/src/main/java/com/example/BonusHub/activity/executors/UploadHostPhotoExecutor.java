@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.Log;
+import com.example.BonusHub.activity.fragment.EditFragment;
 
 import com.example.BonusHub.activity.Ui;
 import com.example.BonusHub.activity.fragment.ProfileFragment;

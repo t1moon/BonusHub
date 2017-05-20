@@ -5,10 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -26,31 +22,27 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.CreateHostExecutor;
 import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
-import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
-import com.example.BonusHub.activity.retrofit.NetworkThread;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.getInfo.GetInfoResponse;
-import com.example.bonuslib.client.Client;
-import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Response;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCallback <GetInfoResponse> {
     private final static String TAG = ProfileFragment.class.getSimpleName();
 
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 12500;
@@ -62,7 +54,7 @@ public class ProfileFragment extends Fragment {
     FloatingActionButton fab_edit;
     private int host_id;
     private MainActivity mainActivity;
-    ProgressDialog progress;
+    ProgressDialog progressDialog;
     String pathToImageProfile;
 
 
@@ -97,6 +89,14 @@ public class ProfileFragment extends Fragment {
         });
 
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        NetworkThread.getInstance().setCallback(null);
+        GetHostInfoExecutor.getInstance().setCallback(null);
+        CreateHostExecutor.getInstance().setCallback(null);
     }
 
     private void onHostCreated(int host_id) {
@@ -185,27 +185,23 @@ public class ProfileFragment extends Fragment {
         return rootView;
     }
 
+    private void goToLogIn() {
+        Intent intent = new Intent(getActivity(), LogInActivity.class);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
     private void prepareHostInfo() {
-        progress = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
+        progressDialog = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
 
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
         final Call<GetInfoResponse> call = apiInterface.getInfo(1);
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<GetInfoResponse>() {
-            @Override
-            public void onSuccess(GetInfoResponse result) {
-                showResponse(result);
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                showError(ex);
-
-            }
-        });
+        NetworkThread.getInstance().setCallback(this);
+        NetworkThread.getInstance().execute(call);
     }
 
     private void showError(Exception error) {
-        progress.dismiss();
+        progressDialog.dismiss();
         new AlertDialog.Builder(mainActivity)
                 .setTitle("Ошибка")
                 .setMessage(error.getMessage())
@@ -215,7 +211,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showResponse(GetInfoResponse result) {
-        progress.dismiss();
+        progressDialog.dismiss();
         // clear tables
         HelperFactory.getHelper().clearHostTable(HelperFactory.getHelper().getConnectionSource());
 
@@ -311,5 +307,28 @@ public class ProfileFragment extends Fragment {
 
     private void getFromCache() {
         GetHostInfoExecutor.getInstance().loadInfo(host_id);
+    }
+
+    @Override
+    public void onResponse(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
+
+    }
+
+    @Override
+    public void onFailure(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
+        progressDialog.dismiss();
+        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+        AuthUtils.logout(getActivity());
+        goToLogIn();
+    }
+
+    @Override
+    public void onSuccess(GetInfoResponse result) {
+        showResponse(result);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        showError(ex);
     }
 }

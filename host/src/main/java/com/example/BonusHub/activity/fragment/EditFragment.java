@@ -22,9 +22,11 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.EditHostInfoExecutor;
 import com.example.BonusHub.activity.executors.UploadHostPhotoExecutor;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
@@ -79,6 +81,13 @@ public class EditFragment extends Fragment {
         });
 
 
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        EditHostInfoExecutor.getInstance().setCallback(null);
+        UploadHostPhotoExecutor.getInstance().setCallback(null);
     }
 
     private void onHostInfoEdited(int resultCode) {

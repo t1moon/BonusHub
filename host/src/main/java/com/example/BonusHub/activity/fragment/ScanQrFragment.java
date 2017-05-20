@@ -15,10 +15,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.api.host.HostResult;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
-import com.example.BonusHub.activity.retrofit.NetworkThread;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsResponse;
@@ -85,6 +86,12 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         return rootView;
     }
 
+    private void goToLogin() {
+        Intent intent = new Intent(getActivity(), LogInActivity.class);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -118,16 +125,9 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         final int host_id = 1;
         int bill = Integer.parseInt(et_bill.getText().toString());
 
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<UpdatePointsResponse>() {
-            @Override
-            public void onSuccess(UpdatePointsResponse result) {
-                showResponse(result);
-            }
-            @Override
-            public void onError(Exception ex) {
-                showError(ex);
-            }
-        });
+        call = apiInterface.update_points(new UpdatePointsPojo(host_id, client_identificator, bill, isAddTo), AuthUtils.getCookie(getActivity()));
+        NetworkThread.getInstance().setCallback(this);
+        NetworkThread.getInstance().execute(call);
     }
 
     private void showResponse(UpdatePointsResponse result) {
@@ -156,7 +156,10 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     @Override
     public void onFailure(Call<UpdatePointsResponse> call, Response<UpdatePointsResponse> response) {
-        //Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+        progressDialog.dismiss();
+        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+        AuthUtils.logout(getActivity());
+        goToLogin();
     }
 
     @Override

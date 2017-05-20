@@ -1,7 +1,6 @@
-package com.example.BonusHub.activity.fragment;
+package com.example.client.ui;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,24 +12,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.BonusHub.activity.AuthUtils;
-import com.example.BonusHub.activity.Login;
-import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.api.host.HostResult;
-import com.example.BonusHub.activity.api.login.LoginResult;
-import com.example.BonusHub.activity.api.login.Loginner;
-import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.api.login.LogoutResult;
-import com.example.BonusHub.activity.api.registration.RegistrationResult;
-import com.example.BonusHub.activity.api.registration.Registrator;
-import com.example.BonusHub.activity.threadManager.NetworkThread;
+import com.example.client.AuthUtils;
+import com.example.client.retrofit.Login;
+import com.example.client.retrofit.login.LoginResult;
+import com.example.client.retrofit.login.Loginner;
+import com.example.client.retrofit.registration.RegistrationResult;
+import com.example.client.retrofit.registration.Registrator;
+import com.example.client.threadManager.NetworkThread;
 import com.example.bonuslib.FragmentType;
-import com.example.timur.BonusHub.R;
+import com.example.client.R;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
+import static com.example.client.api.RetrofitFactory.retrofitClient;
 
 /**
  * Created by mike on 05.05.17.
@@ -82,12 +77,6 @@ public class RegisterFragment extends Fragment {
         return rootView;
     }
 
-
-    public void goToStartFragment() {
-        logInActivity.setCurrentFragment(FragmentType.StartHost);
-        logInActivity.pushFragment(new StartFragment(), false);
-    }
-
     public void goToMainActivity() {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
@@ -113,7 +102,7 @@ public class RegisterFragment extends Fragment {
         progressDialog.setMessage("Регистрация...");
         progressDialog.show();
 
-        final Registrator registrator = retrofitBarmen().create(Registrator.class);
+        final Registrator registrator = retrofitClient().create(Registrator.class);
         final Call<RegistrationResult> call = registrator.registrate(new Login(login,password));
         NetworkThread.getInstance().setCallback(registrationCallback);
         NetworkThread.getInstance().execute(call);
@@ -128,24 +117,19 @@ public class RegisterFragment extends Fragment {
     private void logIn() {
         final String login = loginInput.getText().toString();
         final String password = passwordInput.getText().toString();
-        final Loginner loginner = retrofitBarmen().create(Loginner.class);
+        final Loginner loginner = retrofitClient().create(Loginner.class);
         final Call<LoginResult> call = loginner.login(new Login(login,password));
         NetworkThread.getInstance().setCallback(loginCallback);
         NetworkThread.getInstance().execute(call);
     }
 
     public void onLoginResult(LoginResult result) {
-        //Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
-        if (result.isHosted() == false && result.getCode() == 0) {
+        if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity());
-            Log.d("LogFrag go start", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + result.isHosted());
-            goToStartFragment();
-        }
-        else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity());
-            AuthUtils.setHosted(getActivity());
-            Log.d("LogFrag go main", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + AuthUtils.isHosted(getActivity()));
             goToMainActivity();
+        }
+        else  {
+            Toast.makeText(getActivity(), "Данный логин уже занят. Попробуйте другой", Toast.LENGTH_SHORT).show();
         }
     }
 

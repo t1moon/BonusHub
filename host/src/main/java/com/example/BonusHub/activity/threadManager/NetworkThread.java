@@ -35,11 +35,6 @@ public class NetworkThread {
             @Override
             public void run() {
                 try {
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
                     final Response<T> response = call.execute();
                     if (response.isSuccessful() && callback != null) {
                         uiHandler.post(new Runnable() {
@@ -58,12 +53,14 @@ public class NetworkThread {
                         });
                     }
                 } catch (final IOException e) {
-                    uiHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onError(e);
-                        }
-                    });
+                    if (callback != null) {
+                        uiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onError(e);
+                            }
+                        });
+                    }
                 }
             }
         });

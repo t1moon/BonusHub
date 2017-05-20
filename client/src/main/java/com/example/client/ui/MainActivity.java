@@ -1,5 +1,6 @@
 package com.example.client.ui;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
@@ -23,15 +25,24 @@ import com.example.bonuslib.StackListner;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
+import com.example.client.AuthUtils;
 import com.example.client.MyApplication;
 import com.example.client.R;
 import com.example.client.qr.QRFragment;
+import com.example.client.retrofit.login.LogoutResult;
+import com.example.client.retrofit.login.Logouter;
+import com.example.client.threadManager.NetworkThread;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements StackListner {
+import retrofit2.Call;
+import retrofit2.Response;
+
+import static com.example.client.api.RetrofitFactory.retrofitClient;
+
+public class MainActivity extends BaseActivity implements StackListner, NetworkThread.ExecuteCallback<LogoutResult> {
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
@@ -42,6 +53,7 @@ public class MainActivity extends BaseActivity implements StackListner {
     public final static String CLIENT_IDENTIFICATOR = "QfgnJKEGNRojer";
     public final static int MENUITEM_QR = 0;
     public final static int MENUITEM_LISTHOST = 1;
+    public final static int MENUITEM_LOGOUT = 2;
 
     private static int client_id;
 
@@ -61,6 +73,10 @@ public class MainActivity extends BaseActivity implements StackListner {
 
         setStackListner(this);
         this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
+        if (!AuthUtils.isAuthorized(this)) {
+            goToLogIn();
+            return;
+        }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -109,6 +125,18 @@ public class MainActivity extends BaseActivity implements StackListner {
         populateHosts();
         setupStartFragment();
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        NetworkThread.getInstance().setCallback(null);
+    }
+
+    private void goToLogIn() {
+        Intent intent = new Intent(this, LogInActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void setupClient() {
@@ -212,6 +240,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         Menu drawerMenu = navigationView.getMenu();
         drawerMenu.add(0, MENUITEM_QR, 0, "Показать QR-код");
         drawerMenu.add(0, MENUITEM_LISTHOST, 1, "Показать список заведений");
+        drawerMenu.add(0, MENUITEM_LOGOUT, 2, "Выход");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -247,6 +276,12 @@ public class MainActivity extends BaseActivity implements StackListner {
                     pushFragment(fragment, false);
                 }
                 break;
+            case MENUITEM_LOGOUT:
+                final Logouter logouter = retrofitClient().create(Logouter.class);
+                final Call<LogoutResult> call = logouter.logout(AuthUtils.getCookie(this));
+                NetworkThread.getInstance().setCallback(this);
+                NetworkThread.getInstance().execute(call);
+                break;
         }
         if (fragment != null) {
             menuItem.setChecked(true);  // Highlight the selected item has been done by NavigationView
@@ -260,6 +295,11 @@ public class MainActivity extends BaseActivity implements StackListner {
         return R.id.container_body;
     }
 
+    private void onLogoutResult() {
+        Toast.makeText(this, "You are logged out", Toast.LENGTH_SHORT).show();
+        AuthUtils.logout(this);
+        goToLogIn();
+    }
 
     @Override
     public void deepStack() {
@@ -312,6 +352,24 @@ public class MainActivity extends BaseActivity implements StackListner {
         Snackbar snackbar = Snackbar
                 .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
         snackbar.show();
+    }
+
+    @Override
+    public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
+    }
+
+    @Override
+    public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
+    }
+
+    @Override
+    public void onSuccess(LogoutResult result) {
+        onLogoutResult();
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
     }
 
 }

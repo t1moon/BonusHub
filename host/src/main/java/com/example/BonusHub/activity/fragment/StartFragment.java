@@ -222,7 +222,7 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
     public void onFailure(Call<HostResult> call, Response<HostResult> response) {
         progressDialog.dismiss();
         Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
-        AuthUtils.setUnauthorized(getActivity());
+        AuthUtils.logout(getActivity());
         goToLogin();
     }
 
