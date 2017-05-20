@@ -1,4 +1,4 @@
-package com.example.client.ui;
+package com.example.BonusHub.activity.activity;
 
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -11,11 +11,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
+import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.fragment.LogInFragment;
+import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.StackListner;
-import com.example.client.AuthUtils;
-import com.example.client.R;
+import com.example.timur.BonusHub.R;
 
 /**
  * Created by mike on 15.04.17.
@@ -41,16 +43,14 @@ public class LogInActivity extends BaseActivity implements StackListner {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
         setStackListner(this);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.login_toolbar);
         setSupportActionBar(mToolbar);
-        initCollapsingToolbar();
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open, R.string.drawer_close);
-        mDrawer.addDrawerListener(drawerToggle);
+        getSupportActionBar().setTitle("");
+
         Log.d("Login", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
         if (!AuthUtils.isAuthorized(this)) {
             setupLogInFragment();
@@ -62,34 +62,6 @@ public class LogInActivity extends BaseActivity implements StackListner {
         }
     }
 
-    private void initCollapsingToolbar() {
-        final CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(" ");
-        appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        appBarLayout.setExpanded(true);
-
-        // hiding & showing the title when toolbar expanded & collapsed
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean isShow = false;
-            int scrollRange = -1;
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle(getString(R.string.app_name));
-                    isShow = true;
-                } else if (isShow) {
-                    collapsingToolbar.setTitle(" ");
-                    isShow = false;
-                }
-            }
-        });
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -97,12 +69,12 @@ public class LogInActivity extends BaseActivity implements StackListner {
 
     private void setupLogInFragment() {
         setCurrentFragment(FragmentType.LogInFragment);
-        pushFragment(new LogInFragment(), false);
+        pushFragment(new LogInFragment(), true);
     }
 
     private void setupStartFragment() {
         setCurrentFragment(FragmentType.StartHost);
-        pushFragment(new StartFragment(), false);
+        pushFragment(new StartFragment(), true);
     }
 
     @Override
@@ -119,19 +91,10 @@ public class LogInActivity extends BaseActivity implements StackListner {
                 onBackPressed();
             }
         });
-        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     @Override
     public void homeStack() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(false); // hide back button
-        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-        drawerToggle.syncState();
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDrawer.openDrawer(GravityCompat.START);
-            }
-        });
     }
 }

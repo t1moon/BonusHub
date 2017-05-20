@@ -61,7 +61,7 @@
             android:text="Нет аккаунта? Тогда вперёд!"
             android:gravity="center"
             android:textSize="16dip"
-            android:textColor="@color/black"/>
+            android:textColor="@color/white"/>
 
     </LinearLayout>
 </ScrollView>

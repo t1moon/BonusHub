@@ -23,6 +23,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.journeyapps:zxing-android-embedded:3.5.0'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -35,6 +36,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:25.0.+'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.journeyapps:zxing-android-embedded:3.5.0'
+    compile 'com.android.support:preference-v7:25.2.0'
 
     // Retrofit
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
@@ -42,7 +44,6 @@ dependencies {
 
     // OkHttp
     compile 'com.squareup.okhttp3:okhttp:3.4.2'
-
 
     testCompile 'junit:junit:4.12'
 }

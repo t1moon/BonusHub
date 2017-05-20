@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -86,6 +89,8 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_start, container, false);
 
+        ImageView backdrop = (ImageView) logInActivity.findViewById(R.id.backdrop);
+        backdrop.setBackgroundColor(Color.WHITE);
         host_title = (EditText) rootView.findViewById(R.id.host_title_et);
         host_description = (EditText) rootView.findViewById(R.id.host_description_et);
         host_address = (EditText) rootView.findViewById(R.id.host_address_et);

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +18,13 @@ import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.api.host.HostResult;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
-import com.example.BonusHub.activity.retrofit.ClientResponse;
+import com.example.BonusHub.activity.retrofit.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
-import com.example.BonusHub.activity.retrofit.UpdatePointsPojo;
-import com.example.BonusHub.activity.retrofit.UpdatePointsResponse;
-import com.example.BonusHub.activity.threadManager.NetworkThread;
+import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
+import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsResponse;
 import com.example.timur.BonusHub.R;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-
-import java.util.concurrent.Callable;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -122,15 +118,16 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         final int host_id = 1;
         int bill = Integer.parseInt(et_bill.getText().toString());
 
-        progressDialog = new ProgressDialog(mainActivity);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Загрузка информации на сервер...");
-        progressDialog.show();
-
-        UpdatePointsPojo updatePojo = new UpdatePointsPojo(host_id, client_identificator, bill, isAddTo);
-        call = apiInterface.update_points(updatePojo, AuthUtils.getCookie(getActivity()));
-        NetworkThread.getInstance().setCallback(this);
-        NetworkThread.getInstance().execute(call);
+        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<UpdatePointsResponse>() {
+            @Override
+            public void onSuccess(UpdatePointsResponse result) {
+                showResponse(result);
+            }
+            @Override
+            public void onError(Exception ex) {
+                showError(ex);
+            }
+        });
     }
 
     private void showResponse(UpdatePointsResponse result) {

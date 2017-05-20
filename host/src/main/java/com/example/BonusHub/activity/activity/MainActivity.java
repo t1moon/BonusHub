@@ -5,7 +5,9 @@ import android.content.res.Configuration;
 import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,16 +20,21 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.MyApplication;
 import com.example.BonusHub.activity.api.login.LogoutResult;
 import com.example.BonusHub.activity.api.login.Logouter;
+import com.example.BonusHub.activity.fragment.OwnerSettingsFragment;
+import com.example.BonusHub.activity.fragment.EditFragment;
 import com.example.BonusHub.activity.fragment.ProfileFragment;
 import com.example.BonusHub.activity.fragment.ScanQrFragment;
+import com.example.BonusHub.activity.fragment.StatisticFragment;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.StackListner;
 import com.example.timur.BonusHub.R;
 
+import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import retrofit2.Call;
@@ -43,10 +50,12 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
+    private FloatingActionButton fab;
     public final static int MENUITEM_READ_QR = 0;
     public final static int MENUITEM_SHOW_PROFILE = 1;
-    public final static int MENUITEM_LOGOUT = 2;
-
+    public final static int MENUITEM_OWNER_SETTINGS = 2;
+    public final static int MENUITEM_STATISTIC = 3;
+    public final static int MENUITEM_LOGOUT = 4;
 
     static {
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -56,7 +65,6 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
                 .build()
         );
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +87,7 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         setupProfileFragment();
     }
 
@@ -97,7 +106,7 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
     private void initCollapsingToolbar() {
         final CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(" ");
+        collapsingToolbar.setTitle(" ");                                        // necessary
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         appBarLayout.setExpanded(true);
 
@@ -112,10 +121,16 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle(getString(R.string.app_name));
+//                    collapsingToolbar.setTitle(getString(R.string.app_name));
+                    fab.hide();
+
                     isShow = true;
                 } else if (isShow) {
-                    collapsingToolbar.setTitle(" ");
+//                    collapsingToolbar.setTitle(" ");
+                    Fragment fragment = getSupportFragmentManager().findFragmentById(getFragmentContainerResId());
+                    if (fragment instanceof ProfileFragment ||
+                            fragment instanceof EditFragment)
+                        fab.show();
                     isShow = false;
                 }
             }
@@ -146,9 +161,12 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
 
     private void setupDrawerContent(final NavigationView navigationView) {
         Menu drawerMenu = navigationView.getMenu();
+
         drawerMenu.add(0, MENUITEM_READ_QR, 0, "Считать QR-код");
         drawerMenu.add(0, MENUITEM_SHOW_PROFILE, 1, "Профиль заведения");
-        drawerMenu.add(0, MENUITEM_LOGOUT, 2, "Выход");
+        drawerMenu.add(0, MENUITEM_OWNER_SETTINGS, 2, "Параметры акций");
+        drawerMenu.add(0, MENUITEM_STATISTIC, 3, "Статистика");
+        drawerMenu.add(0, MENUITEM_LOGOUT, 4, "Выход");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -177,6 +195,10 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
                 fragment = new ScanQrFragment();
                 pushFragment(fragment, true);
                 break;
+            case MENUITEM_STATISTIC:
+                fragment = new StatisticFragment();
+                pushFragment(fragment, true);
+                break;
             case MENUITEM_SHOW_PROFILE:
                 if (fragment.getClass() != ProfileFragment.class) {
                     setCurrentFragment(FragmentType.ProfileHost);
@@ -184,6 +206,15 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
                     pushFragment(fragment, false);
                 }
                 break;
+
+            case MENUITEM_OWNER_SETTINGS:
+                if (fragment.getClass() != OwnerSettingsFragment.class) {
+                    setCurrentFragment(FragmentType.OwnerSettings);
+                    fragment = new OwnerSettingsFragment();
+                    pushFragment(fragment, true);
+                }
+                break;
+
             case MENUITEM_LOGOUT:
                 Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
                 final Logouter logouter = retrofitBarmen().create(Logouter.class);
@@ -196,6 +227,7 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
             menuItem.setChecked(true);  // Highlight the selected item has been done by NavigationView
             setTitle(menuItem.getTitle());  // Set action bar title
             mDrawer.closeDrawers();
+            fab.setVisibility(View.GONE);
         }
 
     }
@@ -241,6 +273,30 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
         Toast.makeText(this, "You are logged out", Toast.LENGTH_SHORT).show();
         AuthUtils.logout(this);
         goToLogIn();
+    }
+
+    // Method to manually check connection status
+    public boolean hasConnection() {
+        boolean isConnected = BaseActivity.isConnected(MyApplication.getInstance());
+        if (!isConnected)
+            showSnack(false);
+        return isConnected;
+    }
+
+
+    // Showing the status in Snackbar
+    private void showSnack(boolean isConnected) {
+        String message;
+
+        if (isConnected) {
+            message = "Connected to internet";
+        } else {
+            message = "Sorry! No connection to internet";
+        }
+
+        Snackbar snackbar = Snackbar
+                .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 
     @Override
