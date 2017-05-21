@@ -82,8 +82,6 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
                     .load(pathToImageProfile)
                     .into(holder.thumbnail);
 
-//        Glide.with(context).load(host.getThumbnail()).into(holder.thumbnail);
-
     }
 
     @Override

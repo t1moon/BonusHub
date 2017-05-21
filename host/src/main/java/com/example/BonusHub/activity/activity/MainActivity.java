@@ -34,7 +34,6 @@ import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.StackListner;
 import com.example.timur.BonusHub.R;
 
-import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import retrofit2.Call;
@@ -285,20 +284,25 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
 
 
     // Showing the status in Snackbar
-    private void showSnack(boolean isConnected) {
+    public void showSnack(boolean isConnected) {
         String message;
 
         if (isConnected) {
-            message = "Connected to internet";
+            message = "Обновлено";
         } else {
-            message = "Sorry! No connection to internet";
+            message = "Нет соединения с интернетом";
         }
 
         Snackbar snackbar = Snackbar
                 .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
-
+    // Showing the status in Snackbar
+    public void showSnack(String message) {
+        Snackbar snackbar = Snackbar
+                .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
     @Override
     public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
     }

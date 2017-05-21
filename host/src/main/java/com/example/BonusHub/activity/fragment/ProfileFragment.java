@@ -2,8 +2,6 @@ package com.example.BonusHub.activity.fragment;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +25,7 @@ import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.CreateHostExecutor;
 import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
+import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
@@ -36,6 +35,8 @@ import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -57,8 +58,6 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
     ProgressDialog progressDialog;
     String pathToImageProfile;
 
-
-
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -73,84 +72,7 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
             ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
         }
-
-        GetHostInfoExecutor.getInstance().setCallback(new GetHostInfoExecutor.Callback() {
-            @Override
-            public void onLoaded(Host host) {
-                onHostInfoLoaded(host);
-            }
-        });
-
-        CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
-            @Override
-            public void onCreated(int host_id) {
-                onHostCreated(host_id);
-            }
-        });
-
-
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        NetworkThread.getInstance().setCallback(null);
-        GetHostInfoExecutor.getInstance().setCallback(null);
-        CreateHostExecutor.getInstance().setCallback(null);
-    }
-
-    private void onHostCreated(int host_id) {
-        Host host = null;
-        try {
-            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        String title = host.getTitle();
-        String description = host.getDescription();
-        String address = host.getAddress();
-        int open_hour = host.getTime_open() / 60;
-        int open_minute = host.getTime_open() % 60;
-        int close_hour = host.getTime_close() / 60;
-        int close_minute = host.getTime_close() % 60;
-        String imageUriString = host.getProfile_image();
-        host_title.setText(title);
-        host_description.setText(description);
-        host_address.setText(address);
-        if (open_minute != 0)
-            host_open_time_tv.setText(open_hour + ":" + open_minute);
-        else
-            host_open_time_tv.setText(open_hour + "0:" + "00");
-        if (close_minute != 0)
-            host_close_time_tv.setText(close_hour + ":" + close_minute);
-        else
-            host_close_time_tv.setText(close_hour + "0:" + "00");
-
-        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-        Glide
-                .with(getActivity().getApplicationContext())
-                .load(imageUriString)
-                .fitCenter()
-                .into(imgView);
-        Toast.makeText(mainActivity.getApplicationContext(), "Информация обновлена", Toast.LENGTH_SHORT).show();
-////        // setImage
-//        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-//        if (imageUriString != null) {
-//            Bitmap bitmap = null;
-//            try {
-//                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
-//                        .openInputStream(Uri.parse(imageUriString)));
-//                BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
-//                imgView.setBackground(bdrawable);
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-
-}
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -175,16 +97,31 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
         });
 
         host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
-        if(mainActivity.hasConnection()) {
-            prepareHostInfo();
-        } else {
-            getFromCache();
-        }
 
+        if(mainActivity.hasConnection())
+            getFromInternet();
+        else
+            getFromCache();
 
         return rootView;
     }
 
+    private void getFromCache() {
+        DbExecutorService.getInstance().loadInfo(host_id, new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onCacheLoaded((Host) result.get("host"));
+            }
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+    private void getFromInternet() {
+        progress = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
     private void goToLogIn() {
         Intent intent = new Intent(getActivity(), LogInActivity.class);
         startActivity(intent);
@@ -233,37 +170,36 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
                 .into(imgView);
 
         host.setProfile_image(pathToImageProfile);
+        // TO-DO: Выяснить как кешируется glide
 //        UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
-        CreateHostExecutor.getInstance().createHost(host);
-
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("Permission", "READ_EXTERNAL_STORAGE permission granted");
-                } else {
-                }
+        DbExecutorService.getInstance().createHost(host, new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onHostCreated((Integer) result.get("host_id"));
             }
-        }
+
+            @Override
+            public void onError(Exception ex) {
+                new AlertDialog.Builder(mainActivity)
+                        .setTitle("Ошибка при записи в кэш")
+                        .setMessage(ex.getMessage())
+                        .setPositiveButton("OK", null)
+                        .show();
+            }
+        });
     }
 
-    private void onHostInfoLoaded(Host host) {
+    private void showError(Exception error) {
+        progress.dismiss();
+        new AlertDialog.Builder(mainActivity)
+                .setTitle("Ошибка при подключении к серверу")
+                .setMessage(error.getMessage())
+                .setPositiveButton("OK", null)
+                .show();
+
+    }
+
+    private void onCacheLoaded(Host host) {
         String title = host.getTitle();
         String description = host.getDescription();
         String address = host.getAddress();
@@ -284,30 +220,68 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
         else
             host_close_time_tv.setText(close_hour + "0:" + "00");
 
-////        // setImage
-//        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
-//        if (imageUriString != null) {
-//            Bitmap bitmap = null;
-//            try {
-//                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
-//                        .openInputStream(Uri.parse(imageUriString)));
-//                BitmapDrawable bdrawable = new BitmapDrawable(getContext().getResources(), bitmap);
-//                imgView.setBackground(bdrawable);
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
         ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
         Glide
                 .with(getActivity().getApplicationContext())
                 .load(imageUriString)
                 .fitCenter()
                 .into(imgView);
+        Toast.makeText(mainActivity, "Информация загружена из кэша", Toast.LENGTH_SHORT).show();
     }
 
-    private void getFromCache() {
-        GetHostInfoExecutor.getInstance().loadInfo(host_id);
+    private void onHostCreated(int host_id) {
+        Host host = null;
+        try {
+            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        String title = host.getTitle();
+        String description = host.getDescription();
+        String address = host.getAddress();
+        int open_hour = host.getTime_open() / 60;
+        int open_minute = host.getTime_open() % 60;
+        int close_hour = host.getTime_close() / 60;
+        int close_minute = host.getTime_close() % 60;
+        String imageUriString = host.getProfile_image();
+        host_title.setText(title);
+        host_description.setText(description);
+        host_address.setText(address);
+
+        String open_time = String.format("%02d:%02d", open_hour, open_minute);
+        String close_time = String.format("%02d:%02d", close_hour, close_minute);
+        host_open_time_tv.setText(open_time);
+        host_close_time_tv.setText(close_time);
+
+        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+        Glide
+                .with(getActivity().getApplicationContext())
+                .load(imageUriString)
+                .fitCenter()
+                .into(imgView);
+
+        mainActivity.showSnack(true);   // Say to user that info is up-to-date
+
     }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("Permission", "READ_EXTERNAL_STORAGE permission granted");
+                } else {
+                }
+            }
+        }
+    }
+
+
 
     @Override
     public void onResponse(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {

@@ -17,18 +17,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="#fff"
-                    android:padding="20dp"
+                    android:paddingLeft="@dimen/material_horizontal"
+                    android:paddingRight="@dimen/material_horizontal"
+                    android:paddingTop="@dimen/material_vertical"
+                    android:paddingBottom="@dimen/material_vertical"
                     android:typeface="monospace"
                     android:text="Здесь будет Ваше название"
                     android:textColor="#000"
-                    android:textSize="25dp" />
+                    android:textSize="24dp" />
 
             <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            android:layout_marginTop="4dp"
             android:background="@color/colorAccent" />
 
 
@@ -36,32 +36,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_content_paste_black_24dp"
+                android:drawablePadding="32dp"
                 android:text="Описание"
-                android:textStyle="italic"
                 android:textColor="@color/black"
-                android:textSize="20dp"
-                android:padding="@dimen/profile_item"
-                android:layout_marginTop="10sp"/>
+                android:textSize="16sp"
+                android:paddingLeft="@dimen/profile_item"
+                android:paddingTop="@dimen/material_vertical"/>
 
             <TextView
                 android:id="@+id/host_description_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2sp"
                 android:hint="@string/description"
                 android:paddingLeft="@dimen/profile_subitem"
-                android:paddingRight="@dimen/profile_subitem"/>
+                android:paddingRight="@dimen/material_horizontal"
+                android:paddingBottom="@dimen/material_vertical"
+                android:paddingTop="@dimen/material_vertical_between"
+                android:textSize="14sp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#12000000"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_pin_drop_black_24dp"
+                android:drawablePadding="32dp"
                 android:text="Адрес"
-                android:textStyle="italic"
                 android:textColor="@color/black"
-                android:textSize="20dp"
-                android:padding="@dimen/profile_item"
-                android:layout_marginTop="10sp"/>
+                android:textSize="16sp"
+                android:paddingLeft="@dimen/profile_item"
+                android:paddingTop="@dimen/material_vertical"/>
 
             <TextView
                 android:id="@+id/host_address_tv"
@@ -69,26 +75,35 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2sp"
                 android:hint="Здесь будет ваш адрес"
-                android:paddingRight="@dimen/profile_subitem"
-                android:paddingLeft="@dimen/profile_subitem"/>
-
+                android:paddingLeft="@dimen/profile_subitem"
+                android:paddingRight="@dimen/material_horizontal"
+                android:paddingBottom="@dimen/material_vertical"
+                android:paddingTop="@dimen/material_vertical_between"
+                android:textSize="14sp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#12000000"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_access_time_black_24dp"
+                android:drawablePadding="32dp"
                 android:text="Время работы"
-                android:textStyle="italic"
                 android:textColor="@color/black"
-                android:textSize="20dp"
-                android:padding="@dimen/profile_item"
-                android:layout_marginTop="10sp"/>
+                android:textSize="16sp"
+                android:paddingLeft="@dimen/profile_item"
+                android:paddingTop="@dimen/material_vertical"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/profile_subitem"
-                android:paddingRight="@dimen/profile_subitem">
+                android:paddingRight="@dimen/material_horizontal"
+                android:paddingBottom="@dimen/material_vertical"
+                android:paddingTop="@dimen/material_vertical_between"
+                android:textSize="14sp">
 
                 <TextView
                     android:id="@+id/host_open_time_tv"
@@ -101,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2sp"
-                    android:text="  -  " />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/host_close_time_tv"

@@ -85,7 +85,7 @@ public class RegisterFragment extends Fragment {
 
     public void goToStartFragment() {
         logInActivity.setCurrentFragment(FragmentType.StartHost);
-        logInActivity.pushFragment(new StartFragment(), false);
+        logInActivity.pushFragment(new StartFragment(), true);
     }
 
     public void goToMainActivity() {
@@ -137,13 +137,13 @@ public class RegisterFragment extends Fragment {
     public void onLoginResult(LoginResult result) {
         //Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.isHosted() == false && result.getCode() == 0) {
-            AuthUtils.setAuthorized(getActivity());
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
             Log.d("LogFrag go start", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + result.isHosted());
             goToStartFragment();
         }
         else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity());
-            AuthUtils.setHosted(getActivity());
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
+            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
             Log.d("LogFrag go main", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + AuthUtils.isHosted(getActivity()));
             goToMainActivity();
         }

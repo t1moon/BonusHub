@@ -168,12 +168,12 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
     public void onLoginResult(LoginResult result) {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.isHosted() == false && result.getCode() == 0) {
-            AuthUtils.setAuthorized(getActivity());
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
             goToStartFragment();
         }
         else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity());
-            AuthUtils.setHosted(getActivity());
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
+            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
             goToMainActivity();
         }
     }

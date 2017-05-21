@@ -13,7 +13,7 @@ import retrofit2.http.POST;
  */
 
 public interface Hoster {
-    @POST("barmen/edithost/")
+    @POST("barmen/create/")
     @Headers({
             "Accept: application/json"
     })

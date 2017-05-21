@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -28,13 +27,13 @@ import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.api.host.HostResult;
 import com.example.BonusHub.activity.api.host.Hoster;
-import com.example.BonusHub.activity.api.login.LoginResult;
-import com.example.BonusHub.activity.api.login.Loginner;
-import com.example.BonusHub.activity.executors.CreateHostExecutor;
+import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
+
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -65,13 +64,6 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logInActivity = (LogInActivity) getActivity();
-        CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
-            @Override
-            public void onCreated(int host_id) {
-                onHostCreated(host_id);
-            }
-        });
-
     }
 
     @Override
@@ -89,7 +81,7 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_start, container, false);
 
-        ImageView backdrop = (ImageView) logInActivity.findViewById(R.id.backdrop);
+        ImageView backdrop = (ImageView) logInActivity.findViewById(R.id.login_backdrop);
         backdrop.setBackgroundColor(Color.WHITE);
         host_title = (EditText) rootView.findViewById(R.id.host_title_et);
         host_description = (EditText) rootView.findViewById(R.id.host_description_et);
@@ -127,7 +119,6 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
         logInActivity.setCurrentFragment(FragmentType.LogInFragment);
         logInActivity.pushFragment(new LogInFragment(), true);
     }
-
     private void pickTime(final View v) {
         // Launch Time Picker Dialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
@@ -185,18 +176,32 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
                     host.setTime_open(open_hour * 60 + open_minute);
                     host.setTime_close(close_hour * 60 + close_minute);
                     host.setProfile_image(null);
-                    CreateHostExecutor.getInstance().createHost(host);
+
 
                     progressDialog = new ProgressDialog(logInActivity);
                     progressDialog.setIndeterminate(true);
                     progressDialog.setMessage("Отправка информации на сервер...");
                     progressDialog.show();
 
+
                     final Hoster hoster = retrofitBarmen().create(Hoster.class);
                     final Call<HostResult> call = hoster.login(host, AuthUtils.getCookie(getActivity()));
                     //final Call<HostResult> call = hoster.login(host, "no");
                     NetworkThread.getInstance().setCallback(this);
                     NetworkThread.getInstance().execute(call);
+
+
+                    DbExecutorService.getInstance().createHost(host, new DbExecutorService.DbExecutorCallback() {
+                        @Override
+                        public void onSuccess(Map<String, ?> result) {
+                            onHostCreated((Integer) result.get("host_id"));
+                        }
+
+                        @Override
+                        public void onError(Exception ex) {
+                            Toast.makeText(logInActivity, "Произошла ошибка при создании заведения", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
         }
         return super.onOptionsItemSelected(item);
@@ -218,18 +223,20 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
         progressDialog.dismiss();
     }
 
+
     @Override
     public void onFailure(Call<HostResult> call, Response<HostResult> response) {
         progressDialog.dismiss();
         Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
-        AuthUtils.logout(getActivity());
+        AuthUtils.logout(getActivity().getApplicationContext());
         goToLogin();
     }
+
 
     @Override
     public void onSuccess(HostResult result) {
         if (result.getCode() == 0) {
-            AuthUtils.setHosted(logInActivity);
+            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
             goToMainActivity();
         }
         else
@@ -241,5 +248,4 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
         progressDialog.dismiss();
         Log.d("LoginExeption", ex.getMessage());
     }
-
 }
