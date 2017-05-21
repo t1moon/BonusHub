@@ -3,7 +3,6 @@ package com.example.BonusHub.activity.fragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,13 +17,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.executors.CreateHostExecutor;
+import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
+
+import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -50,13 +52,6 @@ public class StartFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logInActivity = (LogInActivity) getActivity();
-        CreateHostExecutor.getInstance().setCallback(new CreateHostExecutor.Callback() {
-            @Override
-            public void onCreated(int host_id) {
-                onHostCreated(host_id);
-            }
-        });
-
     }
 
 
@@ -66,7 +61,7 @@ public class StartFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_start, container, false);
 
-        ImageView backdrop = (ImageView) logInActivity.findViewById(R.id.backdrop);
+        ImageView backdrop = (ImageView) logInActivity.findViewById(R.id.login_backdrop);
         backdrop.setBackgroundColor(Color.WHITE);
         host_title = (EditText) rootView.findViewById(R.id.host_title_et);
         host_description = (EditText) rootView.findViewById(R.id.host_description_et);
@@ -157,8 +152,17 @@ public class StartFragment extends Fragment {
                     host.setTime_open(open_hour * 60 + open_minute);
                     host.setTime_close(close_hour * 60 + close_minute);
                     host.setProfile_image(null);
-                    CreateHostExecutor.getInstance().createHost(host);
+                    DbExecutorService.getInstance().createHost(host, new DbExecutorService.DbExecutorCallback() {
+                        @Override
+                        public void onSuccess(Map<String, ?> result) {
+                            onHostCreated((Integer) result.get("host_id"));
+                        }
 
+                        @Override
+                        public void onError(Exception ex) {
+                            Toast.makeText(logInActivity, "Произошла ошибка при создании заведения", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     AuthUtils.setHosted(logInActivity);
                     goToMainActivity();
                 }
