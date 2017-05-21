@@ -144,6 +144,7 @@ public class ListHostFragment extends Fragment {
     }
 
     private void getFromCache() {
+        clientHostsList.clear();
         Client client = null;
         int client_id = getClientId();
         try {
@@ -197,20 +198,28 @@ public class ListHostFragment extends Fragment {
         List<HostListResponse.HostPoints> hostPoints = response.getHosts();
         List<ClientHost> clientHosts = new ArrayList<>();
         ClientHost clientHost = null;
+        Client client = null;
+        try {
+            client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         for (HostListResponse.HostPoints hp : hostPoints) {
             Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
-
-
             host.setProfile_image(hp.getProfile_image());
-
-            Client client = null;
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
-                client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             clientHost = new ClientHost(client, host, hp.getPoints());
+            try {
+                HelperFactory.getHelper().getClientHostDAO().createClientHost(client, host, hp.getPoints());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             clientHostsList.add(clientHost);
         }
 

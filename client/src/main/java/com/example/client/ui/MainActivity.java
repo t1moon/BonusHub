@@ -43,7 +43,7 @@ public class MainActivity extends BaseActivity implements StackListner {
     public final static int MENUITEM_QR = 0;
     public final static int MENUITEM_LISTHOST = 1;
 
-    private static int client_id;
+    private static int client_id = 66;
 
     public static int getClientId() {
         return client_id;
@@ -60,7 +60,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         setContentView(R.layout.activity_main);
 
         setStackListner(this);
-        this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
+        //this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -105,8 +105,8 @@ public class MainActivity extends BaseActivity implements StackListner {
                 }
         );
 
-        setupClient();
-        populateHosts();
+//        setupClient();
+        //populateHosts();
         setupStartFragment();
 
     }
