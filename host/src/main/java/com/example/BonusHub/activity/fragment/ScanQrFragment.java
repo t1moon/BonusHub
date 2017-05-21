@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.retrofit.NetworkThread;
@@ -104,9 +105,8 @@ public class ScanQrFragment extends Fragment {
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
         final Call<UpdatePointsResponse> call;
 
-        final int host_id = 1;
         int bill = Integer.parseInt(et_bill.getText().toString());
-        call = apiInterface.update_points(new UpdatePointsPojo(host_id, client_identificator, bill, isAddTo));
+        call = apiInterface.update_points(new UpdatePointsPojo(client_identificator, bill, isAddTo), AuthUtils.getCookie(mainActivity));
 
         NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<UpdatePointsResponse>() {
             @Override

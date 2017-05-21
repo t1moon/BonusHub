@@ -24,6 +24,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
@@ -191,7 +192,7 @@ public class EditFragment extends Fragment {
                 host.setTime_close(close_hour * 60 + close_minute);
 
                 final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-                Call<EditResponse> call = apiInterface.editHost(new EditPojo(host_id, host));
+                Call<EditResponse> call = apiInterface.editHost(host, AuthUtils.getCookie(mainActivity));
                 NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<EditResponse>() {
                     @Override
                     public void onSuccess(EditResponse result) {
@@ -258,7 +259,7 @@ public class EditFragment extends Fragment {
                 MultipartBody.Part body =
                         MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
 
-                Call<UploadResponse> call = apiInterface.upload(body, host_id);
+                Call<UploadResponse> call = apiInterface.upload(body, AuthUtils.getCookie(mainActivity));
                 NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<UploadResponse>() {
                     @Override
                     public void onSuccess(UploadResponse result) {
