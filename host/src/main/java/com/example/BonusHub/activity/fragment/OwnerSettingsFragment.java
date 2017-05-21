@@ -59,7 +59,7 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
         super.onResume();
         sp.registerOnSharedPreferenceChangeListener(this);
         // update bonus system type
-        bst = Integer.parseInt(sp.getString(getString(BONUS_SYSTEM_KEY_ADDRESS), ""));
+         bst = Integer.parseInt(sp.getString(getString(BONUS_SYSTEM_KEY_ADDRESS), ""));
         render();
     }
 

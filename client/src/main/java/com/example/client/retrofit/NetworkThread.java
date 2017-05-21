@@ -28,7 +28,7 @@ public class NetworkThread {
             @Override
             public void run() {
                 try {
-                    final Response<T> response = call.execute();
+                        final Response<T> response = call.execute();
                     if (response.isSuccessful()) {
                         uiHandler.post(new Runnable() {
                             @Override

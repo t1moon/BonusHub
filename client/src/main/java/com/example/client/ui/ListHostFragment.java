@@ -17,14 +17,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.bonuslib.client.Client;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
-import com.example.client.recycler.GridSpacingItemDecoration;
 import com.example.client.recycler.HostAdapter;
 import com.example.client.recycler.RecyclerTouchListener;
 import com.example.client.R;
@@ -50,6 +48,7 @@ public class ListHostFragment extends Fragment {
     private HostAdapter mAdapter;
     private MainActivity mainActivity;
     private SwipeRefreshLayout swipeRefreshLayout;
+
     public ListHostFragment() {
         // Required empty public constructor
     }
@@ -68,16 +67,17 @@ public class ListHostFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_list_host, container, false);
 
         setInfo();
-        //prepareHostData();
+        //getFromInternet();
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (mainActivity.hasConnection()){
-                    prepareHostData();
+                if (mainActivity.hasConnection()) {
+                    getFromInternet();
                 } else {
                     swipeRefreshLayout.setRefreshing(false);
+
                 }
 
             }
@@ -87,7 +87,8 @@ public class ListHostFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        StaggeredGridLayoutManager mStaggeredLayoutManager;mStaggeredLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager mStaggeredLayoutManager;
+        mStaggeredLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(mStaggeredLayoutManager);
 //        recyclerView.addItemDecoration(new GridSpacingItemDecoration(1, dpToPx(10), true));
         recyclerView.setAdapter(mAdapter);
@@ -103,8 +104,8 @@ public class ListHostFragment extends Fragment {
             }
         }));
 
-        if(mainActivity.hasConnection()) {
-            prepareHostData();
+        if (mainActivity.hasConnection()) {
+            getFromInternet();
         } else {
             getFromCache();
         }
@@ -143,7 +144,6 @@ public class ListHostFragment extends Fragment {
     }
 
     private void getFromCache() {
-        clientHostsList.clear();
         Client client = null;
         int client_id = getClientId();
         try {
@@ -167,10 +167,11 @@ public class ListHostFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
 
     }
-    private void prepareHostData() {
+
+    private void getFromInternet() {
         // showing refresh animation before making http call
         swipeRefreshLayout.setRefreshing(true);
-
+        clientHostsList.clear();
         final HostListFetcher hostListFetcher = RetrofitFactory.retrofitClient().create(HostListFetcher.class);
         final Call<HostListResponse> call = hostListFetcher.listHosts(new ClientPOJO(1));
         NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<HostListResponse>() {
@@ -199,6 +200,7 @@ public class ListHostFragment extends Fragment {
         for (HostListResponse.HostPoints hp : hostPoints) {
             Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
 
+
             host.setProfile_image(hp.getProfile_image());
 
             Client client = null;
@@ -210,13 +212,13 @@ public class ListHostFragment extends Fragment {
             }
             clientHost = new ClientHost(client, host, hp.getPoints());
             clientHostsList.add(clientHost);
-            Toast.makeText(mainActivity.getApplicationContext(), hp.getTitle() + hp.getPoints()+ hp.getProfile_image(), Toast.LENGTH_SHORT).show();
         }
 
 
         mAdapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
     }
+
     private void showError(Throwable error) {
         new AlertDialog.Builder(mainActivity)
                 .setTitle("Ошибка")
