@@ -61,7 +61,7 @@ public class StartFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_start, container, false);
 
-        ImageView backdrop = (ImageView) logInActivity.findViewById(R.id.backdrop);
+        ImageView backdrop = (ImageView) logInActivity.findViewById(R.id.login_backdrop);
         backdrop.setBackgroundColor(Color.WHITE);
         host_title = (EditText) rootView.findViewById(R.id.host_title_et);
         host_description = (EditText) rootView.findViewById(R.id.host_description_et);

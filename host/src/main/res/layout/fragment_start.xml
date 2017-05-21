@@ -13,10 +13,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="15sp"
+            android:padding="24dp"
             android:text="Укажите информацию о заведении"
-            android:textColor="#000000"
-            android:textSize="25sp" />
+            android:textColor="@color/white"
+            android:textSize="24sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,39 +26,43 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:errorEnabled="true">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/host_title_et"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:textColorHint="@color/white"
+                app:errorEnabled="true"
+                style="@style/StyledTilEditText">
+                <EditText android:id="@+id/host_title_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Название заведения" />
             </android.support.design.widget.TextInputLayout>
-
-
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:hint="Описание">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/host_description_et"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:textColorHint="@color/white"
+                app:errorEnabled="true"
+                style="@style/StyledTilEditText">
+                <EditText android:id="@+id/host_description_et"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:hint="Описание" />
             </android.support.design.widget.TextInputLayout>
 
-
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/host_address_et"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:textColorHint="@color/white"
+                app:errorEnabled="true"
+                style="@style/StyledTilEditText">
+                <EditText android:id="@+id/host_address_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Адрес" />
             </android.support.design.widget.TextInputLayout>
-
         </LinearLayout>
 
         <LinearLayout
@@ -73,6 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textColor="@color/white"
                 android:text="Время открытия" />
 
             <Button
@@ -81,6 +86,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textColor="@color/white"
                 android:text="Время закрытия" />
         </LinearLayout>
 

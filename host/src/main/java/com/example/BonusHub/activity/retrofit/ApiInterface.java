@@ -15,6 +15,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -54,11 +55,11 @@ public interface ApiInterface {
     })
     Call<StatisticResponse> getStatistic(@Path("host_id") int host_id);
 
-    @GET("{host_id}/info/")
+    @GET("info/")
     @Headers({
             "Accept: application/json"
     })
-    Call<GetInfoResponse> getInfo(@Path("host_id") int host_id);
+    Call<GetInfoResponse> getInfo(@Header("Cookie")String cookie);
 
 
 
