@@ -1,11 +1,13 @@
 package com.example.BonusHub.activity.fragment;
 
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,15 +24,23 @@ import android.widget.Toast;
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.api.host.HostResult;
+import com.example.BonusHub.activity.api.host.Hoster;
 import com.example.BonusHub.activity.executors.DbExecutorService;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
+import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import java.util.Map;
 
-import static android.content.Context.MODE_PRIVATE;
+import retrofit2.Call;
+import retrofit2.Response;
 
-public class StartFragment extends Fragment {
+import static android.content.Context.MODE_PRIVATE;
+import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
+
+public class StartFragment extends Fragment implements NetworkThread.ExecuteCallback <HostResult> {
     private static final String LOGIN_PREFERENCES = "LoginData";
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
@@ -41,6 +51,7 @@ public class StartFragment extends Fragment {
     private EditText host_address;
     private static int host_id;
     private LogInActivity logInActivity;
+    private ProgressDialog progressDialog;
 
     View rootView;
 
@@ -95,6 +106,10 @@ public class StartFragment extends Fragment {
         getActivity().finish();
     }
 
+    private void goToLogin() {
+        logInActivity.setCurrentFragment(FragmentType.LogInFragment);
+        logInActivity.pushFragment(new LogInFragment(), true);
+    }
     private void pickTime(final View v) {
         // Launch Time Picker Dialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
@@ -152,6 +167,21 @@ public class StartFragment extends Fragment {
                     host.setTime_open(open_hour * 60 + open_minute);
                     host.setTime_close(close_hour * 60 + close_minute);
                     host.setProfile_image(null);
+
+
+                    progressDialog = new ProgressDialog(logInActivity);
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setMessage("Отправка информации на сервер...");
+                    progressDialog.show();
+
+
+                    final Hoster hoster = retrofitBarmen().create(Hoster.class);
+                    final Call<HostResult> call = hoster.login(host, AuthUtils.getCookie(getActivity()));
+                    //final Call<HostResult> call = hoster.login(host, "no");
+                    NetworkThread.getInstance().setCallback(this);
+                    NetworkThread.getInstance().execute(call);
+
+
                     DbExecutorService.getInstance().createHost(host, new DbExecutorService.DbExecutorCallback() {
                         @Override
                         public void onSuccess(Map<String, ?> result) {
@@ -163,8 +193,6 @@ public class StartFragment extends Fragment {
                             Toast.makeText(logInActivity, "Произошла ошибка при создании заведения", Toast.LENGTH_SHORT).show();
                         }
                     });
-                    AuthUtils.setHosted(logInActivity);
-                    goToMainActivity();
                 }
         }
         return super.onOptionsItemSelected(item);
@@ -182,5 +210,33 @@ public class StartFragment extends Fragment {
     }
 
 
+    @Override
+    public void onResponse(Call<HostResult> call, Response<HostResult> response) {
+        progressDialog.dismiss();
+    }
 
+    @Override
+    public void onFailure(Call<HostResult> call, Response<HostResult> response) {
+        progressDialog.dismiss();
+        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+        AuthUtils.logout(getActivity().getApplicationContext());
+        goToLogin();
+    }
+
+
+    @Override
+    public void onSuccess(HostResult result) {
+        if (result.getCode() == 0) {
+            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+            goToMainActivity();
+        }
+        else
+            Toast.makeText(getActivity(), "Ошибка заполнения", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        progressDialog.dismiss();
+        Log.d("LoginExeption", ex.getMessage());
+    }
 }

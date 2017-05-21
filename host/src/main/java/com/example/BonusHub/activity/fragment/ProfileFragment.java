@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
@@ -119,7 +120,7 @@ public class ProfileFragment extends Fragment {
         progress = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
 
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-        final Call<GetInfoResponse> call = apiInterface.getInfo(AuthUtils.getCookie(mainActivity));
+        final Call<GetInfoResponse> call = apiInterface.getInfo(AuthUtils.getCookie(mainActivity.getApplicationContext()));
         NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<GetInfoResponse>() {
             @Override
             public void onSuccess(GetInfoResponse result) {

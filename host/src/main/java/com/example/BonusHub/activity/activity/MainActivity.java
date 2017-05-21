@@ -41,7 +41,7 @@ import retrofit2.Response;
 
 import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 
-public class MainActivity extends BaseActivity implements StackListner {
+public class MainActivity extends BaseActivity implements StackListner, NetworkThread.ExecuteCallback<LogoutResult> {
     private static final String LOGIN_PREFERENCES = "LoginData";
     private final static String TAG = MainActivity.class.getSimpleName();
     private Toolbar mToolbar;
@@ -212,25 +212,8 @@ public class MainActivity extends BaseActivity implements StackListner {
                 Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
                 final Logouter logouter = retrofitBarmen().create(Logouter.class);
                 final Call<LogoutResult> call = logouter.logout(AuthUtils.getCookie(this));
-                NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<LogoutResult>() {
-                    @Override
-                    public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
-                    }
-
-                    @Override
-                    public void onFailure(Call<LogoutResult> call, Throwable t) {
-                    }
-
-                    @Override
-                    public void onSuccess(LogoutResult result) {
-                        onLogoutResult();
-                    }
-
-                    @Override
-                    public void onError(Exception ex) {
-                        Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                NetworkThread.getInstance().setCallback(this);
+                NetworkThread.getInstance().execute(call);
                 break;
         }
         if (fragment != null) {
@@ -282,6 +265,7 @@ public class MainActivity extends BaseActivity implements StackListner {
     private void onLogoutResult() {
         Toast.makeText(this, "You are logged out", Toast.LENGTH_SHORT).show();
         AuthUtils.logout(this);
+        AuthUtils.setHosted(this,false);
         goToLogIn();
     }
 
@@ -313,5 +297,22 @@ public class MainActivity extends BaseActivity implements StackListner {
         Snackbar snackbar = Snackbar
                 .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
         snackbar.show();
+    }
+    @Override
+    public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
+    }
+
+    @Override
+    public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
+    }
+
+    @Override
+    public void onSuccess(LogoutResult result) {
+        onLogoutResult();
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
     }
 }

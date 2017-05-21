@@ -61,6 +61,7 @@ public class LogInActivity extends BaseActivity implements StackListner {
             Log.d("Login go logfrag", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
         }
         else if (!AuthUtils.isHosted(this)) {
+            setupLogInFragment();
             setupStartFragment();
             Log.d("Login go start", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
         }
@@ -105,7 +106,7 @@ public class LogInActivity extends BaseActivity implements StackListner {
     }
 
     private void setupStartFragment() {
-        setCurrentFragment(FragmentType.StartHost);
+//        setCurrentFragment(FragmentType.StartHost);
         pushFragment(new StartFragment(), true);
     }
 

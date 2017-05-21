@@ -28,7 +28,7 @@ import retrofit2.Response;
 
 import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 
-public class LogInFragment extends Fragment {
+public class LogInFragment extends Fragment implements NetworkThread.ExecuteCallback<LoginResult>{
     private static final String LOGIN_PREFERENCES = "LoginData";
     private LogInActivity logInActivity;
 
@@ -37,6 +37,7 @@ public class LogInFragment extends Fragment {
     private EditText loginInput;
     private EditText passwordInput;
     View rootView;
+    private ProgressDialog progressDialog;
 
     public LogInFragment() {
 
@@ -104,7 +105,7 @@ public class LogInFragment extends Fragment {
             return;
         }
 
-        final ProgressDialog progressDialog = new ProgressDialog(logInActivity);
+        progressDialog = new ProgressDialog(logInActivity);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Аутентификация...");
         progressDialog.show();
@@ -112,46 +113,19 @@ public class LogInFragment extends Fragment {
 
         final Loginner loginner = retrofitBarmen().create(Loginner.class);
         final Call<LoginResult> call = loginner.login(new Login(login,password));
-
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<LoginResult>() {
-            @Override
-            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
-                String cookie = response.headers().get("Set-Cookie");
-                AuthUtils.setCookie(getActivity(), cookie);
-                Log.d("кука", "кука0");
-                progressDialog.dismiss();
-            }
-
-            @Override
-            public void onFailure(Call<LoginResult> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("кука", "кука1");
-                progressDialog.dismiss();
-            }
-
-            @Override
-            public void onSuccess(LoginResult result) {
-                onLoginResult(result);
-                progressDialog.dismiss();
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                Log.d("кука", "кука3");
-                progressDialog.dismiss();
-            }
-        });
+        NetworkThread.getInstance().setCallback(this);
+        NetworkThread.getInstance().execute(call);
     }
 
     public void onLoginResult(LoginResult result) {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.isHosted() == false && result.getCode() == 0) {
-            AuthUtils.setAuthorized(getActivity());
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
             goToStartFragment();
         }
         else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity());
-            AuthUtils.setHosted(getActivity());
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
+            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
             goToMainActivity();
         }
     }
@@ -173,4 +147,35 @@ public class LogInFragment extends Fragment {
         }
         return valid;
     }
+    @Override
+    public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+        String cookie = response.headers().get("Set-Cookie");
+        AuthUtils.setCookie(getActivity().getApplicationContext(), cookie);
+        progressDialog.dismiss();
+    }
+
+    @Override
+    public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+        progressDialog.dismiss();
+        Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccess(LoginResult result) {
+        onLoginResult(result);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        progressDialog.dismiss();
+        Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (progressDialog != null)
+            progressDialog.dismiss();
+        NetworkThread.getInstance().setCallback(null);
+    }
+
 }

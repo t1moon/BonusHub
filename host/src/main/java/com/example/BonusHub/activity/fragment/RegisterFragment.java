@@ -1,5 +1,6 @@
 package com.example.BonusHub.activity.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -35,9 +36,13 @@ import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 public class RegisterFragment extends Fragment {
     private LogInActivity logInActivity;
 
+    private static NetworkThread.ExecuteCallback<RegistrationResult> registrationCallback;
+    private static NetworkThread.ExecuteCallback<LoginResult> loginCallback;
+
     private Button registrationButton;
     private EditText loginInput;
     private EditText passwordInput;
+    private ProgressDialog progressDialog;
     View rootView;
 
     public RegisterFragment() {
@@ -48,6 +53,7 @@ public class RegisterFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logInActivity = (LogInActivity) getActivity();
+        prepareCallbacks();
     }
 
 
@@ -69,13 +75,10 @@ public class RegisterFragment extends Fragment {
 
     public void goToStartFragment() {
         logInActivity.setCurrentFragment(FragmentType.StartHost);
-        logInActivity.pushFragment(new StartFragment(), false);
+        logInActivity.pushFragment(new StartFragment(), true);
     }
 
-    public void goToLoginFragment() {
-        logInActivity.setCurrentFragment(FragmentType.LogInFragment);
-        logInActivity.pushFragment(new LogInFragment(), false);
-    }
+
 
     public void goToMainActivity() {
         Intent intent = new Intent(getActivity(), MainActivity.class);
@@ -97,34 +100,15 @@ public class RegisterFragment extends Fragment {
         if (!validate())
             return;
 
+        progressDialog = new ProgressDialog(logInActivity);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Регистрация...");
+        progressDialog.show();
+
         final Registrator registrator = retrofitBarmen().create(Registrator.class);
         final Call<RegistrationResult> call = registrator.registrate(new Login(login,password));
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<RegistrationResult>() {
-            @Override
-            public void onResponse(Call<RegistrationResult> call, Response<RegistrationResult> response) {
-                okhttp3.Headers headers = response.headers();
-                String cookie = response.headers().get("Set-Cookie");
-                AuthUtils.setCookie(getActivity(), cookie);
-            }
-
-            @Override
-            public void onFailure(Call<RegistrationResult> call, Throwable t) {
-
-            }
-
-            @Override
-            public void onSuccess(RegistrationResult result) {
-                if (result.getCode() == 0){
-                    onRegistrationResult(result);
-                }
-
-            }
-
-            @Override
-            public void onError(Exception ex) {
-
-            }
-        });
+        NetworkThread.getInstance().setCallback(registrationCallback);
+        NetworkThread.getInstance().execute(call);
     }
 
     public void onRegistrationResult(RegistrationResult result) {
@@ -138,41 +122,20 @@ public class RegisterFragment extends Fragment {
         final String password = passwordInput.getText().toString();
         final Loginner loginner = retrofitBarmen().create(Loginner.class);
         final Call<LoginResult> call = loginner.login(new Login(login,password));
-        NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<LoginResult>() {
-            @Override
-            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
-                okhttp3.Headers headers = response.headers();
-                String cookie = response.headers().get("Set-Cookie");
-                AuthUtils.setCookie(getActivity(), cookie);
-            }
-
-            @Override
-            public void onFailure(Call<LoginResult> call, Throwable t) {
-
-            }
-
-            @Override
-            public void onSuccess(LoginResult result) {
-                onLoginResult(result);
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                Toast.makeText(getActivity(), "Возникли проблемы с авторизацией, попробуйте позже", Toast.LENGTH_SHORT).show();
-            }
-        });
+        NetworkThread.getInstance().setCallback(loginCallback);
+        NetworkThread.getInstance().execute(call);
     }
 
     public void onLoginResult(LoginResult result) {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.isHosted() == false && result.getCode() == 0) {
-            AuthUtils.setAuthorized(getActivity());
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
             Log.d("LogFrag go start", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + result.isHosted());
             goToStartFragment();
         }
         else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity());
-            AuthUtils.setHosted(getActivity());
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
+            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
             Log.d("LogFrag go main", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + AuthUtils.isHosted(getActivity()));
             goToMainActivity();
         }
@@ -195,4 +158,68 @@ public class RegisterFragment extends Fragment {
         }
         return valid;
     }
+
+    private void prepareCallbacks() {
+        registrationCallback = new NetworkThread.ExecuteCallback<RegistrationResult>() {
+            @Override
+            public void onResponse(Call<RegistrationResult> call, Response<RegistrationResult> response) {
+                progressDialog.dismiss();
+                okhttp3.Headers headers = response.headers();
+                String cookie = response.headers().get("Set-Cookie");
+                AuthUtils.setCookie(getActivity().getApplicationContext(), cookie);
+            }
+
+            @Override
+            public void onFailure(Call<RegistrationResult> call, Response<RegistrationResult> response) {
+                progressDialog.dismiss();
+                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(RegistrationResult result) {
+                progressDialog.dismiss();
+                if (result.getCode() == 0){
+                    onRegistrationResult(result);
+                }
+
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        loginCallback = new NetworkThread.ExecuteCallback<LoginResult>() {
+            @Override
+            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+                String cookie = response.headers().get("Set-Cookie");
+                AuthUtils.setCookie(getActivity().getApplicationContext(), cookie);
+            }
+
+            @Override
+            public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(LoginResult result) {
+                onLoginResult(result);
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+            }
+        };
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        NetworkThread.getInstance().setCallback(null);
+    }
+
 }

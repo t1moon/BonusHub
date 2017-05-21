@@ -29,11 +29,11 @@ public class AuthUtils {
                 .apply();
     }
 
-    public static void setHosted(Context context)
+    public static void setHosted(Context context, boolean isHosted)
     {
         context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
                 .edit()
-                .putBoolean(PREFERENCES_HOSTED_KEY, true)
+                .putBoolean(PREFERENCES_HOSTED_KEY, isHosted)
                 .apply();
     }
 
