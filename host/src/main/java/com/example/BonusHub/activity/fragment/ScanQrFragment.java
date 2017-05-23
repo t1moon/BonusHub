@@ -44,7 +44,6 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     String client_identificator = null;
     private static Fragment fragmentInstance;
     MainActivity mainActivity;
-    private ProgressDialog progressDialog;
 
     EditText et_bill;
     SwitchCompat switchCompat;
@@ -120,16 +119,13 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     private void updatePoints(boolean isAddTo) {
 
-        // JUST FOR TESTING
         client_identificator = "QfgnJKEGNRojer";
 
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
         final Call<UpdatePointsResponse> call;
 
-        final int host_id = 1;
         int bill = Integer.parseInt(et_bill.getText().toString());
-
-        call = apiInterface.update_points(new UpdatePointsPojo(host_id, client_identificator, bill, isAddTo), AuthUtils.getCookie(getActivity()));
+        call = apiInterface.update_points(new UpdatePointsPojo(client_identificator, bill, isAddTo), AuthUtils.getCookie(mainActivity));
 
         if (updatePointsCallbackId == null) {
             updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);
@@ -158,15 +154,13 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     @Override
     public void onResponse(Call<UpdatePointsResponse> call, Response<UpdatePointsResponse> response) {
-        progressDialog.dismiss();
     }
 
     @Override
     public void onFailure(Call<UpdatePointsResponse> call, Response<UpdatePointsResponse> response) {
-        progressDialog.dismiss();
         NetworkThread.getInstance().unRegisterCallback(updatePointsCallbackId);
         updatePointsCallbackId = null;
-        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
         AuthUtils.logout(getActivity());
         goToLogin();
     }

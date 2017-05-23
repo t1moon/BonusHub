@@ -10,7 +10,7 @@ import retrofit2.http.POST;
  */
 
 public interface Logouter {
-    @POST("client/logout/")
+    @POST("logout/")
     @Headers({
             "Accept: application/json"
     })

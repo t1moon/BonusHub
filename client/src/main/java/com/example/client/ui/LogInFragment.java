@@ -34,6 +34,7 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
     private EditText passwordInput;
     private ProgressDialog progressDialog;
     View rootView;
+    private Integer loginCallbackId;
 
     public LogInFragment() {
 
@@ -50,7 +51,8 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
         super.onDestroy();
         if (progressDialog != null)
             progressDialog.dismiss();
-        NetworkThread.getInstance().setCallback(null);
+        if (loginCallbackId != null)
+            NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
     }
 
 
@@ -100,8 +102,8 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
 
         final Loginner loginner = retrofitClient().create(Loginner.class);
         final Call<LoginResult> call = loginner.login(new Login(login,password));
-        NetworkThread.getInstance().setCallback(this);
-        NetworkThread.getInstance().execute(call);
+        loginCallbackId = NetworkThread.getInstance().registerCallback(this);
+        NetworkThread.getInstance().execute(call, loginCallbackId);
     }
 
     public boolean validate() {
@@ -141,17 +143,23 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
 
     @Override
     public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+        NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+        loginCallbackId = null;
         progressDialog.dismiss();
         Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSuccess(LoginResult result) {
+        NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+        loginCallbackId = null;
         onLoginResult(result);
     }
 
     @Override
     public void onError(Exception ex) {
+        NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+        loginCallbackId = null;
         progressDialog.dismiss();
         Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
     }

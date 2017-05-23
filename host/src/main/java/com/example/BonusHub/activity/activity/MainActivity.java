@@ -318,17 +318,23 @@ public class MainActivity extends BaseActivity implements StackListner {
 
             @Override
             public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
+                NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
+                logoutCallbackId = null;
                 AuthUtils.logout(MainActivity.this);
                 goToLogIn();
             }
 
             @Override
             public void onSuccess(LogoutResult result) {
+                NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
+                logoutCallbackId = null;
                 onLogoutResult();
             }
 
             @Override
             public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
+                logoutCallbackId = null;
                 Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
         };

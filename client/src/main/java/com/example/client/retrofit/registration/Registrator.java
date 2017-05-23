@@ -11,7 +11,7 @@ import retrofit2.http.POST;
  */
 
 public interface Registrator {
-    @POST("client/register/")
+    @POST("register/")
     @Headers({
             "Accept: application/json"
     })

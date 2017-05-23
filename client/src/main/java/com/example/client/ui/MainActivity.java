@@ -56,6 +56,7 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
     public final static int MENUITEM_LOGOUT = 2;
 
     private static int client_id;
+    private Integer logoutCallbackId;
 
     public static int getClientId() {
         return client_id;
@@ -130,7 +131,9 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
     @Override
     public void onDestroy() {
         super.onDestroy();
-        NetworkThread.getInstance().setCallback(null);
+        if (logoutCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
+        }
     }
 
     private void goToLogIn() {
@@ -279,8 +282,8 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
             case MENUITEM_LOGOUT:
                 final Logouter logouter = retrofitClient().create(Logouter.class);
                 final Call<LogoutResult> call = logouter.logout(AuthUtils.getCookie(this));
-                NetworkThread.getInstance().setCallback(this);
-                NetworkThread.getInstance().execute(call);
+                logoutCallbackId = NetworkThread.getInstance().registerCallback(this);
+                NetworkThread.getInstance().execute(call, logoutCallbackId);
                 break;
         }
         if (fragment != null) {

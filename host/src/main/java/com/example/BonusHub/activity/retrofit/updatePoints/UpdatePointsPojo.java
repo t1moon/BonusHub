@@ -11,7 +11,7 @@ public class UpdatePointsPojo {
     private String client_identificator;
 
 
-    public UpdatePointsPojo(int host_id, String client_identificator, int bill, boolean isAdd) {
+    public UpdatePointsPojo(String client_identificator, int bill, boolean isAdd) {
         this.host_id = host_id;
         this.bill = bill;
         this.is_add = isAdd;

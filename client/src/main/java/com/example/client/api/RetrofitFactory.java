@@ -13,7 +13,7 @@ public class RetrofitFactory {
     }
 
     private final static Retrofit CLIENT_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://burmistrovm.pythonanywhere.com/api/")
+            .baseUrl("http://romvanocouponserver.pythonanywhere.com/api/client/")
             //.baseUrl("http://192.168.0.102:5000/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();

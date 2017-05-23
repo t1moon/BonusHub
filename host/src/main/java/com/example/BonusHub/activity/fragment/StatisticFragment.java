@@ -90,7 +90,7 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
         tl = (TableLayout) rootView.findViewById(R.id.statistic_table);
 
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-        Call<StatisticResponse> call = apiInterface.getStatistic(AuthUtils.getCookie(getActivity().getApplicationContext()));
+        Call<StatisticResponse> call = apiInterface.getStatistic(AuthUtils.getCookie(mainActivity));
         if (statisticCallbackId == null) {
             statisticCallbackId = NetworkThread.getInstance().registerCallback(this);
             NetworkThread.getInstance().execute(call, statisticCallbackId);
@@ -104,12 +104,6 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
         getActivity().finish();
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-
     private void showResponse(StatisticResponse result) {
 
         List<DataPoint> pointList = new ArrayList<>();
@@ -118,42 +112,43 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
         for (StatisticResponse.Operation operation : operationList) {
 
             Calendar calendar = getDate(operation.getDate());
-//            Date dateGraph = getDateFromString(date);
             Date d = calendar.getTime();
             dates.add(Integer.toString(d.getDate()));
-
-//            Toast.makeText(mainActivity.getApplicationContext(), date, Toast.LENGTH_SHORT).show();
-//            makeTableRow(date, operation.getAvgBill(), operation.getIncome(), operation.getOutcome());
             pointList.add(new DataPoint(d.getDate(), operation.getAvgBill()));
+            makeTableRow(getReadableDate(operation.getDate()), operation.getAvgBill(), operation.getIncome(), operation.getOutcome());
         }
-        DataPoint[] dataPoints = new DataPoint[pointList.size()];
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(pointList.toArray(dataPoints));
-        graph.addSeries(series);
-
-        // set date label formatter
-//        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
-
         String[] axisX = new String[dates.size()];
         axisX = dates.toArray(axisX);
-        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-        staticLabelsFormatter.setHorizontalLabels(axisX);
-        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        if (axisX.length > 1) {
+            DataPoint[] dataPoints = new DataPoint[pointList.size()];
+            LineGraphSeries<DataPoint> series = new LineGraphSeries<>(pointList.toArray(dataPoints));
+            graph.addSeries(series);
 
-        graph.getViewport().setMinX(Integer.parseInt(dates.get(0)));
-        graph.getViewport().setMaxX(Integer.parseInt(dates.get(dates.size() - 1)));
-        graph.getViewport().setXAxisBoundsManual(true);
+            StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
 
+            staticLabelsFormatter.setHorizontalLabels(axisX);
+            graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+
+            graph.getViewport().setMinX(Integer.parseInt(dates.get(0)));
+            graph.getViewport().setMaxX(Integer.parseInt(dates.get(dates.size() - 1)));
+            graph.getViewport().setXAxisBoundsManual(true);
+        }
+        else {
+            graph.setVisibility(View.GONE);
+            Toast.makeText(mainActivity, "Для статистики вам нужны ещё данные", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private Date getDateFromString(String date) {
-        SimpleDateFormat src = new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
-        Date newDate = null;
+    private String getReadableDate(String date) {
+        SimpleDateFormat src = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
+        SimpleDateFormat dsn = new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
+        Date result = null;
         try {
-            newDate = src.parse(date);
+            result = src.parse(date);
         } catch (ParseException e) {
             Log.d("Exception", e.getMessage());
         }
-        return newDate;
+        return dsn.format(result);
     }
 
     private void makeTableRow(String date, float avgBill, int income, int outcome) {

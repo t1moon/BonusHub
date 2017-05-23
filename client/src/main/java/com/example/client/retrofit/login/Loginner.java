@@ -11,7 +11,7 @@ import retrofit2.http.POST;
  */
 
 public interface Loginner {
-    @POST("client/login/")
+    @POST("login/")
     @Headers({
             "Accept: application/json"
     })
