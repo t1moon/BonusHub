@@ -39,6 +39,8 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     public final static int HOST_PERCENTAGE = 10;
 
+    private Integer updatePointsCallbackId;
+
     String client_identificator = null;
     private static Fragment fragmentInstance;
     MainActivity mainActivity;
@@ -60,7 +62,9 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     @Override
     public void onDestroy() {
         super.onDestroy();
-        NetworkThread.getInstance().setCallback(null);
+        if (updatePointsCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(updatePointsCallbackId);
+        }
     }
 
     @Override
@@ -126,8 +130,11 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         int bill = Integer.parseInt(et_bill.getText().toString());
 
         call = apiInterface.update_points(new UpdatePointsPojo(host_id, client_identificator, bill, isAddTo), AuthUtils.getCookie(getActivity()));
-        NetworkThread.getInstance().setCallback(this);
-        NetworkThread.getInstance().execute(call);
+
+        if (updatePointsCallbackId == null) {
+            updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);
+            NetworkThread.getInstance().execute(call,updatePointsCallbackId);
+        }
     }
 
     private void showResponse(UpdatePointsResponse result) {
@@ -157,6 +164,8 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     @Override
     public void onFailure(Call<UpdatePointsResponse> call, Response<UpdatePointsResponse> response) {
         progressDialog.dismiss();
+        NetworkThread.getInstance().unRegisterCallback(updatePointsCallbackId);
+        updatePointsCallbackId = null;
         Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
         AuthUtils.logout(getActivity());
         goToLogin();
@@ -164,11 +173,15 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     @Override
     public void onSuccess(UpdatePointsResponse result) {
+        NetworkThread.getInstance().unRegisterCallback(updatePointsCallbackId);
+        updatePointsCallbackId = null;
         showResponse(result);
     }
 
     @Override
     public void onError(Exception ex) {
+        NetworkThread.getInstance().unRegisterCallback(updatePointsCallbackId);
+        updatePointsCallbackId = null;
         showError(ex);
     }
 

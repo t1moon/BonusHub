@@ -9,18 +9,28 @@ import android.os.Looper;
 
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.Callback;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class NetworkThread {
     private final static NetworkThread INSTANCE = new NetworkThread();
 
-    private final Executor executor = Executors.newSingleThreadExecutor();
+    private final Executor executor = Executors.newCachedThreadPool();
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
-    private ExecuteCallback callback;
+    private final Map<Integer, ExecuteCallback> callbacks = new HashMap<>();
+    private static int idCounter = 1;
 
-    public void setCallback(ExecuteCallback newCallback) {
-        callback = newCallback;
+    public Integer registerCallback(ExecuteCallback newCallback) {
+        callbacks.put(idCounter, newCallback);
+        return idCounter++;
+    }
+
+    public void unRegisterCallback (int iD) {
+        callbacks.remove(iD);
+        if (callbacks.isEmpty()) {
+            idCounter = 1;
+        }
     }
 
     private NetworkThread() {
@@ -30,33 +40,37 @@ public class NetworkThread {
         return INSTANCE;
     }
 
-    public <T> void execute(final Call<T> call) {
+    public <T> void execute(final Call<T> call, final Integer callbackId) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     final Response<T> response = call.execute();
-                    if (response.isSuccessful() && callback != null) {
+                    if (response.isSuccessful() && callbacks.containsKey(callbackId)) {
                         uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
+                                final NetworkThread.ExecuteCallback<T> callback;
+                                callback = callbacks.get(callbackId);
                                 callback.onResponse(call, response);
                                 callback.onSuccess(response.body());
                             }
                         });
-                    } else if (callback != null) {
+                    } else if (callbacks.containsKey(callbackId)) {
                         uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
+                                final NetworkThread.ExecuteCallback<T> callback = callbacks.get(callbackId);
                                 callback.onFailure(call, response);
                             }
                         });
                     }
                 } catch (final IOException e) {
-                    if (callback != null) {
+                    if (callbacks.containsKey(callbackId)) {
                         uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
+                                final NetworkThread.ExecuteCallback<T> callback = callbacks.get(callbackId);
                                 callback.onError(e);
                             }
                         });

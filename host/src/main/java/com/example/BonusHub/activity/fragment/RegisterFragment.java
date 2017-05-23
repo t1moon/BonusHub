@@ -39,8 +39,11 @@ import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 public class RegisterFragment extends Fragment {
     private LogInActivity logInActivity;
 
+
     private static NetworkThread.ExecuteCallback<RegistrationResult> registrationCallback;
+    private Integer registrationCallbackId;
     private static NetworkThread.ExecuteCallback<LoginResult> loginCallback;
+    private Integer loginCallbackId;
 
     private Button registrationButton;
     private EditText loginInput;
@@ -65,7 +68,12 @@ public class RegisterFragment extends Fragment {
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
-        NetworkThread.getInstance().setCallback(null);
+        if (loginCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+        }
+        if (registrationCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
+        }
     }
 
     @Override
@@ -115,8 +123,9 @@ public class RegisterFragment extends Fragment {
 
         final Registrator registrator = retrofitBarmen().create(Registrator.class);
         final Call<RegistrationResult> call = registrator.registrate(new Login(login,password));
-        NetworkThread.getInstance().setCallback(registrationCallback);
-        NetworkThread.getInstance().execute(call);
+
+        registrationCallbackId = NetworkThread.getInstance().registerCallback(registrationCallback);
+        NetworkThread.getInstance().execute(call, registrationCallbackId);
     }
 
     public void onRegistrationResult(RegistrationResult result) {
@@ -130,8 +139,9 @@ public class RegisterFragment extends Fragment {
         final String password = passwordInput.getText().toString();
         final Loginner loginner = retrofitBarmen().create(Loginner.class);
         final Call<LoginResult> call = loginner.login(new Login(login,password));
-        NetworkThread.getInstance().setCallback(loginCallback);
-        NetworkThread.getInstance().execute(call);
+
+        loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
+        NetworkThread.getInstance().execute(call,loginCallbackId);
     }
 
     public void onLoginResult(LoginResult result) {
@@ -172,19 +182,22 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onResponse(Call<RegistrationResult> call, Response<RegistrationResult> response) {
                 progressDialog.dismiss();
-                okhttp3.Headers headers = response.headers();
                 String cookie = response.headers().get("Set-Cookie");
                 AuthUtils.setCookie(getActivity(), cookie);
             }
 
             @Override
             public void onFailure(Call<RegistrationResult> call, Response<RegistrationResult> response) {
+                NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
+                registrationCallbackId = null;
                 progressDialog.dismiss();
                 Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSuccess(RegistrationResult result) {
+                NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
+                registrationCallbackId = null;
                 progressDialog.dismiss();
                 if (result.getCode() == 0){
                     onRegistrationResult(result);
@@ -194,6 +207,8 @@ public class RegisterFragment extends Fragment {
 
             @Override
             public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
+                registrationCallbackId = null;
                 Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
             }
         };
@@ -207,16 +222,23 @@ public class RegisterFragment extends Fragment {
 
             @Override
             public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+                NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+                loginCallbackId = null;
                 Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
             }
 
+
             @Override
             public void onSuccess(LoginResult result) {
+                NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+                loginCallbackId = null;
                 onLoginResult(result);
             }
 
             @Override
             public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+                loginCallbackId = null;
                 Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
             }
         };

@@ -61,6 +61,7 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
     MainActivity mainActivity;
     TableLayout tl;
     GraphView graph;
+    private Integer statisticCallbackId;
 
     public StatisticFragment() {
         // Required empty public constructor
@@ -75,7 +76,9 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
     @Override
     public void onDestroy(){
         super.onDestroy();
-        NetworkThread.getInstance().setCallback(null);
+        if (statisticCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(statisticCallbackId);
+        }
     }
 
     @Override
@@ -87,9 +90,11 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
         tl = (TableLayout) rootView.findViewById(R.id.statistic_table);
 
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-        Call<StatisticResponse> call = apiInterface.getStatistic(1);
-        NetworkThread.getInstance().setCallback(this);
-        NetworkThread.getInstance().execute(call);
+        Call<StatisticResponse> call = apiInterface.getStatistic(AuthUtils.getCookie(getActivity().getApplicationContext()));
+        if (statisticCallbackId == null) {
+            statisticCallbackId = NetworkThread.getInstance().registerCallback(this);
+            NetworkThread.getInstance().execute(call, statisticCallbackId);
+        }
         return rootView;
     }
 

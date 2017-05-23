@@ -3,8 +3,6 @@ package com.example.BonusHub.activity.activity;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -24,12 +22,8 @@ import com.example.timur.BonusHub.R;
  */
 
 public class LogInActivity extends BaseActivity implements StackListner {
-    private static final String LOGIN_PREFERENCES = "LoginData";
     private final static String TAG = LogInActivity.class.getSimpleName();
     private Toolbar mToolbar;
-    private DrawerLayout mDrawer;
-    private ActionBarDrawerToggle drawerToggle;
-    private AppBarLayout appBarLayout;
 
     static {
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -74,7 +68,7 @@ public class LogInActivity extends BaseActivity implements StackListner {
     }
 
     private void setupStartFragment() {
-//        setCurrentFragment(FragmentType.StartHost);
+        setCurrentFragment(FragmentType.StartHost);
         pushFragment(new StartFragment(), true);
     }
 

@@ -41,9 +41,12 @@ import retrofit2.Response;
 
 import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 
-public class MainActivity extends BaseActivity implements StackListner, NetworkThread.ExecuteCallback<LogoutResult> {
-    private static final String LOGIN_PREFERENCES = "LoginData";
+public class MainActivity extends BaseActivity implements StackListner {
     private final static String TAG = MainActivity.class.getSimpleName();
+
+    private NetworkThread.ExecuteCallback<LogoutResult> logoutCallback;
+    private Integer logoutCallbackId;
+
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
@@ -67,6 +70,7 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        prepareCallbacks();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setStackListner(this);
@@ -93,7 +97,9 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
     @Override
     public void onDestroy() {
         super.onDestroy();
-        NetworkThread.getInstance().setCallback(null);
+        if (logoutCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
+        }
     }
 
     private void goToLogIn() {
@@ -218,8 +224,8 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
                 Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
                 final Logouter logouter = retrofitBarmen().create(Logouter.class);
                 final Call<LogoutResult> call = logouter.logout(AuthUtils.getCookie(this));
-                NetworkThread.getInstance().setCallback(this);
-                NetworkThread.getInstance().execute(call);
+                logoutCallbackId = NetworkThread.getInstance().registerCallback(logoutCallback);
+                NetworkThread.getInstance().execute(call, logoutCallbackId);
                 break;
         }
         if (fragment != null) {
@@ -303,21 +309,28 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
                 .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
-    @Override
-    public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
-    }
 
-    @Override
-    public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
-    }
+    private void prepareCallbacks() {
+        logoutCallback = new NetworkThread.ExecuteCallback<LogoutResult>() {
+            @Override
+            public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
+            }
 
-    @Override
-    public void onSuccess(LogoutResult result) {
-        onLogoutResult();
-    }
+            @Override
+            public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
+                AuthUtils.logout(MainActivity.this);
+                goToLogIn();
+            }
 
-    @Override
-    public void onError(Exception ex) {
-        Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            @Override
+            public void onSuccess(LogoutResult result) {
+                onLogoutResult();
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        };
     }
 }

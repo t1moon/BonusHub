@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,18 +25,18 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
-import com.example.BonusHub.activity.retrofit.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.editInfo.EditPojo;
 import com.example.BonusHub.activity.retrofit.editInfo.EditResponse;
 import com.example.BonusHub.activity.retrofit.editInfo.UploadResponse;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
-import com.j256.ormlite.stmt.UpdateBuilder;
 
 import java.io.File;
 import java.util.Map;
@@ -44,9 +45,19 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.Response;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class EditFragment extends Fragment {
     private static int RESULT_LOAD_IMG = 1;
+
+    private static NetworkThread.ExecuteCallback<EditResponse> editCallback;
+    private Integer editCallbackId;
+    private static NetworkThread.ExecuteCallback<UploadResponse> uploadCallback;
+    private Integer uploadCallbackId;
+    private static DbExecutorService.DbExecutorCallback dBUploadCallback;
+    private static DbExecutorService.DbExecutorCallback dBInfoCallback;
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private Button open_time_btn;
@@ -55,9 +66,10 @@ public class EditFragment extends Fragment {
     private EditText host_description_et;
     private EditText host_address_et;
     private FloatingActionButton fab_upload;
-    View rootView;
-    int host_id;
-    MainActivity mainActivity;
+    private View rootView;
+    private int host_id;
+    private Uri targetUri;
+    private MainActivity mainActivity;
 
     public EditFragment() {
         // Required empty public constructor
@@ -67,6 +79,19 @@ public class EditFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
+        prepareCallbacks();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (editCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(editCallbackId);
+        }
+        if (uploadCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
+        }
+        DbExecutorService.getInstance().setCallback(null);
     }
 
     @Override
@@ -112,20 +137,17 @@ public class EditFragment extends Fragment {
         return rootView;
     }
 
+    private void goToLogin() {
+        Intent intent = new Intent(getActivity(), LogInActivity.class);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
     private void getFromCache() {
-        host_id = getActivity().getPreferences(Context.MODE_PRIVATE).getInt("host_id", -1);
-        DbExecutorService.getInstance().loadInfo(host_id, new DbExecutorService.DbExecutorCallback() {
-            @Override
-            public void onSuccess(Map<String, ?> result) {
-                onCacheLoaded((Host) result.get("host"));
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
-
-            }
-        });
+        Log.d("host","" + host_id);
+        host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
+        DbExecutorService.getInstance().setCallback(dBInfoCallback);
+        DbExecutorService.getInstance().loadInfo(host_id);
     }
 
 
@@ -193,18 +215,11 @@ public class EditFragment extends Fragment {
                 host.setTime_close(close_hour * 60 + close_minute);
 
                 final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-                Call<EditResponse> call = apiInterface.editHost(new EditPojo(host_id, host));
-                NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<EditResponse>() {
-                    @Override
-                    public void onSuccess(EditResponse result) {
-                        showResponse(result);
-                    }
-
-                    @Override
-                    public void onError(Exception ex) {
-                        showError(ex);
-                    }
-                });
+                Call<EditResponse> call = apiInterface.editHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));
+                if (editCallbackId == null) {
+                    editCallbackId = NetworkThread.getInstance().registerCallback(editCallback);
+                    NetworkThread.getInstance().execute(call, editCallbackId);
+                }
                 mainActivity.popFragment();
                 return true;
         }
@@ -248,7 +263,7 @@ public class EditFragment extends Fragment {
             // When an Image is picked
             if (requestCode == RESULT_LOAD_IMG && null != data) {
                 // Get the Image from data
-                final Uri targetUri = data.getData();
+                targetUri = data.getData();
 
                 String path = getRealPathFromURI(mainActivity, targetUri);
                 final ApiInterface apiInterface = RetrofitFactory.retrofitHost().   create(ApiInterface.class);
@@ -260,32 +275,12 @@ public class EditFragment extends Fragment {
                 MultipartBody.Part body =
                         MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
 
-                Call<UploadResponse> call = apiInterface.upload(body, host_id);
-                NetworkThread.getInstance().execute(call, new NetworkThread.ExecuteCallback<UploadResponse>() {
-                    @Override
-                    public void onSuccess(UploadResponse result) {
-                        Toast.makeText(mainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
+                Call<UploadResponse> call = apiInterface.upload(body, AuthUtils.getCookie(getActivity().getApplicationContext()));
 
-                        DbExecutorService.getInstance().upload(getContext(), host_id, targetUri, new DbExecutorService.DbExecutorCallback() {
-                            @Override
-                            public void onSuccess(Map<String, ?> result) {
-                                onHostPhotoUploaded((String) result.get("image"));
-                            }
-                            @Override
-                            public void onError(Exception ex) {
-                                showError(ex);
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void onError(Exception ex) {
-                        showError(ex);
-                    }
-                });
-
-
+                if (uploadCallbackId == null) {
+                    uploadCallbackId = NetworkThread.getInstance().registerCallback(uploadCallback);
+                    NetworkThread.getInstance().execute(call, uploadCallbackId);
+                }
             } else {
                 Toast.makeText(mainActivity, "Вы не выбрали изображение", Toast.LENGTH_SHORT).show();
             }
@@ -317,5 +312,96 @@ public class EditFragment extends Fragment {
                 cursor.close();
             }
         }
+    }
+
+    private void prepareCallbacks() {
+        uploadCallback = new NetworkThread.ExecuteCallback<UploadResponse>() {
+            @Override
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<UploadResponse> call, Response<UploadResponse> response) {
+                NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
+                uploadCallbackId = null;
+                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                AuthUtils.logout(getActivity().getApplicationContext());
+                goToLogin();
+            }
+
+            @Override
+            public void onSuccess(UploadResponse result) {
+                NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
+                uploadCallbackId = null;
+                Toast.makeText(mainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
+                DbExecutorService.getInstance().setCallback(dBUploadCallback);
+                DbExecutorService.getInstance().upload(getContext(), host_id, targetUri);
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
+                uploadCallbackId = null;
+                NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
+                uploadCallbackId = null;
+                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        editCallback = new NetworkThread.ExecuteCallback<EditResponse>() {
+            @Override
+            public void onResponse(Call<EditResponse> call, Response<EditResponse> response) {
+            }
+
+
+            @Override
+            public void onFailure(Call<EditResponse> call, Response<EditResponse> response) {
+                NetworkThread.getInstance().unRegisterCallback(editCallbackId);
+                editCallbackId = null;
+                Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+                AuthUtils.logout(getActivity().getApplicationContext());
+                goToLogin();
+            }
+
+
+            @Override
+            public void onSuccess(EditResponse result) {
+                NetworkThread.getInstance().unRegisterCallback(editCallbackId);
+                editCallbackId = null;
+                showResponse(result);
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(editCallbackId);
+                editCallbackId = null;
+                showError(ex);
+            }
+        };
+
+        dBUploadCallback = new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onHostPhotoUploaded((String) result.get("image"));
+            }
+            @Override
+            public void onError(Exception ex) {
+                showError(ex);
+            }
+        };
+
+        dBInfoCallback = new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onCacheLoaded((Host) result.get("host"));
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
+
+            }
+        };
     }
 }

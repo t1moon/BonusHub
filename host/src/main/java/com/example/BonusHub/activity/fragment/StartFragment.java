@@ -29,7 +29,6 @@ import com.example.BonusHub.activity.api.host.HostResult;
 import com.example.BonusHub.activity.api.host.Hoster;
 import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
-import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
@@ -41,8 +40,11 @@ import retrofit2.Response;
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 
-public class StartFragment extends Fragment implements NetworkThread.ExecuteCallback <HostResult> {
-    private static final String LOGIN_PREFERENCES = "LoginData";
+public class StartFragment extends Fragment {
+
+    private static DbExecutorService.DbExecutorCallback dBHostCallback;
+    private static NetworkThread.ExecuteCallback <HostResult> netHostCallback;
+    private Integer netHostCallbackId;
 
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private Button open_time_btn;
@@ -64,6 +66,7 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logInActivity = (LogInActivity) getActivity();
+        prepareCallbacks();
     }
 
     @Override
@@ -71,7 +74,10 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
         super.onDestroy();
         if (progressDialog != null)
             progressDialog.dismiss();
-        NetworkThread.getInstance().setCallback(null);
+        if (netHostCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(netHostCallbackId);
+        }
+        DbExecutorService.getInstance().setCallback(null);
     }
 
 
@@ -119,6 +125,7 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
         logInActivity.setCurrentFragment(FragmentType.LogInFragment);
         logInActivity.pushFragment(new LogInFragment(), true);
     }
+
     private void pickTime(final View v) {
         // Launch Time Picker Dialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
@@ -186,22 +193,12 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
 
                     final Hoster hoster = retrofitBarmen().create(Hoster.class);
                     final Call<HostResult> call = hoster.login(host, AuthUtils.getCookie(getActivity()));
-                    //final Call<HostResult> call = hoster.login(host, "no");
-                    NetworkThread.getInstance().setCallback(this);
-                    NetworkThread.getInstance().execute(call);
-
-
-                    DbExecutorService.getInstance().createHost(host, new DbExecutorService.DbExecutorCallback() {
-                        @Override
-                        public void onSuccess(Map<String, ?> result) {
-                            onHostCreated((Integer) result.get("host_id"));
-                        }
-
-                        @Override
-                        public void onError(Exception ex) {
-                            Toast.makeText(logInActivity, "Произошла ошибка при создании заведения", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    if (netHostCallbackId == null) {
+                        netHostCallbackId = NetworkThread.getInstance().registerCallback(netHostCallback);
+                        NetworkThread.getInstance().execute(call, netHostCallbackId);
+                    }
+                    DbExecutorService.getInstance().setCallback(dBHostCallback);
+                    DbExecutorService.getInstance().createHost(host);
                 }
         }
         return super.onOptionsItemSelected(item);
@@ -218,34 +215,57 @@ public class StartFragment extends Fragment implements NetworkThread.ExecuteCall
                 .putInt("host_id", host_id).apply();
     }
 
-    @Override
-    public void onResponse(Call<HostResult> call, Response<HostResult> response) {
-        progressDialog.dismiss();
-    }
+
+    private void prepareCallbacks() {
+        netHostCallback = new NetworkThread.ExecuteCallback <HostResult>() {
+            @Override
+            public void onResponse(Call<HostResult> call, Response<HostResult> response) {
+                progressDialog.dismiss();
+            }
 
 
-    @Override
-    public void onFailure(Call<HostResult> call, Response<HostResult> response) {
-        progressDialog.dismiss();
-        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
-        AuthUtils.logout(getActivity().getApplicationContext());
-        goToLogin();
-    }
+            @Override
+            public void onFailure(Call<HostResult> call, Response<HostResult> response) {
+                progressDialog.dismiss();
+                NetworkThread.getInstance().unRegisterCallback(netHostCallbackId);
+                netHostCallbackId = null;
+                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                AuthUtils.logout(getActivity().getApplicationContext());
+                goToLogin();
+            }
 
 
-    @Override
-    public void onSuccess(HostResult result) {
-        if (result.getCode() == 0) {
-            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-            goToMainActivity();
-        }
-        else
-            Toast.makeText(getActivity(), "Ошибка заполнения", Toast.LENGTH_SHORT).show();
-    }
+            @Override
+            public void onSuccess(HostResult result) {
+                NetworkThread.getInstance().unRegisterCallback(netHostCallbackId);
+                netHostCallbackId = null;
+                if (result.getCode() == 0) {
+                    AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+                    goToMainActivity();
+                }
+                else
+                    Toast.makeText(getActivity(), "Ошибка заполнения", Toast.LENGTH_SHORT).show();
+            }
 
-    @Override
-    public void onError(Exception ex) {
-        progressDialog.dismiss();
-        Log.d("LoginExeption", ex.getMessage());
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(netHostCallbackId);
+                netHostCallbackId = null;
+                progressDialog.dismiss();
+                Log.d("LoginExeption", ex.getMessage());
+            }
+        };
+
+        dBHostCallback = new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onHostCreated((Integer) result.get("host_id"));
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(logInActivity, "Произошла ошибка при создании заведения", Toast.LENGTH_SHORT).show();
+            }
+        };
     }
 }

@@ -1,26 +1,17 @@
 package com.example.BonusHub.activity.executors;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
-import com.example.BonusHub.activity.Ui;
-import com.example.BonusHub.activity.fragment.EditFragment;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.j256.ormlite.stmt.UpdateBuilder;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -30,6 +21,7 @@ import java.util.concurrent.Executors;
  */
 
 public class DbExecutorService {
+    private DbExecutorCallback callback;
 
     private final static String TAG = DbExecutorService.class.getSimpleName();
 
@@ -40,9 +32,13 @@ public class DbExecutorService {
         return DB_EXECUTOR_SERVICE;
     }
 
+    public void setCallback(DbExecutorCallback newCallback) {
+        callback = newCallback;
+    }
+
     private final Executor executor = Executors.newCachedThreadPool();
 
-    public void loadInfo(final int host_id, final DbExecutorCallback callback) {
+    public void loadInfo(final int host_id) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -72,7 +68,7 @@ public class DbExecutorService {
         });
     }
 
-    public void createHost(final Host host, final DbExecutorCallback callback) {
+    public void createHost(final Host host) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -93,7 +89,9 @@ public class DbExecutorService {
                     uiHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onSuccess(result);
+                            if (callback != null) {
+                                callback.onSuccess(result);
+                            }
                         }
                     });
                 }
@@ -101,7 +99,7 @@ public class DbExecutorService {
         });
     }
 
-    public void editInfo(final int host_id, final Host host, final DbExecutorCallback callback) {
+    public void editInfo(final int host_id, final Host host) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -139,7 +137,7 @@ public class DbExecutorService {
         });
     }
 
-    public void upload(final Context context, final int host_id, final Uri targetUri, final DbExecutorCallback callback) {
+    public void upload(final Context context, final int host_id, final Uri targetUri) {
         executor.execute(new Runnable() {
             @Override
             public void run() {

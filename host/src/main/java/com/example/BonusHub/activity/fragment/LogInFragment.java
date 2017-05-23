@@ -28,8 +28,11 @@ import retrofit2.Response;
 
 import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
 
-public class LogInFragment extends Fragment implements NetworkThread.ExecuteCallback<LoginResult> {
+public class LogInFragment extends Fragment {
     private LogInActivity logInActivity;
+
+    private static NetworkThread.ExecuteCallback<LoginResult> loginCallback;
+    private Integer loginCallbackId;
 
     private Button logInButton;
     private TextView registrationButton;
@@ -44,6 +47,7 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        prepareCallbacks();
         super.onCreate(savedInstanceState);
         logInActivity = (LogInActivity) getActivity();
     }
@@ -53,7 +57,8 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
         super.onDestroy();
         if (progressDialog != null)
             progressDialog.dismiss();
-        NetworkThread.getInstance().setCallback(null);
+        if (loginCallbackId != null)
+            NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
     }
 
 
@@ -103,9 +108,10 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
 
         final Loginner loginner = retrofitBarmen().create(Loginner.class);
         final Call<LoginResult> call = loginner.login(new Login(login,password));
-        NetworkThread.getInstance().setCallback(this);
-
-        NetworkThread.getInstance().execute(call);
+        if (loginCallbackId == null) {
+            loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
+            NetworkThread.getInstance().execute(call, loginCallbackId);
+        }
     }
 
     public boolean validate() {
@@ -141,28 +147,38 @@ public class LogInFragment extends Fragment implements NetworkThread.ExecuteCall
         getActivity().finish();
     }
 
-    @Override
-    public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
-        String cookie = response.headers().get("Set-Cookie");
-        AuthUtils.setCookie(getActivity(), cookie);
-        progressDialog.dismiss();
-    }
+    private void prepareCallbacks() {
+        loginCallback = new NetworkThread.ExecuteCallback<LoginResult>() {
+            @Override
+            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+                String cookie = response.headers().get("Set-Cookie");
+                AuthUtils.setCookie(getActivity().getApplicationContext(), cookie);
+                progressDialog.dismiss();
+            }
 
-    @Override
-    public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
-        progressDialog.dismiss();
-        Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
-    }
+            @Override
+            public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+                NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+                loginCallbackId = null;
+                progressDialog.dismiss();
+                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+            }
 
-    @Override
-    public void onSuccess(LoginResult result) {
-        onLoginResult(result);
-    }
+            @Override
+            public void onSuccess(LoginResult result) {
+                NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+                loginCallbackId = null;
+                onLoginResult(result);
+            }
 
-    @Override
-    public void onError(Exception ex) {
-        progressDialog.dismiss();
-        Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+                loginCallbackId = null;
+                progressDialog.dismiss();
+                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+            }
+        };
     }
 
     public void onLoginResult(LoginResult result) {

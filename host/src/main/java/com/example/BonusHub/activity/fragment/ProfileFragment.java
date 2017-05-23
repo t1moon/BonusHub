@@ -2,6 +2,8 @@ package com.example.BonusHub.activity.fragment;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -23,8 +25,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.executors.CreateHostExecutor;
-import com.example.BonusHub.activity.executors.GetHostInfoExecutor;
 import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
@@ -35,7 +35,6 @@ import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -43,8 +42,13 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCallback <GetInfoResponse> {
+public class ProfileFragment extends Fragment {
     private final static String TAG = ProfileFragment.class.getSimpleName();
+
+    private static NetworkThread.ExecuteCallback <GetInfoResponse> netInfoCallback;
+    private Integer netInfoCallbackId;
+    private static DbExecutorService.DbExecutorCallback dBHostCallback;
+    private static DbExecutorService.DbExecutorCallback dBInfoCallback;
 
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 12500;
     private TextView host_open_time_tv;
@@ -65,13 +69,25 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prepareCallbacks();
         mainActivity = (MainActivity) getActivity();
-
         if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        if (netInfoCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
+        }
+        DbExecutorService.getInstance().setCallback(null);
     }
 
     @Override
@@ -107,34 +123,24 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
     }
 
     private void getFromCache() {
-        DbExecutorService.getInstance().loadInfo(host_id, new DbExecutorService.DbExecutorCallback() {
-            @Override
-            public void onSuccess(Map<String, ?> result) {
-                onCacheLoaded((Host) result.get("host"));
-            }
-            @Override
-            public void onError(Exception ex) {
-                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
-
-            }
-        });
+        DbExecutorService.getInstance().setCallback(dBInfoCallback);
+        DbExecutorService.getInstance().loadInfo(host_id);
     }
 
     private void getFromInternet() {
-        progress = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
+        progressDialog = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
+        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
+        final Call<GetInfoResponse> call = apiInterface.getInfo(AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        if (netInfoCallbackId == null) {
+            netInfoCallbackId = NetworkThread.getInstance().registerCallback(netInfoCallback);
+            NetworkThread.getInstance().execute(call, netInfoCallbackId);
+        }
+    }
+
     private void goToLogIn() {
         Intent intent = new Intent(getActivity(), LogInActivity.class);
         startActivity(intent);
         getActivity().finish();
-    }
-
-    private void prepareHostInfo() {
-        progressDialog = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
-
-        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-        final Call<GetInfoResponse> call = apiInterface.getInfo(1);
-        NetworkThread.getInstance().setCallback(this);
-        NetworkThread.getInstance().execute(call);
     }
 
     private void showError(Exception error) {
@@ -172,31 +178,8 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
         host.setProfile_image(pathToImageProfile);
         // TO-DO: Выяснить как кешируется glide
 //        UploadHostPhotoExecutor.getInstance().upload(getContext(), host_id, targetUri);
-        DbExecutorService.getInstance().createHost(host, new DbExecutorService.DbExecutorCallback() {
-            @Override
-            public void onSuccess(Map<String, ?> result) {
-                onHostCreated((Integer) result.get("host_id"));
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                new AlertDialog.Builder(mainActivity)
-                        .setTitle("Ошибка при записи в кэш")
-                        .setMessage(ex.getMessage())
-                        .setPositiveButton("OK", null)
-                        .show();
-            }
-        });
-    }
-
-    private void showError(Exception error) {
-        progress.dismiss();
-        new AlertDialog.Builder(mainActivity)
-                .setTitle("Ошибка при подключении к серверу")
-                .setMessage(error.getMessage())
-                .setPositiveButton("OK", null)
-                .show();
-
+        DbExecutorService.getInstance().setCallback(dBHostCallback);
+        DbExecutorService.getInstance().createHost(host);
     }
 
     private void onCacheLoaded(Host host) {
@@ -236,6 +219,8 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        getActivity().getPreferences(MODE_PRIVATE).edit()
+                .putInt("host_id", host_id).apply();
         String title = host.getTitle();
         String description = host.getDescription();
         String address = host.getAddress();
@@ -281,28 +266,63 @@ public class ProfileFragment extends Fragment implements NetworkThread.ExecuteCa
         }
     }
 
+    private void prepareCallbacks() {
+        netInfoCallback = new NetworkThread.ExecuteCallback<GetInfoResponse>() {
+            @Override
+            public void onResponse(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
 
+            }
 
-    @Override
-    public void onResponse(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
+            @Override
+            public void onFailure(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
+                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
+                netInfoCallbackId = null;
+                progressDialog.dismiss();
+                AuthUtils.logout(getActivity());
+                goToLogIn();
+            }
 
-    }
+            @Override
+            public void onSuccess(GetInfoResponse result) {
+                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
+                netInfoCallbackId = null;
+                showResponse(result);
+            }
 
-    @Override
-    public void onFailure(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
-        progressDialog.dismiss();
-        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
-        AuthUtils.logout(getActivity());
-        goToLogIn();
-    }
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
+                netInfoCallbackId = null;
+                showError(ex);
+            }
+        };
 
-    @Override
-    public void onSuccess(GetInfoResponse result) {
-        showResponse(result);
-    }
+        dBHostCallback = new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onHostCreated((Integer) result.get("host_id"));
+            }
 
-    @Override
-    public void onError(Exception ex) {
-        showError(ex);
+            @Override
+            public void onError(Exception ex) {
+                new AlertDialog.Builder(mainActivity)
+                        .setTitle("Ошибка при записи в кэш")
+                        .setMessage(ex.getMessage())
+                        .setPositiveButton("OK", null)
+                        .show();
+            }
+        };
+
+        dBInfoCallback = new DbExecutorService.DbExecutorCallback() {
+            @Override
+            public void onSuccess(Map<String, ?> result) {
+                onCacheLoaded((Host) result.get("host"));
+            }
+            @Override
+            public void onError(Exception ex) {
+                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
+
+            }
+        };
     }
 }

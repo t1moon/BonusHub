@@ -8,6 +8,7 @@ import com.example.BonusHub.activity.retrofit.getInfo.GetInfoResponse;
 import com.example.BonusHub.activity.retrofit.statistic.StatisticResponse;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsResponse;
+import com.example.bonuslib.host.Host;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -28,32 +29,32 @@ public interface ApiInterface {
     @Headers({
             "Accept: application/json"
     })
-    Call<UpdatePointsResponse> update_points(@Body UpdatePointsPojo updatePointsPojo,@Header("Cookie")String cookie);
+    Call<UpdatePointsResponse> update_points(@Body UpdatePointsPojo updatePointsPojo, @Header("Cookie")String cookie);
 
     @POST("edit_host/")
     @Headers({
             "Accept: application/json"
     })
-    Call<EditResponse> editHost(@Body EditPojo editPojo);
+    Call<EditResponse> editHost(@Body Host host, @Header("Cookie")String cookie);
 
     @Multipart
-    @POST("{host_id}/upload/")
+    @POST("upload/")
     Call<UploadResponse> upload(
             @Part MultipartBody.Part image,
-            @Path("host_id") Integer host_id
+            @Header("Cookie")String cookie
     );
 
-    @GET("{host_id}/get_client/{identificator}/")
+    @GET("get_client/{identificator}/")
     @Headers({
             "Accept: application/json"
     })
-    Call<ClientResponse> getPoints(@Path("host_id") int host_id, @Path("identificator") String identificator);
+    Call<ClientResponse> getPoints(@Path("identificator") String identificator, @Header("Cookie")String cookie);
 
-    @GET("{host_id}/statistic/")
+    @GET("statistic/")
     @Headers({
             "Accept: application/json"
     })
-    Call<StatisticResponse> getStatistic(@Path("host_id") int host_id);
+    Call<StatisticResponse> getStatistic(@Header("Cookie")String cookie);
 
     @GET("info/")
     @Headers({
