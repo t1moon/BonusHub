@@ -37,8 +37,6 @@ import retrofit2.Response;
  */
 public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCallback<UpdatePointsResponse> {
 
-    public final static int HOST_PERCENTAGE = 10;
-
     private Integer updatePointsCallbackId;
 
     String client_identificator = null;
@@ -74,8 +72,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         switchCompat = (SwitchCompat) rootView.findViewById(R.id.switch_gprs);
 
         fragmentInstance = this;
-        // ENABLE THAT
-        //IntentIntegrator.forSupportFragment(fragmentInstance).initiateScan();
+        IntentIntegrator.forSupportFragment(fragmentInstance).setBeepEnabled(false).initiateScan();
 
         final Button update_points_btn = (Button) rootView.findViewById(R.id.update_points_btn);
 
@@ -118,8 +115,6 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     }
 
     private void updatePoints(boolean isAddTo) {
-
-        client_identificator = "QfgnJKEGNRojer";
 
         final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
         final Call<UpdatePointsResponse> call;

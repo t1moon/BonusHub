@@ -49,13 +49,15 @@
 
     </RelativeLayout>
 
-
-    <Button
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/update_points_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Выполнить" />
-
+        android:layout_margin="24dp"
+        android:padding="12dp"
+        android:background="@drawable/rounded_accent"
+        android:text="Выполнить"
+        android:textColor="@color/colorAccent"/>
 
 </LinearLayout>
 </android.support.v4.widget.NestedScrollView>
