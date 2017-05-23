@@ -88,13 +88,14 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
 
         graph = (GraphView) rootView.findViewById(R.id.graph);
         tl = (TableLayout) rootView.findViewById(R.id.statistic_table);
+        Toast.makeText(mainActivity, "Для статистики вам нужны ещё данные", Toast.LENGTH_SHORT).show();
 
-        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-        Call<StatisticResponse> call = apiInterface.getStatistic(AuthUtils.getCookie(mainActivity));
-        if (statisticCallbackId == null) {
-            statisticCallbackId = NetworkThread.getInstance().registerCallback(this);
-            NetworkThread.getInstance().execute(call, statisticCallbackId);
-        }
+//        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
+//        Call<StatisticResponse> call = apiInterface.getStatistic(AuthUtils.getCookie(mainActivity));
+//        if (statisticCallbackId == null) {
+//            statisticCallbackId = NetworkThread.getInstance().registerCallback(this);
+//            NetworkThread.getInstance().execute(call, statisticCallbackId);
+//        }
         return rootView;
     }
 
@@ -229,7 +230,10 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
 
     @Override
     public void onFailure(Call<StatisticResponse> call, Response<StatisticResponse> response) {
-        Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+        if (response.body() != null)
+            Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(getActivity(), "Произошла ошибка", Toast.LENGTH_SHORT).show();
         AuthUtils.logout(getActivity());
         goToLogin();
     }
