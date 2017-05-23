@@ -1,4 +1,4 @@
-package com.example.client.qr;
+package com.example.client.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -21,7 +21,7 @@ import com.google.zxing.common.BitMatrix;
 public class QRFragment extends Fragment {
 
     View rootView;
-    public final static int QRcodeWidth = 500;
+    public final static int QRcodeWidth = 800;
     Bitmap bitmap;
     ImageView imageView;
 
@@ -46,7 +46,8 @@ public class QRFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    bitmap = TextToImageEncode(MainActivity.CLIENT_IDENTIFICATOR);
+                    bitmap = TextToImageEncode(getActivity().getPreferences(Context.MODE_PRIVATE).
+                            getString(MainActivity.CLIENT_IDENTIFICATOR, ""));
                     imageView.post(new Runnable() {
                         @Override
                         public void run() {
@@ -95,7 +96,7 @@ public class QRFragment extends Fragment {
             }
         }
         Bitmap bitmap = Bitmap.createBitmap(bitMatrixWidth, bitMatrixHeight, Bitmap.Config.ARGB_4444);
-        bitmap.setPixels(pixels, 0, 500, 0, 0, bitMatrixWidth, bitMatrixHeight);
+        bitmap.setPixels(pixels, 0, bitMatrixWidth, 0, 0, bitMatrixWidth, bitMatrixHeight);
         return bitmap;
     }
 

@@ -2,6 +2,7 @@ package com.example.client.ui;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
@@ -17,54 +18,69 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
 import com.example.bonuslib.StackListner;
-import com.example.bonuslib.client.Client;
 import com.example.bonuslib.db.HelperFactory;
-import com.example.bonuslib.host.Host;
 import com.example.client.AuthUtils;
 import com.example.client.MyApplication;
 import com.example.client.R;
-import com.example.client.qr.QRFragment;
+import com.example.client.retrofit.client.ClientInfoFetcher;
+import com.example.client.retrofit.client.ClientResponse;
 import com.example.client.retrofit.login.LogoutResult;
 import com.example.client.retrofit.login.Logouter;
 import com.example.client.threadManager.NetworkThread;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
 import static com.example.client.api.RetrofitFactory.retrofitClient;
 
-public class MainActivity extends BaseActivity implements StackListner, NetworkThread.ExecuteCallback<LogoutResult> {
+public class MainActivity extends BaseActivity implements StackListner {
+
+    private static NetworkThread.ExecuteCallback<LogoutResult> logoutCallback;
+    private Integer logoutCallbackId;
+    private static NetworkThread.ExecuteCallback<ClientResponse> clientCallback;
+    private Integer clientCallbackId;
+
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
 
-    public final static String CLIENT_NAME = "Timur";
-    public final static String CLIENT_IDENTIFICATOR = "QfgnJKEGNRojer";
     public final static int MENUITEM_QR = 0;
     public final static int MENUITEM_LISTHOST = 1;
     public final static int MENUITEM_LOGOUT = 2;
 
-    private static int client_id;
-    private Integer logoutCallbackId;
+    private MainActivity mainActivity;
 
-    public static int getClientId() {
-        return client_id;
+    static {
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectActivityLeaks()
+                .penaltyLog()
+                .penaltyDeath()
+                .build()
+        );
     }
 
-    public static void setClient_id(int client_id) {
-        MainActivity.client_id = client_id;
-    }
+    public final static String CLIENT_NAME = "CLIENT_NAME";
+    public final static String CLIENT_IDENTIFICATOR = "CLIENT_IDENTIFICATOR";
+    public final static String CLIENT_ID = "CLIENT_ID";
+
+    private int client_id;
+//    private static int CLIENT_ID;
+//
+//    public static int getClientId() {
+//        return CLIENT_ID;
+//    }
+//
+//    public static void setClientId(int clientId) {
+//        MainActivity.CLIENT_ID = clientId;
+//    }
 
 
     @Override
@@ -72,8 +88,9 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mainActivity = this;
         setStackListner(this);
-        this.getPreferences(MODE_PRIVATE).edit().putInt("client_id", -1).apply();
+        //this.getPreferences(MODE_PRIVATE).edit().putInt("CLIENT_ID", -1).apply();
         if (!AuthUtils.isAuthorized(this)) {
             goToLogIn();
             return;
@@ -122,8 +139,9 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
                 }
         );
 
+        prepareCallbacks();
         setupClient();
-        populateHosts();
+        //populateHosts();
         setupStartFragment();
 
     }
@@ -134,6 +152,9 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
         if (logoutCallbackId != null) {
             NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
         }
+        if (clientCallbackId != null) {
+            NetworkThread.getInstance().unRegisterCallback(clientCallbackId);
+        }
     }
 
     private void goToLogIn() {
@@ -143,48 +164,53 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
     }
 
     private void setupClient() {
-        int client_id = this.getPreferences(MODE_PRIVATE).getInt("client_id", -1);
-
-        if (client_id == -1) {
-            try {
-                client_id = HelperFactory.getHelper().getClientDAO().createClient(CLIENT_NAME, CLIENT_IDENTIFICATOR);
-                Log.d("MA, create", Integer.toString(client_id));
-                this.getPreferences(MODE_PRIVATE).edit()
-                        .putInt("client_id", client_id).apply();
-                setClient_id(client_id);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        } else {
-            setClient_id(client_id);
+//        int CLIENT_ID = this.getPreferences(MODE_PRIVATE).getInt("CLIENT_ID", -1);
+        final ClientInfoFetcher clientInfoFetcher = retrofitClient().create(ClientInfoFetcher.class);
+        final Call<ClientResponse> call = clientInfoFetcher.getInfo(AuthUtils.getCookie(this));
+        if (clientCallbackId == null) {
+            clientCallbackId = NetworkThread.getInstance().registerCallback(clientCallback);
+            NetworkThread.getInstance().execute(call, clientCallbackId);
         }
+//        if (CLIENT_ID == -1) {
+//            try {
+//                CLIENT_ID = HelperFactory.getHelper().getClientDAO().createClient(CLIENT_NAME, CLIENT_IDENTIFICATOR);
+//                Log.d("MA, create", Integer.toString(CLIENT_ID));
+//                this.getPreferences(MODE_PRIVATE).edit()
+//                        .putInt("CLIENT_ID", CLIENT_ID).apply();
+//                setClientId(CLIENT_ID);
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            setClientId(CLIENT_ID);
+//        }
     }
 
-    private void populateHosts() {
-        Client client = null;
-        try {
-            client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        List<Host> hostList = new ArrayList<>();
-        Host host = new Host("Surf coffee", "Best Coffee in The World and bla bla lba" +
-                "lalalkeglergishfogjhdosfhgosirhgoridhgseiuhgdkfjnkjdngkjnflkjbnsdlkfnlksdfnvlksdfn" +
-                "dlkbnldkvnbldknbonfdvlbknfvb", "Baumanskaya");
-        hostList.add(host);
-        host = new Host("One bucks", "Sweety", "Tverskay");
-        hostList.add(host);
-        try {
-            for (Host item : hostList) {
-                HelperFactory.getHelper().getHostDAO().createHost(item);
-                HelperFactory.getHelper().getClientHostDAO().createClientHost(client, item, 5);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void populateHosts() {
+//        Client client = null;
+//        try {
+//            client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        List<Host> hostList = new ArrayList<>();
+//        Host host = new Host("Surf coffee", "Best Coffee in The World and bla bla lba" +
+//                "lalalkeglergishfogjhdosfhgosirhgoridhgseiuhgdkfjnkjdngkjnflkjbnsdlkfnlksdfnvlksdfn" +
+//                "dlkbnldkvnbldknbonfdvlbknfvb", "Baumanskaya");
+//        hostList.add(host);
+//        host = new Host("One bucks", "Sweety", "Tverskay");
+//        hostList.add(host);
+//        try {
+//            for (Host item : hostList) {
+//                HelperFactory.getHelper().getHostDAO().createHost(item);
+//                HelperFactory.getHelper().getClientHostDAO().createClientHost(client, item, 5);
+//            }
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * Initializing collapsing toolbar
@@ -282,8 +308,10 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
             case MENUITEM_LOGOUT:
                 final Logouter logouter = retrofitClient().create(Logouter.class);
                 final Call<LogoutResult> call = logouter.logout(AuthUtils.getCookie(this));
-                logoutCallbackId = NetworkThread.getInstance().registerCallback(this);
-                NetworkThread.getInstance().execute(call, logoutCallbackId);
+                if (logoutCallbackId == null) {
+                    logoutCallbackId = NetworkThread.getInstance().registerCallback(logoutCallback);
+                    NetworkThread.getInstance().execute(call, logoutCallbackId);
+                }
                 break;
         }
         if (fragment != null) {
@@ -357,22 +385,80 @@ public class MainActivity extends BaseActivity implements StackListner, NetworkT
         snackbar.show();
     }
 
-    @Override
-    public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
-    }
 
-    @Override
-    public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
-    }
+    private void prepareCallbacks() {
+        logoutCallback = new NetworkThread.ExecuteCallback<LogoutResult>() {
+            @Override
+            public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
 
-    @Override
-    public void onSuccess(LogoutResult result) {
-        onLogoutResult();
-    }
+            }
 
-    @Override
-    public void onError(Exception ex) {
-        Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-    }
+            @Override
+            public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
+                NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
+                logoutCallbackId = null;
+                Toast.makeText(getApplicationContext(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void onSuccess(LogoutResult result) {
+                NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
+                logoutCallbackId = null;
+                onLogoutResult();
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
+                logoutCallbackId = null;
+                Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        clientCallback = new NetworkThread.ExecuteCallback<ClientResponse>() {
+
+            @Override
+            public void onResponse(Call<ClientResponse> call, Response<ClientResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ClientResponse> call, Response<ClientResponse> response) {
+                NetworkThread.getInstance().unRegisterCallback(clientCallbackId);
+                clientCallbackId = null;
+                Toast.makeText(mainActivity, response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(ClientResponse result) {
+                NetworkThread.getInstance().unRegisterCallback(clientCallbackId);
+                clientCallbackId = null;
+
+                mainActivity.getPreferences(MODE_PRIVATE).edit().putString(CLIENT_NAME, result.getName())
+                        .putString(CLIENT_IDENTIFICATOR, result.getIdentificator()).apply();
+
+                try {
+                    client_id = HelperFactory.getHelper().getClientDAO().createClient(CLIENT_NAME, CLIENT_IDENTIFICATOR);
+                    Log.d("MA, create", Integer.toString(client_id));
+                    mainActivity.getPreferences(MODE_PRIVATE).edit()
+                            .putInt(CLIENT_ID, client_id).apply();
+                } catch (java.sql.SQLException e) {
+                    e.printStackTrace();
+                }
+
+                NavigationView nvDrawer = (NavigationView) mainActivity.findViewById(R.id.navigation_view);
+                View header = nvDrawer.getHeaderView(0);
+                TextView profileName = (TextView) header.findViewById(R.id.tv_profile_name);
+                profileName.setText(mainActivity.getPreferences(MODE_PRIVATE).getString(CLIENT_NAME, "Name"));
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(clientCallbackId);
+                clientCallbackId = null;
+                Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+    }
 }

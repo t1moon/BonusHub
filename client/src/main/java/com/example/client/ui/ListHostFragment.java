@@ -25,14 +25,11 @@ import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.example.client.AuthUtils;
-import com.example.client.recycler.GridSpacingItemDecoration;
 import com.example.client.recycler.HostAdapter;
 import com.example.client.recycler.RecyclerTouchListener;
 import com.example.client.R;
-import com.example.client.retrofit.ClientPOJO;
 import com.example.client.retrofit.hosts.HostListFetcher;
 import com.example.client.retrofit.hosts.HostListResponse;
-import com.example.client.retrofit.login.LoginResult;
 import com.example.client.threadManager.NetworkThread;
 import com.example.client.retrofit.RetrofitFactory;
 
@@ -43,9 +40,6 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
-
-import static com.example.client.ui.MainActivity.getClientId;
-
 
 public class ListHostFragment extends Fragment implements NetworkThread.ExecuteCallback<HostListResponse> {
     private List<ClientHost> clientHostsList = new ArrayList<>();
@@ -81,9 +75,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_list_host, container, false);
 
-        setInfo();
-        //getFromInternet();
-
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -105,7 +96,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         StaggeredGridLayoutManager mStaggeredLayoutManager;
         mStaggeredLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(mStaggeredLayoutManager);
-//        recyclerView.addItemDecoration(new GridSpacingItemDecoration(1, dpToPx(10), true));
         recyclerView.setAdapter(mAdapter);
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -124,31 +114,16 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         } else {
             getFromCache();
         }
-        return rootView;
-    }
 
-    private void setInfo() {
         ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
         Glide
                 .with(getActivity().getApplicationContext())
                 .load(R.drawable.bonus_hub_logo)
                 .fitCenter()
                 .into(imgView);
-
-        Client client = null;
-        try {
-            client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (client != null) {
-            NavigationView nvDrawer = (NavigationView) getActivity().findViewById(R.id.navigation_view);
-            View header = nvDrawer.getHeaderView(0);
-            TextView profileName = (TextView) header.findViewById(R.id.tv_profile_name);
-            profileName.setText(client.getName());
-        }
+        return rootView;
     }
+
 
     public void goToHostFragment(int position) {
         final Bundle bundle = new Bundle();
@@ -160,7 +135,8 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     private void getFromCache() {
         clientHostsList.clear();
         Client client = null;
-        int client_id = getClientId();
+        int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
+                getInt(MainActivity.CLIENT_ID, -1);
         try {
             client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
         } catch (SQLException e) {
@@ -186,7 +162,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         swipeRefreshLayout.setRefreshing(true);
         clientHostsList.clear();
         final HostListFetcher hostListFetcher = RetrofitFactory.retrofitClient().create(HostListFetcher.class);
-        final Call<HostListResponse> call = hostListFetcher.listHosts(new ClientPOJO(1));
+        final Call<HostListResponse> call = hostListFetcher.listHosts(AuthUtils.getCookie(mainActivity));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(this);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
@@ -202,8 +178,11 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         List<ClientHost> clientHosts = new ArrayList<>();
         ClientHost clientHost = null;
         Client client = null;
+        int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
+                getInt(MainActivity.CLIENT_ID, -1);
+
         try {
-            client = HelperFactory.getHelper().getClientDAO().getClientById(getClientId());
+            client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -251,14 +230,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-    /**
-     * Converting dp to pixel
-     */
-    private int dpToPx(int dp) {
-        Resources r = getActivity().getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
     @Override
