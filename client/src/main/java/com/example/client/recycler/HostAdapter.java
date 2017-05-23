@@ -2,6 +2,7 @@ package com.example.client.recycler;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.bonuslib.client_host.ClientHost;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
@@ -24,11 +26,7 @@ import java.util.List;
  */
 
 public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder>  {
-//
-//    private List<AboutHost> hostsList;
-//    private List<Integer> points;
 
-//    private Map<AboutHost, Integer> pointsToHost;
     private List<ClientHost> clientHostList;
     private Context context;
 
@@ -71,16 +69,27 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
 
         int point = clientHostList.get(position).getPoints();
 
-        String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
-
         holder.title.setText(host.getTitle());
         holder.descrpition.setText(host.getDescription());
         holder.points.setText(Integer.toString(point));
-        // loading album cover using Glide library
-                    Glide
+
+        if (host.getProfile_image() != null) {
+            String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
+            // loading album cover using Glide library
+            Log.d("Image", pathToImageProfile);
+            Glide
                     .with(context)
                     .load(pathToImageProfile)
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(holder.thumbnail);
+        } else {
+            // set default
+            Glide
+                    .with(context)
+                    .load(R.drawable.test2)
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .into(holder.thumbnail);
+        }
 
     }
 
