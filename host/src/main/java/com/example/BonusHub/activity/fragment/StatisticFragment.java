@@ -4,10 +4,15 @@ package com.example.BonusHub.activity.fragment;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,6 +36,18 @@ import com.example.BonusHub.activity.retrofit.statistic.StatisticResponse;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsResponse;
 import com.example.timur.BonusHub.R;
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.MPPointF;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.jjoe64.graphview.GraphView;
@@ -56,11 +73,12 @@ import retrofit2.Response;
  * Use the { ScanQrFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class StatisticFragment extends Fragment implements NetworkThread.ExecuteCallback <StatisticResponse> {
+public class StatisticFragment extends Fragment implements NetworkThread.ExecuteCallback <StatisticResponse>, OnChartValueSelectedListener {
 
     MainActivity mainActivity;
     TableLayout tl;
     GraphView graph;
+    private PieChart mChart;
     private Integer statisticCallbackId;
 
     public StatisticFragment() {
@@ -86,10 +104,61 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_statistic, container, false);
 
-        graph = (GraphView) rootView.findViewById(R.id.graph);
-        tl = (TableLayout) rootView.findViewById(R.id.statistic_table);
-        Toast.makeText(mainActivity, "Для статистики вам нужны ещё данные", Toast.LENGTH_SHORT).show();
+//        graph = (GraphView) rootView.findViewById(R.id.graph);
+//
+//        LineGraphSeries<DataPoint> series = new LineGraphSeries<>();
+//        DataPoint[] dataPoints = new DataPoint[];
+//        graph.addSeries(series);
+        mChart = (PieChart) rootView.findViewById(R.id.chart1);
+        mChart.setUsePercentValues(true);
+        mChart.getDescription().setEnabled(false);
+        mChart.setExtraOffsets(5, 10, 5, 5);
 
+        mChart.setDragDecelerationFrictionCoef(0.95f);
+
+//        mChart.setCenterTextTypeface(mTfLight);
+        mChart.setCenterText(generateCenterSpannableText());
+
+        mChart.setDrawHoleEnabled(true);
+        mChart.setHoleColor(Color.WHITE);
+
+        mChart.setTransparentCircleColor(Color.WHITE);
+        mChart.setTransparentCircleAlpha(110);
+
+        mChart.setHoleRadius(58f);
+        mChart.setTransparentCircleRadius(61f);
+
+        mChart.setDrawCenterText(true);
+
+        mChart.setRotationAngle(0);
+        // enable rotation of the chart by touch
+        mChart.setRotationEnabled(true);
+        mChart.setHighlightPerTapEnabled(true);
+        mChart.setOnChartValueSelectedListener(this);
+        setData(4, 100);
+
+        mChart.animateY(1400, Easing.EasingOption.EaseInOutQuad);
+        Legend l = mChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+        l.setXEntrySpace(7f);
+        l.setYEntrySpace(0f);
+        l.setYOffset(0f);
+
+        // entry label styling
+        mChart.setEntryLabelColor(Color.WHITE);
+//        mChart.setEntryLabelTypeface(mTfRegular);
+        mChart.setEntryLabelTextSize(12f);
+
+
+//        tl = (TableLayout) rootView.findViewById(R.id.statistic_table);
+//        Toast.makeText(mainActivity, "Для статистики вам нужны ещё данные", Toast.LENGTH_SHORT).show();
+//        makeTableRow("01.06.2017", 330, 150, 410);
+//        makeTableRow("02.06.2017", 540, 200, 220);
+//        makeTableRow("03.06.2017", 690, 250, 330);
+//        makeTableRow("04.06.2017", 800, 230, 560);
 //        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
 //        Call<StatisticResponse> call = apiInterface.getStatistic(AuthUtils.getCookie(mainActivity));
 //        if (statisticCallbackId == null) {
@@ -97,6 +166,78 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
 //            NetworkThread.getInstance().execute(call, statisticCallbackId);
 //        }
         return rootView;
+    }
+    private SpannableString generateCenterSpannableText() {
+
+        SpannableString s = new SpannableString("Продажи сотрудников");
+        s.setSpan(new RelativeSizeSpan(1.7f), 0, s.length(), 0);
+//        s.setSpan(new StyleSpan(Typeface.NORMAL), 14, s.length() - 15, 0);
+//        s.setSpan(new ForegroundColorSpan(Color.GRAY), 14, s.length() - 15, 0);
+//        s.setSpan(new RelativeSizeSpan(.8f), 14, s.length() - 15, 0);
+//        s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 14, s.length(), 0);
+//        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 14, s.length(), 0);
+        return s;
+    }
+
+    private void setData(int count, float range) {
+
+        float mult = range;
+
+        ArrayList<PieEntry> entries = new ArrayList<PieEntry>();
+        String[] mParties = new String[] {
+                "Масалимов", "Алиев", "Туркевич", "Мазырин"
+        };
+        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+        // the chart.
+
+        entries.add(new PieEntry(10f, "Масалимов"));
+        entries.add(new PieEntry(2f, "Алиев"));
+        entries.add(new PieEntry(6f, "Туркевич"));
+        entries.add(new PieEntry(5f, "Аквазырин"));
+
+        PieDataSet dataSet = new PieDataSet(entries, "Сотрудники");
+
+        dataSet.setDrawIcons(false);
+
+        dataSet.setSliceSpace(3f);
+        dataSet.setIconsOffset(new MPPointF(0, 40));
+        dataSet.setSelectionShift(5f);
+
+        // add a lot of colors
+
+        ArrayList<Integer> colors = new ArrayList<Integer>();
+
+        for (int c : ColorTemplate.VORDIPLOM_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.JOYFUL_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.COLORFUL_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.LIBERTY_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.PASTEL_COLORS)
+            colors.add(c);
+
+        colors.add(ColorTemplate.getHoloBlue());
+
+        dataSet.setColors(colors);
+        //dataSet.setSelectionShift(0f);
+
+        PieData data = new PieData(dataSet);
+        data.setValueFormatter(new PercentFormatter());
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.WHITE);
+//        data.setValueTypeface(mTfLight);//
+        mChart.setData(data);
+
+        // undo all highlights
+        mChart.highlightValues(null);
+
+        mChart.invalidate();
     }
 
     private void goToLogin() {
@@ -246,5 +387,15 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
     @Override
     public void onError(Exception ex) {
         showError(ex);
+    }
+
+    @Override
+    public void onValueSelected(Entry e, Highlight h) {
+
+    }
+
+    @Override
+    public void onNothingSelected() {
+
     }
 }

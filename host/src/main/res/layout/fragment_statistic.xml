@@ -11,52 +11,56 @@
         android:orientation="vertical"
         tools:context="com.example.BonusHub.activity.fragment.StatisticFragment">
 
-        <TableLayout
-            android:id="@+id/statistic_table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <!--<TableLayout-->
+            <!--android:id="@+id/statistic_table"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
 
-            <TableRow
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal">
+            <!--<TableRow-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:gravity="center_horizontal">-->
 
-                <TextView
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:gravity="center"
-                    android:padding="18dip"
-                    android:text="Дата"
-                    android:textColor="#000000" />
+                <!--<TextView-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:gravity="center"-->
+                    <!--android:padding="18dip"-->
+                    <!--android:text="Дата"-->
+                    <!--android:textColor="#000000" />-->
 
-                <TextView
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:gravity="center"
-                    android:padding="18dip"
-                    android:text="Ср. чек"
-                    android:textColor="#000000" />
+                <!--<TextView-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:gravity="center"-->
+                    <!--android:padding="18dip"-->
+                    <!--android:text="Ср. чек"-->
+                    <!--android:textColor="#000000" />-->
 
-                <TextView
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:gravity="center"
-                    android:padding="18dip"
-                    android:text="Общий приход"
-                    android:textColor="#000000" />
-                <TextView
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:gravity="center"
-                    android:padding="18dip"
-                    android:text="Общий расход"
-                    android:textColor="#000000" />
-            </TableRow>
-        </TableLayout>
+                <!--<TextView-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:gravity="center"-->
+                    <!--android:padding="18dip"-->
+                    <!--android:text="Общий приход"-->
+                    <!--android:textColor="#000000" />-->
+                <!--<TextView-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:gravity="center"-->
+                    <!--android:padding="18dip"-->
+                    <!--android:text="Общий расход"-->
+                    <!--android:textColor="#000000" />-->
+            <!--</TableRow>-->
+        <!--</TableLayout>-->
 
-        <com.jjoe64.graphview.GraphView
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:id="@+id/graph" />
+        <!--<com.jjoe64.graphview.GraphView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="200dp"-->
+            <!--android:id="@+id/graph" />-->
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chart1"
+            android:layout_width="350dp"
+            android:layout_height="350dp" />
 
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

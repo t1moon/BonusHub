@@ -17,7 +17,7 @@ public class RetrofitFactory {
 
 //    192.168.31.122
     private final static Retrofit HOST_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://romvanocouponserver.pythonanywhere.com/api/host/")
+            .baseUrl("http://t1moon.pythonanywhere.com/api/host/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
     public final static String MEDIA_URL = "media/";
