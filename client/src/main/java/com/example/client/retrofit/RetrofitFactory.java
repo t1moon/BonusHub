@@ -9,7 +9,7 @@ public class RetrofitFactory {
     }
 //    192.168.31.122
     private final static Retrofit CLIENT_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://http://t1moon.pythonanywhere.com/api/client/")
+            .baseUrl("http://t1moon.pythonanywhere.com/api/client/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
