@@ -1,4 +1,4 @@
-package com.example.BonusHub.activity.api.registration;
+package com.example.BonusHub.activity.retrofit.registration;
 
 /**
  * Created by mike on 07.05.17.

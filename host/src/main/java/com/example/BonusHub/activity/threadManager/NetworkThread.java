@@ -84,7 +84,6 @@ public class NetworkThread {
         void onResponse(Call<T> call, Response<T> response);
         void onFailure(Call<T> call,  Response<T> response);
         void onSuccess(T result);
-
         void onError(Exception ex);
     }
 }

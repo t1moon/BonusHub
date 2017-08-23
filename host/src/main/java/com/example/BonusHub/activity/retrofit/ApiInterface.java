@@ -1,18 +1,20 @@
 package com.example.BonusHub.activity.retrofit;
 
-import com.example.BonusHub.activity.retrofit.editInfo.EditPojo;
+import com.example.BonusHub.activity.retrofit.client.ClientResponse;
+import com.example.BonusHub.activity.retrofit.auth.Login;
 import com.example.BonusHub.activity.retrofit.editInfo.EditResponse;
-import com.example.BonusHub.activity.retrofit.editInfo.UploadPojo;
 import com.example.BonusHub.activity.retrofit.editInfo.UploadResponse;
 import com.example.BonusHub.activity.retrofit.getInfo.GetInfoResponse;
+import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
+import com.example.BonusHub.activity.retrofit.auth.LogoutResponse;
+import com.example.BonusHub.activity.retrofit.host.HostResult;
+import com.example.BonusHub.activity.retrofit.registration.RegistrationResult;
 import com.example.BonusHub.activity.retrofit.statistic.StatisticResponse;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsResponse;
 import com.example.bonuslib.host.Host;
 
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -25,6 +27,30 @@ import retrofit2.http.Path;
 
 
 public interface ApiInterface {
+    @POST("register/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<RegistrationResult> registrate(@Body Login login);
+
+    @POST("login/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<LoginResponse> login(@Body Login login);
+
+    @POST("logout/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<LogoutResponse> logout(@Header("Cookie")String cookie);
+
+    @POST("create/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<HostResult> createHost(@Body Host host, @Header("Cookie")String cookie);
+
     @POST("update_points/")
     @Headers({
             "Accept: application/json"
@@ -61,7 +87,5 @@ public interface ApiInterface {
             "Accept: application/json"
     })
     Call<GetInfoResponse> getInfo(@Header("Cookie")String cookie);
-
-
 
 }

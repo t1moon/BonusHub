@@ -1,7 +1,6 @@
 package com.example.BonusHub.activity.fragment;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,15 +13,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
-import com.example.BonusHub.activity.Login;
+import com.example.BonusHub.activity.retrofit.auth.Login;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.api.host.HostResult;
-import com.example.BonusHub.activity.api.login.LoginResult;
-import com.example.BonusHub.activity.api.login.Loginner;
+import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
 import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.api.login.LogoutResult;
-import com.example.BonusHub.activity.api.registration.RegistrationResult;
-import com.example.BonusHub.activity.api.registration.Registrator;
+import com.example.BonusHub.activity.retrofit.registration.RegistrationResult;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.FragmentType;
 import com.example.timur.BonusHub.R;
@@ -30,11 +26,7 @@ import com.example.timur.BonusHub.R;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
-
-/**
- * Created by mike on 05.05.17.
- */
+import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHost;
 
 public class RegisterFragment extends Fragment {
     private LogInActivity logInActivity;
@@ -42,7 +34,7 @@ public class RegisterFragment extends Fragment {
 
     private static NetworkThread.ExecuteCallback<RegistrationResult> registrationCallback;
     private Integer registrationCallbackId;
-    private static NetworkThread.ExecuteCallback<LoginResult> loginCallback;
+    private static NetworkThread.ExecuteCallback<LoginResponse> loginCallback;
     private Integer loginCallbackId;
 
     private Button registrationButton;
@@ -121,8 +113,8 @@ public class RegisterFragment extends Fragment {
         progressDialog.setMessage("Регистрация...");
         progressDialog.show();
 
-        final Registrator registrator = retrofitBarmen().create(Registrator.class);
-        final Call<RegistrationResult> call = registrator.registrate(new Login(login,password));
+        final ApiInterface apiInterface= retrofitHost().create(ApiInterface.class);
+        final Call<RegistrationResult> call = apiInterface.registrate(new Login(login,password));
 
         registrationCallbackId = NetworkThread.getInstance().registerCallback(registrationCallback);
         NetworkThread.getInstance().execute(call, registrationCallbackId);
@@ -137,14 +129,14 @@ public class RegisterFragment extends Fragment {
     private void logIn() {
         final String login = loginInput.getText().toString();
         final String password = passwordInput.getText().toString();
-        final Loginner loginner = retrofitBarmen().create(Loginner.class);
-        final Call<LoginResult> call = loginner.login(new Login(login,password));
+        final ApiInterface apiInterface = retrofitHost().create(ApiInterface.class);
+        final Call<LoginResponse> call = apiInterface.login(new Login(login,password));
 
         loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
         NetworkThread.getInstance().execute(call,loginCallbackId);
     }
 
-    public void onLoginResult(LoginResult result) {
+    public void onLoginResult(LoginResponse result) {
         //Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.isHosted() == false && result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
@@ -213,15 +205,15 @@ public class RegisterFragment extends Fragment {
             }
         };
 
-        loginCallback = new NetworkThread.ExecuteCallback<LoginResult>() {
+        loginCallback = new NetworkThread.ExecuteCallback<LoginResponse>() {
             @Override
-            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 String cookie = response.headers().get("Set-Cookie");
                 AuthUtils.setCookie(getActivity(), cookie);
             }
 
             @Override
-            public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+            public void onFailure(Call<LoginResponse> call, Response<LoginResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
@@ -229,7 +221,7 @@ public class RegisterFragment extends Fragment {
 
 
             @Override
-            public void onSuccess(LoginResult result) {
+            public void onSuccess(LoginResponse result) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 onLoginResult(result);

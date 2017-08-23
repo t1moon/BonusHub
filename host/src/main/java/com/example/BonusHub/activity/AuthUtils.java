@@ -2,10 +2,6 @@ package com.example.BonusHub.activity;
 
 import android.content.Context;
 
-/**
- * Created by mike on 07.05.17.
- */
-
 public class AuthUtils {
     private static final String PREFERENCES_AUTHORIZED_KEY = "isAuthorized";
     private static final String PREFERENCES_HOSTED_KEY = "isHosted";

@@ -22,11 +22,11 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.bonuslib.FragmentType;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.api.host.HostResult;
-import com.example.BonusHub.activity.api.host.Hoster;
+import com.example.BonusHub.activity.retrofit.host.HostResult;
 import com.example.BonusHub.activity.executors.DbExecutorService;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.host.Host;
@@ -38,7 +38,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
+import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHost;
 
 public class StartFragment extends Fragment {
 
@@ -191,8 +191,8 @@ public class StartFragment extends Fragment {
                     progressDialog.show();
 
 
-                    final Hoster hoster = retrofitBarmen().create(Hoster.class);
-                    final Call<HostResult> call = hoster.login(host, AuthUtils.getCookie(getActivity()));
+                    final ApiInterface apiInterface = retrofitHost().create(ApiInterface.class);
+                    final Call<HostResult> call = apiInterface.createHost(host, AuthUtils.getCookie(getActivity()));
                     if (netHostCallbackId == null) {
                         netHostCallbackId = NetworkThread.getInstance().registerCallback(netHostCallback);
                         NetworkThread.getInstance().execute(call, netHostCallbackId);

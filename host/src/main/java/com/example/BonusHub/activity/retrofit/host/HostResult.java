@@ -1,4 +1,4 @@
-package com.example.BonusHub.activity.api.host;
+package com.example.BonusHub.activity.retrofit.host;
 
 /**
  * Created by mike on 15.05.17.

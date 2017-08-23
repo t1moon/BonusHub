@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
-import com.example.BonusHub.activity.Login;
-import com.example.BonusHub.activity.api.login.LoginResult;
-import com.example.BonusHub.activity.api.login.Loginner;
+import com.example.BonusHub.activity.retrofit.auth.Login;
+import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
@@ -26,12 +25,12 @@ import com.example.timur.BonusHub.R;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
+import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHost;
 
 public class LogInFragment extends Fragment {
     private LogInActivity logInActivity;
 
-    private static NetworkThread.ExecuteCallback<LoginResult> loginCallback;
+    private static NetworkThread.ExecuteCallback<LoginResponse> loginCallback;
     private Integer loginCallbackId;
 
     private Button logInButton;
@@ -60,7 +59,6 @@ public class LogInFragment extends Fragment {
         if (loginCallbackId != null)
             NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,7 +94,6 @@ public class LogInFragment extends Fragment {
         final String login = loginInput.getText().toString();
         final String password = passwordInput.getText().toString();
 
-
         if (!validate()) {
             return;
         }
@@ -106,8 +103,8 @@ public class LogInFragment extends Fragment {
         progressDialog.setMessage("Аутентификация...");
         progressDialog.show();
 
-        final Loginner loginner = retrofitBarmen().create(Loginner.class);
-        final Call<LoginResult> call = loginner.login(new Login(login,password));
+        final ApiInterface apiInterface = retrofitHost().create(ApiInterface.class);
+        final Call<LoginResponse> call = apiInterface.login(new Login(login,password));
         if (loginCallbackId == null) {
             loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
             NetworkThread.getInstance().execute(call, loginCallbackId);
@@ -126,7 +123,7 @@ public class LogInFragment extends Fragment {
         }
 
         if (password.isEmpty() || password.length() <= 5 ) {
-            passwordInput.setError("Не менее 5 символов");
+            passwordInput.setError("Не менее 6 символов");
             valid = false;
         }
         return valid;
@@ -148,16 +145,16 @@ public class LogInFragment extends Fragment {
     }
 
     private void prepareCallbacks() {
-        loginCallback = new NetworkThread.ExecuteCallback<LoginResult>() {
+        loginCallback = new NetworkThread.ExecuteCallback<LoginResponse>() {
             @Override
-            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 String cookie = response.headers().get("Set-Cookie");
                 AuthUtils.setCookie(getActivity().getApplicationContext(), cookie);
                 progressDialog.dismiss();
             }
 
             @Override
-            public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+            public void onFailure(Call<LoginResponse> call, Response<LoginResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 progressDialog.dismiss();
@@ -165,7 +162,7 @@ public class LogInFragment extends Fragment {
             }
 
             @Override
-            public void onSuccess(LoginResult result) {
+            public void onSuccess(LoginResponse result) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 onLoginResult(result);
@@ -181,9 +178,9 @@ public class LogInFragment extends Fragment {
         };
     }
 
-    public void onLoginResult(LoginResult result) {
+    public void onLoginResult(LoginResponse result) {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
-        if (result.isHosted() == false && result.getCode() == 0) {
+        if (!result.isHosted() && result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
             goToStartFragment();
         }

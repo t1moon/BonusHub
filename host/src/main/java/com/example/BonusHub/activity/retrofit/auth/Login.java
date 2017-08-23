@@ -1,8 +1,4 @@
-package com.example.BonusHub.activity;
-
-/**
- * Created by mike on 16.04.17.
- */
+package com.example.BonusHub.activity.retrofit.auth;
 
 public class Login {
     String login;

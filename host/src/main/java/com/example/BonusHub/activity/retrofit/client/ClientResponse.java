@@ -1,4 +1,4 @@
-package com.example.BonusHub.activity.retrofit;
+package com.example.BonusHub.activity.retrofit.client;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,10 +1,10 @@
-package com.example.BonusHub.activity.api.login;
+package com.example.BonusHub.activity.retrofit.auth;
 
 /**
  * Created by mike on 16.04.17.
  */
 
-public class LoginResult {
+public class LoginResponse {
     private int code;
 
     private boolean isHosted;

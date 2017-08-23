@@ -1,7 +1,6 @@
 package com.example.BonusHub.activity.fragment;
 
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.api.host.HostResult;
 import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;

@@ -21,8 +21,8 @@ import android.view.View;
 
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.MyApplication;
-import com.example.BonusHub.activity.api.login.LogoutResult;
-import com.example.BonusHub.activity.api.login.Logouter;
+import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.auth.LogoutResponse;
 import com.example.BonusHub.activity.fragment.OwnerSettingsFragment;
 import com.example.BonusHub.activity.fragment.EditFragment;
 import com.example.BonusHub.activity.fragment.ProfileFragment;
@@ -39,12 +39,12 @@ import android.widget.Toast;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.BonusHub.activity.api.RetrofitFactory.retrofitBarmen;
+import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHost;
 
 public class MainActivity extends BaseActivity implements StackListner {
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    private NetworkThread.ExecuteCallback<LogoutResult> logoutCallback;
+    private NetworkThread.ExecuteCallback<LogoutResponse> logoutCallback;
     private Integer logoutCallbackId;
 
     private Toolbar mToolbar;
@@ -222,8 +222,8 @@ public class MainActivity extends BaseActivity implements StackListner {
 
             case MENUITEM_LOGOUT:
                 Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
-                final Logouter logouter = retrofitBarmen().create(Logouter.class);
-                final Call<LogoutResult> call = logouter.logout(AuthUtils.getCookie(this));
+                final ApiInterface apiInterface = retrofitHost().create(ApiInterface.class);
+                final Call<LogoutResponse> call = apiInterface.logout(AuthUtils.getCookie(this));
                 logoutCallbackId = NetworkThread.getInstance().registerCallback(logoutCallback);
                 NetworkThread.getInstance().execute(call, logoutCallbackId);
                 break;
@@ -311,13 +311,13 @@ public class MainActivity extends BaseActivity implements StackListner {
     }
 
     private void prepareCallbacks() {
-        logoutCallback = new NetworkThread.ExecuteCallback<LogoutResult>() {
+        logoutCallback = new NetworkThread.ExecuteCallback<LogoutResponse>() {
             @Override
-            public void onResponse(Call<LogoutResult> call, Response<LogoutResult> response) {
+            public void onResponse(Call<LogoutResponse> call, Response<LogoutResponse> response) {
             }
 
             @Override
-            public void onFailure(Call<LogoutResult> call, Response<LogoutResult> response) {
+            public void onFailure(Call<LogoutResponse> call, Response<LogoutResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
                 AuthUtils.logout(MainActivity.this);
@@ -325,7 +325,7 @@ public class MainActivity extends BaseActivity implements StackListner {
             }
 
             @Override
-            public void onSuccess(LogoutResult result) {
+            public void onSuccess(LogoutResponse result) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
                 onLogoutResult();

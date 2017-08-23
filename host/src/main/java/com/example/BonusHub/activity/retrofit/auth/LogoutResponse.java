@@ -1,10 +1,10 @@
-package com.example.BonusHub.activity.api.login;
+package com.example.BonusHub.activity.retrofit.auth;
 
 /**
  * Created by mike on 07.05.17.
  */
 
-public class LogoutResult {
+public class LogoutResponse {
     private int code;
 
     public int getCode() {
