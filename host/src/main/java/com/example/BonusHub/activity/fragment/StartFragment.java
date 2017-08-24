@@ -25,7 +25,7 @@ import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.bonuslib.FragmentType;
 import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.activity.HostMainActivity;
 import com.example.BonusHub.activity.retrofit.host.HostResult;
 import com.example.BonusHub.activity.executor.DbExecutorService;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
@@ -116,7 +116,7 @@ public class StartFragment extends Fragment {
     }
 
     public void goToMainActivity() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
+        Intent intent = new Intent(getActivity(), HostMainActivity.class);
         startActivity(intent);
         getActivity().finish();
     }

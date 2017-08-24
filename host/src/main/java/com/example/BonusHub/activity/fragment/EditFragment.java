@@ -26,8 +26,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.HostMainActivity;
 import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executor.DbExecutorService;
 import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
@@ -68,7 +68,7 @@ public class EditFragment extends Fragment {
     private View rootView;
     private int host_id;
     private Uri targetUri;
-    private MainActivity mainActivity;
+    private HostMainActivity hostMainActivity;
 
     public EditFragment() {
         // Required empty public constructor
@@ -77,7 +77,7 @@ public class EditFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivity = (MainActivity) getActivity();
+        hostMainActivity = (HostMainActivity) getActivity();
         prepareCallbacks();
     }
 
@@ -105,7 +105,7 @@ public class EditFragment extends Fragment {
         host_address_et = (EditText) rootView.findViewById(R.id.edit_host_address_et);
         open_time_btn = (Button) rootView.findViewById(R.id.edit_open_time_btn);
         close_time_btn = (Button) rootView.findViewById(R.id.edit_close_time_btn);
-        fab_upload = (FloatingActionButton) mainActivity.findViewById(R.id.fab);
+        fab_upload = (FloatingActionButton) hostMainActivity.findViewById(R.id.fab);
         fab_upload.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_a_photo_black_24dp));
         fab_upload.setOnClickListener(new View.OnClickListener() {
 
@@ -203,8 +203,8 @@ public class EditFragment extends Fragment {
             // Respond to the action bar's Up/Home button
             case R.id.continue_btn:
                 //hide keyboard
-                InputMethodManager imm = (InputMethodManager) mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mainActivity.getCurrentFocus().getWindowToken(), 0);
+                InputMethodManager imm = (InputMethodManager) hostMainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(hostMainActivity.getCurrentFocus().getWindowToken(), 0);
 
                 Host host = new Host();
                 host.setTitle(host_title_et.getText().toString());
@@ -219,14 +219,14 @@ public class EditFragment extends Fragment {
                     editCallbackId = NetworkThread.getInstance().registerCallback(editCallback);
                     NetworkThread.getInstance().execute(call, editCallbackId);
                 }
-                mainActivity.popFragment();
+                hostMainActivity.popFragment();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void showError(Throwable error) {
-        mainActivity.showSnack("Не удалось обновить информацию");
+        hostMainActivity.showSnack("Не удалось обновить информацию");
         new AlertDialog.Builder(getActivity())
                 .setTitle("Ошибка")
                 .setMessage(error.getMessage())
@@ -236,7 +236,7 @@ public class EditFragment extends Fragment {
     }
 
     private void showResponse(EditResponse result) {
-        Toast.makeText(mainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(hostMainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
 
     }
 
@@ -264,7 +264,7 @@ public class EditFragment extends Fragment {
                 // Get the Image from data
                 targetUri = data.getData();
 
-                String path = getRealPathFromURI(mainActivity, targetUri);
+                String path = getRealPathFromURI(hostMainActivity, targetUri);
                 final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().   create(HostApiInterface.class);
                 File file = new File(path);
                 // create RequestBody instance from file
@@ -281,16 +281,16 @@ public class EditFragment extends Fragment {
                     NetworkThread.getInstance().execute(call, uploadCallbackId);
                 }
             } else {
-                Toast.makeText(mainActivity, "Вы не выбрали изображение", Toast.LENGTH_SHORT).show();
+                Toast.makeText(hostMainActivity, "Вы не выбрали изображение", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(mainActivity, "Что-то пошло не так", Toast.LENGTH_SHORT)
+            Toast.makeText(hostMainActivity, "Что-то пошло не так", Toast.LENGTH_SHORT)
                     .show();
         }
     }
 
     private void onHostPhotoUploaded(String src) {
-        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+        ImageView imgView = (ImageView) hostMainActivity.findViewById(R.id.backdrop);
         Glide
                 .with(getActivity().getApplicationContext())
                 .load(src)
@@ -333,7 +333,7 @@ public class EditFragment extends Fragment {
             public void onSuccess(UploadResponse result) {
                 NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
                 uploadCallbackId = null;
-                Toast.makeText(mainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(hostMainActivity, result.getMessage(), Toast.LENGTH_SHORT).show();
                 DbExecutorService.getInstance().setCallback(dBUploadCallback);
                 DbExecutorService.getInstance().upload(getContext(), host_id, targetUri);
             }
@@ -398,7 +398,7 @@ public class EditFragment extends Fragment {
 
             @Override
             public void onError(Exception ex) {
-                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
+                Toast.makeText(hostMainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
 
             }
         };

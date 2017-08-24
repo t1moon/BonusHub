@@ -14,8 +14,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.HostMainActivity;
 import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
@@ -39,7 +39,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     String client_identificator = null;
     private static Fragment fragmentInstance;
-    MainActivity mainActivity;
+    HostMainActivity hostMainActivity;
 
     EditText et_bill;
     SwitchCompat switchCompat;
@@ -51,7 +51,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivity = (MainActivity) getActivity();
+        hostMainActivity = (HostMainActivity) getActivity();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         if (result != null) {
             if (result.getContents() == null) {
                 Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_LONG).show();
-                mainActivity.popFragment();
+                hostMainActivity.popFragment();
             } else {
                 Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 client_identificator = result.getContents();
@@ -118,7 +118,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         final Call<UpdatePointsResponse> call;
 
         int bill = Integer.parseInt(et_bill.getText().toString());
-        call = hostApiInterface.update_points(new UpdatePointsPojo(client_identificator, bill, isAddTo), AuthUtils.getCookie(mainActivity));
+        call = hostApiInterface.update_points(new UpdatePointsPojo(client_identificator, bill, isAddTo), AuthUtils.getCookie(hostMainActivity));
 
         if (updatePointsCallbackId == null) {
             updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);

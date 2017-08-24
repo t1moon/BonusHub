@@ -41,8 +41,8 @@ import retrofit2.Response;
 
 import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHost;
 
-public class MainActivity extends BaseActivity implements StackListner {
-    private final static String TAG = MainActivity.class.getSimpleName();
+public class HostMainActivity extends BaseActivity implements StackListner {
+    private final static String TAG = HostMainActivity.class.getSimpleName();
 
     private NetworkThread.ExecuteCallback<LogoutResponse> logoutCallback;
     private Integer logoutCallbackId;
@@ -75,7 +75,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         setContentView(R.layout.activity_main);
         setStackListner(this);
         Log.d("Main", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
-        if (!AuthUtils.isAuthorized(this) || !AuthUtils.isHosted(this)) {
+        if (!AuthUtils.isAuthorized(this)) {
             goToLogIn();
             return;
         }
@@ -92,22 +92,7 @@ public class MainActivity extends BaseActivity implements StackListner {
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        chooseMainFragment();
         setupProfileFragment();
-    }
-
-    // TODO!!!!!!!!!!!!!!!!!!!!!!!!
-    private void chooseMainFragment() {
-        switch (AuthUtils.getRole(this)) {
-            case "Host":
-                if (!AuthUtils.isHosted(this))
-                    //setupStartFragment();
-                break;
-            case "Staff":
-                break;
-            case "Client":
-                break;
-        }
     }
 
     @Override
@@ -337,7 +322,7 @@ public class MainActivity extends BaseActivity implements StackListner {
             public void onFailure(Call<LogoutResponse> call, Response<LogoutResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
-                AuthUtils.logout(MainActivity.this);
+                AuthUtils.logout(HostMainActivity.this);
                 goToLogIn();
             }
 
@@ -352,7 +337,7 @@ public class MainActivity extends BaseActivity implements StackListner {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
-                Toast.makeText(MainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(HostMainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
         };
     }

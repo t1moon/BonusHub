@@ -21,8 +21,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.HostMainActivity;
 import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executor.DbExecutorService;
 import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
@@ -56,7 +56,7 @@ public class ProfileFragment extends Fragment {
     private TextView host_address;
     FloatingActionButton fab_edit;
     private int host_id;
-    private MainActivity mainActivity;
+    private HostMainActivity hostMainActivity;
     ProgressDialog progressDialog;
     String pathToImageProfile;
 
@@ -68,10 +68,10 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prepareCallbacks();
-        mainActivity = (MainActivity) getActivity();
-        if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
+        hostMainActivity = (HostMainActivity) getActivity();
+        if (ContextCompat.checkSelfPermission(hostMainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+            ActivityCompat.requestPermissions(hostMainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
         }
     }
@@ -99,20 +99,20 @@ public class ProfileFragment extends Fragment {
         host_address = (TextView) rootView.findViewById(R.id.host_address_tv);
         host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
         host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
-        fab_edit = (FloatingActionButton) mainActivity.findViewById(R.id.fab);
+        fab_edit = (FloatingActionButton) hostMainActivity.findViewById(R.id.fab);
         fab_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_black_24dp));
         fab_edit.setVisibility(View.VISIBLE);
 
         fab_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainActivity.pushFragment(new EditFragment(), true);
+                hostMainActivity.pushFragment(new EditFragment(), true);
             }
         });
 
         host_id = getActivity().getPreferences(MODE_PRIVATE).getInt("host_id", -1);
 
-        if(mainActivity.hasConnection())
+        if(hostMainActivity.hasConnection())
             getFromInternet();
         else
             getFromCache();
@@ -126,9 +126,9 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getFromInternet() {
-        progressDialog = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
+        progressDialog = ProgressDialog.show(hostMainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
         final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
-        final Call<GetInfoResponse> call = hostApiInterface.getInfo(AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        final Call<GetInfoResponse> call = hostApiInterface.getInfo(AuthUtils.getCookie(hostMainActivity.getApplicationContext()));
         if (netInfoCallbackId == null) {
             netInfoCallbackId = NetworkThread.getInstance().registerCallback(netInfoCallback);
             NetworkThread.getInstance().execute(call, netInfoCallbackId);
@@ -143,7 +143,7 @@ public class ProfileFragment extends Fragment {
 
     private void showError(Exception error) {
         progressDialog.dismiss();
-        new AlertDialog.Builder(mainActivity)
+        new AlertDialog.Builder(hostMainActivity)
                 .setTitle("Ошибка")
                 .setMessage(error.getMessage())
                 .setPositiveButton("OK", null)
@@ -201,13 +201,13 @@ public class ProfileFragment extends Fragment {
         else
             host_close_time_tv.setText(close_hour + "0:" + "00");
 
-        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+        ImageView imgView = (ImageView) hostMainActivity.findViewById(R.id.backdrop);
         Glide
                 .with(getActivity().getApplicationContext())
                 .load(imageUriString)
                 .fitCenter()
                 .into(imgView);
-        Toast.makeText(mainActivity, "Информация загружена из кэша", Toast.LENGTH_SHORT).show();
+        Toast.makeText(hostMainActivity, "Информация загружена из кэша", Toast.LENGTH_SHORT).show();
     }
 
     private void onHostCreated(int host_id) {
@@ -236,14 +236,14 @@ public class ProfileFragment extends Fragment {
         host_open_time_tv.setText(open_time);
         host_close_time_tv.setText(close_time);
 
-        ImageView imgView = (ImageView) mainActivity.findViewById(R.id.backdrop);
+        ImageView imgView = (ImageView) hostMainActivity.findViewById(R.id.backdrop);
         Glide
                 .with(getActivity().getApplicationContext())
                 .load(imageUriString)
                 .fitCenter()
                 .into(imgView);
 
-        mainActivity.showSnack(true);   // Say to user that info is up-to-date
+        hostMainActivity.showSnack(true);   // Say to user that info is up-to-date
 
     }
 
@@ -303,7 +303,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onError(Exception ex) {
-                new AlertDialog.Builder(mainActivity)
+                new AlertDialog.Builder(hostMainActivity)
                         .setTitle("Ошибка при записи в кэш")
                         .setMessage(ex.getMessage())
                         .setPositiveButton("OK", null)
@@ -318,7 +318,7 @@ public class ProfileFragment extends Fragment {
             }
             @Override
             public void onError(Exception ex) {
-                Toast.makeText(mainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
+                Toast.makeText(hostMainActivity, "Информацию из кэша загрузить не удалось", Toast.LENGTH_SHORT).show();
 
             }
         };

@@ -7,7 +7,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.example.BonusHub.activity.AuthUtils;
-import com.example.BonusHub.activity.fragment.LogInFragment;
 import com.example.BonusHub.activity.fragment.RoleFragment;
 import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.bonuslib.BaseActivity;
@@ -52,9 +51,21 @@ public class LogInActivity extends BaseActivity implements StackListner {
     }
 
     public void goToMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        this.finish();
+        Intent intent = null;
+        switch (AuthUtils.getRole(this)) {
+            case "Host":
+                intent = new Intent(this, HostMainActivity.class);
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                intent = new Intent(this, ClientMainActivity.class);
+                break;
+        }
+        if (intent != null) {
+            startActivity(intent);
+            this.finish();
+        }
     }
 
     @Override

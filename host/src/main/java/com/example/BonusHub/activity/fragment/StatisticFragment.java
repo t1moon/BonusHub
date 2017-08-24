@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.activity.HostMainActivity;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.statistic.StatisticResponse;
 import com.example.timur.BonusHub.R;
@@ -59,7 +59,7 @@ import retrofit2.Response;
  */
 public class StatisticFragment extends Fragment implements NetworkThread.ExecuteCallback <StatisticResponse>, OnChartValueSelectedListener {
 
-    MainActivity mainActivity;
+    HostMainActivity hostMainActivity;
     TableLayout tl;
     GraphView graph;
     private PieChart mChart;
@@ -72,7 +72,7 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivity = (MainActivity) getActivity();
+        hostMainActivity = (HostMainActivity) getActivity();
     }
 
     @Override
@@ -138,13 +138,13 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
 
 
 //        tl = (TableLayout) rootView.findViewById(R.id.statistic_table);
-//        Toast.makeText(mainActivity, "Для статистики вам нужны ещё данные", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(hostMainActivity, "Для статистики вам нужны ещё данные", Toast.LENGTH_SHORT).show();
 //        makeTableRow("01.06.2017", 330, 150, 410);
 //        makeTableRow("02.06.2017", 540, 200, 220);
 //        makeTableRow("03.06.2017", 690, 250, 330);
 //        makeTableRow("04.06.2017", 800, 230, 560);
 //        final HostApiInterface apiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
-//        Call<StatisticResponse> call = apiInterface.getStatistic(AuthUtils.getCookie(mainActivity));
+//        Call<StatisticResponse> call = apiInterface.getStatistic(AuthUtils.getCookie(hostMainActivity));
 //        if (statisticCallbackId == null) {
 //            statisticCallbackId = NetworkThread.getInstance().registerCallback(this);
 //            NetworkThread.getInstance().execute(call, statisticCallbackId);
@@ -261,7 +261,7 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
         }
         else {
             graph.setVisibility(View.GONE);
-            Toast.makeText(mainActivity, "Для статистики вам нужны ещё данные", Toast.LENGTH_SHORT).show();
+            Toast.makeText(hostMainActivity, "Для статистики вам нужны ещё данные", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -281,15 +281,15 @@ public class StatisticFragment extends Fragment implements NetworkThread.Execute
         TableRow tr;
         TextView date_tv, avg_bill_tv, income_tv, outcome_tv;
 
-        tr = new TableRow(mainActivity.getApplicationContext());
+        tr = new TableRow(hostMainActivity.getApplicationContext());
 
         tr.setLayoutParams(new TableRow.LayoutParams(
                 TableLayout.LayoutParams.MATCH_PARENT,
                 TableLayout.LayoutParams.WRAP_CONTENT));
-        avg_bill_tv = new TextView(mainActivity.getApplicationContext());
-        date_tv = new TextView(mainActivity.getApplicationContext());
-        income_tv = new TextView(mainActivity.getApplicationContext());
-        outcome_tv = new TextView(mainActivity.getApplicationContext());
+        avg_bill_tv = new TextView(hostMainActivity.getApplicationContext());
+        date_tv = new TextView(hostMainActivity.getApplicationContext());
+        income_tv = new TextView(hostMainActivity.getApplicationContext());
+        outcome_tv = new TextView(hostMainActivity.getApplicationContext());
 
         date_tv.setText(date);
         date_tv.setLayoutParams(new TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,

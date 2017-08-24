@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +12,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.ClientMainActivity;
 import com.example.BonusHub.activity.retrofit.ClientApiInterface;
 import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.retrofit.auth.Login;
-import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.activity.HostMainActivity;
 import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.retrofit.registration.RegistrationResult;
@@ -91,9 +91,21 @@ public class RegisterFragment extends Fragment {
     }
 
     public void goToMainActivity() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        startActivity(intent);
-        getActivity().finish();
+        Intent intent = null;
+        switch (AuthUtils.getRole(logInActivity)) {
+            case "Host":
+                intent = new Intent(getActivity(), HostMainActivity.class);
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                intent = new Intent(getActivity(), ClientMainActivity.class);
+                break;
+        }
+        if (intent != null) {
+            startActivity(intent);
+            getActivity().finish();
+        }
     }
 
     private final View.OnClickListener onRegistrationClickListener = new View.OnClickListener() {
@@ -166,14 +178,19 @@ public class RegisterFragment extends Fragment {
 
     public void onLoginResult(LoginResponse result) {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
-        if (!result.isHosted() && result.getCode() == 0) {
+
+        if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            goToStartFragment();
-        }
-        else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-            goToMainActivity();
+            if (!AuthUtils.getRole(logInActivity).equals("Host")) {                  // staff or client
+                goToMainActivity();
+            } else {
+                if (!result.isHosted())
+                    goToStartFragment();
+                else {
+                    AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+                    goToMainActivity();
+                }
+            }
         }
     }
 

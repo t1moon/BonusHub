@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name="com.example.BonusHub.activity.activity.MainActivity">
+        <activity android:name="com.example.BonusHub.activity.activity.LogInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +23,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.example.BonusHub.activity.activity.LogInActivity" />
+        <activity android:name="com.example.BonusHub.activity.activity.HostMainActivity" />
+        <activity android:name="com.example.BonusHub.activity.activity.ClientMainActivity" />
     </application>
 
 </manifest>

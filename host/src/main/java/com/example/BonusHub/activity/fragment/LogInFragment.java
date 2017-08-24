@@ -13,12 +13,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.activity.ClientMainActivity;
 import com.example.BonusHub.activity.retrofit.ClientApiInterface;
 import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.retrofit.auth.Login;
 import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
 import com.example.BonusHub.activity.activity.LogInActivity;
-import com.example.BonusHub.activity.activity.MainActivity;
+import com.example.BonusHub.activity.activity.HostMainActivity;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.FragmentType;
 import com.example.timur.BonusHub.R;
@@ -110,13 +111,13 @@ public class LogInFragment extends Fragment {
         switch (AuthUtils.getRole(logInActivity)) {
             case "Host":
                 final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
-                call = hostApiInterface.login(new Login(login,password));
+                call = hostApiInterface.login(new Login(login, password));
                 break;
             case "Staff":
                 break;
             case "Client":
                 final ClientApiInterface clientApiInterface = retrofitClient().create(ClientApiInterface.class);
-                call = clientApiInterface.login(new Login(login,password));
+                call = clientApiInterface.login(new Login(login, password));
                 break;
         }
         if (loginCallbackId == null && call != null) {
@@ -136,7 +137,7 @@ public class LogInFragment extends Fragment {
             valid = false;
         }
 
-        if (password.isEmpty() || password.length() <= 5 ) {
+        if (password.isEmpty() || password.length() <= 5) {
             passwordInput.setError("Не менее 6 символов");
             valid = false;
         }
@@ -153,9 +154,21 @@ public class LogInFragment extends Fragment {
     }
 
     public void goToMainActivity() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        startActivity(intent);
-        getActivity().finish();
+        Intent intent = null;
+        switch (AuthUtils.getRole(logInActivity)) {
+            case "Host":
+                intent = new Intent(getActivity(), HostMainActivity.class);
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                intent = new Intent(getActivity(), ClientMainActivity.class);
+                break;
+        }
+        if (intent != null) {
+            startActivity(intent);
+            getActivity().finish();
+        }
     }
 
     private void prepareCallbacks() {
@@ -194,14 +207,18 @@ public class LogInFragment extends Fragment {
 
     public void onLoginResult(LoginResponse result) {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
-        if (!result.isHosted() && result.getCode() == 0) {
+        if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            goToStartFragment();
-        }
-        else if (result.getCode() == 0){
-            AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-            goToMainActivity();
+            if (!AuthUtils.getRole(logInActivity).equals("Host")) {                  // staff or client
+                goToMainActivity();
+            } else {
+                if (!result.isHosted())
+                    goToStartFragment();
+                else {
+                    AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+                    goToMainActivity();
+                }
+            }
         }
     }
 }

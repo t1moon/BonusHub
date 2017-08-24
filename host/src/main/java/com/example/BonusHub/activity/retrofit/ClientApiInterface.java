@@ -4,6 +4,7 @@ import com.example.BonusHub.activity.retrofit.auth.Login;
 import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
 import com.example.BonusHub.activity.retrofit.auth.LogoutResponse;
 import com.example.BonusHub.activity.retrofit.client.ClientResponse;
+import com.example.BonusHub.activity.retrofit.clientapp.ClientInfoResponse;
 import com.example.BonusHub.activity.retrofit.clientapp.HostListResponse;
 import com.example.BonusHub.activity.retrofit.registration.RegistrationResult;
 import retrofit2.Call;
@@ -37,7 +38,7 @@ public interface ClientApiInterface {
     @Headers({
             "Accept: application/json"
     })
-    Call<ClientResponse> getInfo(@Header("Cookie")String cookie);
+    Call<ClientInfoResponse> getInfo(@Header("Cookie")String cookie);
 
     @POST("register/")
     @Headers({
