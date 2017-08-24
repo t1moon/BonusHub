@@ -14,7 +14,18 @@ public class RetrofitFactory {
             .build();
     public final static String MEDIA_URL = "media/";
 
+    private final static Retrofit CLIENT_INSTANCE = new Retrofit.Builder()
+            .baseUrl("http://t1moon.pythonanywhere.com/api/client/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+
     public static Retrofit retrofitHost() {
         return HOST_INSTANCE;
     }
+
+    public static Retrofit retrofitClient() {
+        return CLIENT_INSTANCE;
+    }
+
 }

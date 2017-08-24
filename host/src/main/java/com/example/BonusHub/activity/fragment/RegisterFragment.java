@@ -13,9 +13,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.retrofit.ClientApiInterface;
+import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.retrofit.auth.Login;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.retrofit.registration.RegistrationResult;
@@ -26,6 +27,7 @@ import com.example.timur.BonusHub.R;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitClient;
 import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHost;
 
 public class RegisterFragment extends Fragment {
@@ -113,11 +115,23 @@ public class RegisterFragment extends Fragment {
         progressDialog.setMessage("Регистрация...");
         progressDialog.show();
 
-        final ApiInterface apiInterface= retrofitHost().create(ApiInterface.class);
-        final Call<RegistrationResult> call = apiInterface.registrate(new Login(login,password));
+        Call<RegistrationResult> call = null;
+        switch (AuthUtils.getRole(logInActivity)) {
+            case "Host":
+                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
+                call = hostApiInterface.registrate(new Login(login,password));
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                final ClientApiInterface clientApiInterface = retrofitClient().create(ClientApiInterface.class);
+                call = clientApiInterface.registrate(new Login(login,password));
+                break;
+        }
+        if (registrationCallbackId == null && call != null) {
+            registrationCallbackId = NetworkThread.getInstance().registerCallback(registrationCallback);
+            NetworkThread.getInstance().execute(call, registrationCallbackId);        }
 
-        registrationCallbackId = NetworkThread.getInstance().registerCallback(registrationCallback);
-        NetworkThread.getInstance().execute(call, registrationCallbackId);
     }
 
     public void onRegistrationResult(RegistrationResult result) {
@@ -129,24 +143,36 @@ public class RegisterFragment extends Fragment {
     private void logIn() {
         final String login = loginInput.getText().toString();
         final String password = passwordInput.getText().toString();
-        final ApiInterface apiInterface = retrofitHost().create(ApiInterface.class);
-        final Call<LoginResponse> call = apiInterface.login(new Login(login,password));
 
-        loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
-        NetworkThread.getInstance().execute(call,loginCallbackId);
+        Call<LoginResponse> call = null;
+        switch (AuthUtils.getRole(logInActivity)) {
+            case "Host":
+                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
+                call = hostApiInterface.login(new Login(login,password));
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                final ClientApiInterface clientApiInterface = retrofitClient().create(ClientApiInterface.class);
+                call = clientApiInterface.login(new Login(login,password));
+                break;
+        }
+        if (loginCallbackId == null && call != null) {
+            loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
+            NetworkThread.getInstance().execute(call, loginCallbackId);
+        }
+
     }
 
     public void onLoginResult(LoginResponse result) {
-        //Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
-        if (result.isHosted() == false && result.getCode() == 0) {
+        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+        if (!result.isHosted() && result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            Log.d("LogFrag go start", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + result.isHosted());
             goToStartFragment();
         }
         else if (result.getCode() == 0){
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
             AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-            Log.d("LogFrag go main", "auth" + AuthUtils.isAuthorized(getActivity()) + " " + AuthUtils.isHosted(getActivity()));
             goToMainActivity();
         }
     }
@@ -163,7 +189,7 @@ public class RegisterFragment extends Fragment {
         }
 
         if (password.isEmpty() || password.length() <= 5 ) {
-            passwordInput.setError("Не менее 5 символов");
+            passwordInput.setError("Не менее 6 символов");
             valid = false;
         }
         return valid;
@@ -193,7 +219,10 @@ public class RegisterFragment extends Fragment {
                 progressDialog.dismiss();
                 if (result.getCode() == 0){
                     onRegistrationResult(result);
+                } else if (result.getCode() == 1) {
+                    Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+
 
             }
 

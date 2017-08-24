@@ -26,7 +26,7 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 
-public interface ApiInterface {
+public interface HostApiInterface {
     @POST("register/")
     @Headers({
             "Accept: application/json"

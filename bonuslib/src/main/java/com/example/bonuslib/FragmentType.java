@@ -12,6 +12,7 @@ public enum FragmentType {
     StartHost,
     RegisterFragment,
     LogInFragment,
+    RoleFragment,
     EditHost,
     Statistic,
     OwnerSettings

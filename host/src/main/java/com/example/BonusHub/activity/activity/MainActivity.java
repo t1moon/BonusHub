@@ -21,7 +21,7 @@ import android.view.View;
 
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.MyApplication;
-import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.retrofit.auth.LogoutResponse;
 import com.example.BonusHub.activity.fragment.OwnerSettingsFragment;
 import com.example.BonusHub.activity.fragment.EditFragment;
@@ -91,7 +91,23 @@ public class MainActivity extends BaseActivity implements StackListner {
         setupDrawerContent(nvDrawer);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        chooseMainFragment();
         setupProfileFragment();
+    }
+
+    // TODO!!!!!!!!!!!!!!!!!!!!!!!!
+    private void chooseMainFragment() {
+        switch (AuthUtils.getRole(this)) {
+            case "Host":
+                if (!AuthUtils.isHosted(this))
+                    //setupStartFragment();
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                break;
+        }
     }
 
     @Override
@@ -176,7 +192,7 @@ public class MainActivity extends BaseActivity implements StackListner {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                        public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
                         uncheckAllMenuItems(navigationView);
                         selectDrawerItem(menuItem);
                         return true;
@@ -222,8 +238,8 @@ public class MainActivity extends BaseActivity implements StackListner {
 
             case MENUITEM_LOGOUT:
                 Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
-                final ApiInterface apiInterface = retrofitHost().create(ApiInterface.class);
-                final Call<LogoutResponse> call = apiInterface.logout(AuthUtils.getCookie(this));
+                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
+                final Call<LogoutResponse> call = hostApiInterface.logout(AuthUtils.getCookie(this));
                 logoutCallbackId = NetworkThread.getInstance().registerCallback(logoutCallback);
                 NetworkThread.getInstance().execute(call, logoutCallbackId);
                 break;
@@ -303,6 +319,7 @@ public class MainActivity extends BaseActivity implements StackListner {
                 .make(findViewById(R.id.coordinator), message, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
+
     // Showing the status in Snackbar
     public void showSnack(String message) {
         Snackbar snackbar = Snackbar

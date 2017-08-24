@@ -24,7 +24,7 @@ import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executor.DbExecutorService;
-import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.getInfo.GetInfoResponse;
@@ -127,8 +127,8 @@ public class ProfileFragment extends Fragment {
 
     private void getFromInternet() {
         progressDialog = ProgressDialog.show(mainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
-        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-        final Call<GetInfoResponse> call = apiInterface.getInfo(AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
+        final Call<GetInfoResponse> call = hostApiInterface.getInfo(AuthUtils.getCookie(mainActivity.getApplicationContext()));
         if (netInfoCallbackId == null) {
             netInfoCallbackId = NetworkThread.getInstance().registerCallback(netInfoCallback);
             NetworkThread.getInstance().execute(call, netInfoCallbackId);

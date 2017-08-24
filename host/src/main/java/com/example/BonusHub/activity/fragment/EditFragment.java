@@ -29,7 +29,7 @@ import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.executor.DbExecutorService;
-import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.editInfo.EditResponse;
 import com.example.BonusHub.activity.retrofit.editInfo.UploadResponse;
@@ -213,8 +213,8 @@ public class EditFragment extends Fragment {
                 host.setTime_open(open_hour * 60 + open_minute);
                 host.setTime_close(close_hour * 60 + close_minute);
 
-                final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
-                Call<EditResponse> call = apiInterface.editHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));
+                final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
+                Call<EditResponse> call = hostApiInterface.editHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));
                 if (editCallbackId == null) {
                     editCallbackId = NetworkThread.getInstance().registerCallback(editCallback);
                     NetworkThread.getInstance().execute(call, editCallbackId);
@@ -265,7 +265,7 @@ public class EditFragment extends Fragment {
                 targetUri = data.getData();
 
                 String path = getRealPathFromURI(mainActivity, targetUri);
-                final ApiInterface apiInterface = RetrofitFactory.retrofitHost().   create(ApiInterface.class);
+                final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().   create(HostApiInterface.class);
                 File file = new File(path);
                 // create RequestBody instance from file
                 RequestBody requestFile =  RequestBody.create(MediaType.parse("*/*"), file);
@@ -274,7 +274,7 @@ public class EditFragment extends Fragment {
                 MultipartBody.Part body =
                         MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
 
-                Call<UploadResponse> call = apiInterface.upload(body, AuthUtils.getCookie(getActivity().getApplicationContext()));
+                Call<UploadResponse> call = hostApiInterface.upload(body, AuthUtils.getCookie(getActivity().getApplicationContext()));
 
                 if (uploadCallbackId == null) {
                     uploadCallbackId = NetworkThread.getInstance().registerCallback(uploadCallback);

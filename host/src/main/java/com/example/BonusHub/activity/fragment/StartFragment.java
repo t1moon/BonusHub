@@ -22,7 +22,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
-import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.bonuslib.FragmentType;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
@@ -191,8 +191,8 @@ public class StartFragment extends Fragment {
                     progressDialog.show();
 
 
-                    final ApiInterface apiInterface = retrofitHost().create(ApiInterface.class);
-                    final Call<HostResult> call = apiInterface.createHost(host, AuthUtils.getCookie(getActivity()));
+                    final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
+                    final Call<HostResult> call = hostApiInterface.createHost(host, AuthUtils.getCookie(getActivity()));
                     if (netHostCallbackId == null) {
                         netHostCallbackId = NetworkThread.getInstance().registerCallback(netHostCallback);
                         NetworkThread.getInstance().execute(call, netHostCallbackId);
@@ -237,8 +237,6 @@ public class StartFragment extends Fragment {
 
             @Override
             public void onSuccess(HostResult result) {
-                NetworkThread.getInstance().unRegisterCallback(netHostCallbackId);
-                netHostCallbackId = null;
                 if (result.getCode() == 0) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), true);
                     goToMainActivity();

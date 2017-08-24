@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
-import com.example.BonusHub.activity.retrofit.ApiInterface;
+import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.retrofit.updatePoints.UpdatePointsPojo;
@@ -114,11 +114,11 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     private void updatePoints(boolean isAddTo) {
 
-        final ApiInterface apiInterface = RetrofitFactory.retrofitHost().create(ApiInterface.class);
+        final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
         final Call<UpdatePointsResponse> call;
 
         int bill = Integer.parseInt(et_bill.getText().toString());
-        call = apiInterface.update_points(new UpdatePointsPojo(client_identificator, bill, isAddTo), AuthUtils.getCookie(mainActivity));
+        call = hostApiInterface.update_points(new UpdatePointsPojo(client_identificator, bill, isAddTo), AuthUtils.getCookie(mainActivity));
 
         if (updatePointsCallbackId == null) {
             updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);

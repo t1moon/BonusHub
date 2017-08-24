@@ -13,8 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.AuthUtils;
+import com.example.BonusHub.activity.retrofit.ClientApiInterface;
+import com.example.BonusHub.activity.retrofit.HostApiInterface;
 import com.example.BonusHub.activity.retrofit.auth.Login;
-import com.example.BonusHub.activity.retrofit.ApiInterface;
 import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
@@ -25,6 +26,7 @@ import com.example.timur.BonusHub.R;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitClient;
 import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHost;
 
 public class LogInFragment extends Fragment {
@@ -103,9 +105,21 @@ public class LogInFragment extends Fragment {
         progressDialog.setMessage("Аутентификация...");
         progressDialog.show();
 
-        final ApiInterface apiInterface = retrofitHost().create(ApiInterface.class);
-        final Call<LoginResponse> call = apiInterface.login(new Login(login,password));
-        if (loginCallbackId == null) {
+
+        Call<LoginResponse> call = null;
+        switch (AuthUtils.getRole(logInActivity)) {
+            case "Host":
+                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
+                call = hostApiInterface.login(new Login(login,password));
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                final ClientApiInterface clientApiInterface = retrofitClient().create(ClientApiInterface.class);
+                call = clientApiInterface.login(new Login(login,password));
+                break;
+        }
+        if (loginCallbackId == null && call != null) {
             loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
             NetworkThread.getInstance().execute(call, loginCallbackId);
         }
@@ -165,8 +179,6 @@ public class LogInFragment extends Fragment {
 
             @Override
             public void onSuccess(LoginResponse result) {
-                NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
-                loginCallbackId = null;
                 onLoginResult(result);
             }
 

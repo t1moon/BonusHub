@@ -1,13 +1,14 @@
 package com.example.BonusHub.activity.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.fragment.LogInFragment;
+import com.example.BonusHub.activity.fragment.RoleFragment;
 import com.example.BonusHub.activity.fragment.StartFragment;
 import com.example.bonuslib.BaseActivity;
 import com.example.bonuslib.FragmentType;
@@ -34,15 +35,26 @@ public class LogInActivity extends BaseActivity implements StackListner {
 
         mToolbar = (Toolbar) findViewById(R.id.login_toolbar);
         setSupportActionBar(mToolbar);
-        //getSupportActionBar().setTitle("");
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setTitle("");
 
         if (!AuthUtils.isAuthorized(this)) {
-            setupLogInFragment();
+            setupRoleFragment();
         }
-        else if (!AuthUtils.isHosted(this)) {
-            setupLogInFragment();
-            setupStartFragment();
+        else {
+            if(AuthUtils.getRole(this).equals("Host") && !AuthUtils.isHosted(this))
+                setupStartFragment();
+            else
+                goToMainActivity();
         }
+
+
+    }
+
+    public void goToMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        this.finish();
     }
 
     @Override
@@ -50,15 +62,16 @@ public class LogInActivity extends BaseActivity implements StackListner {
         super.onDestroy();
     }
 
-    private void setupLogInFragment() {
-        setCurrentFragment(FragmentType.LogInFragment);
-        pushFragment(new LogInFragment(), true);
+    private void setupRoleFragment() {
+        setCurrentFragment(FragmentType.RoleFragment);
+        pushFragment(new RoleFragment(), true);
     }
 
     private void setupStartFragment() {
         setCurrentFragment(FragmentType.StartHost);
         pushFragment(new StartFragment(), true);
     }
+
 
     @Override
     protected int getFragmentContainerResId() {
