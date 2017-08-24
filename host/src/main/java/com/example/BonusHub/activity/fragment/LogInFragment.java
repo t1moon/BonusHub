@@ -150,6 +150,8 @@ public class LogInFragment extends Fragment {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 String cookie = response.headers().get("Set-Cookie");
                 AuthUtils.setCookie(getActivity().getApplicationContext(), cookie);
+                NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+                loginCallbackId = null;
                 progressDialog.dismiss();
             }
 

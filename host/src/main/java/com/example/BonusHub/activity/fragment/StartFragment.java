@@ -27,7 +27,7 @@ import com.example.bonuslib.FragmentType;
 import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.activity.MainActivity;
 import com.example.BonusHub.activity.retrofit.host.HostResult;
-import com.example.BonusHub.activity.executors.DbExecutorService;
+import com.example.BonusHub.activity.executor.DbExecutorService;
 import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.host.Host;
 import com.example.timur.BonusHub.R;

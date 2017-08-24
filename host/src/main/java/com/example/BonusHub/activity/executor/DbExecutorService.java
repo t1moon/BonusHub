@@ -1,11 +1,10 @@
-package com.example.BonusHub.activity.executors;
+package com.example.BonusHub.activity.executor;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.bonuslib.db.HelperFactory;
 import com.example.bonuslib.host.Host;
 import com.j256.ormlite.stmt.UpdateBuilder;

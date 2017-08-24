@@ -34,7 +34,7 @@ public class LogInActivity extends BaseActivity implements StackListner {
 
         mToolbar = (Toolbar) findViewById(R.id.login_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("");
+        //getSupportActionBar().setTitle("");
 
         if (!AuthUtils.isAuthorized(this)) {
             setupLogInFragment();
