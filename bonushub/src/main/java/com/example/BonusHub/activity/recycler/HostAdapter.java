@@ -1,4 +1,4 @@
-package com.example.client.recycler;
+package com.example.BonusHub.activity.recycler;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -9,21 +9,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.BonusHub.activity.retrofit.RetrofitFactory;
 import com.example.BonusHub.activity.db.client_host.ClientHost;
-import com.example.bonuslib.db.HelperFactory;
+import com.example.BonusHub.activity.db.HelperFactory;
 import com.example.BonusHub.activity.db.host.Host;
-import com.example.client.R;
-import com.example.client.retrofit.RetrofitFactory;
+import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
 import java.util.List;
-
-/**
- * Created by Timur on 29-Apr-17.
- */
 
 public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder>  {
 
@@ -69,26 +64,27 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
 
         int point = clientHostList.get(position).getPoints();
 
-        holder.title.setText(host.getTitle());
-        holder.descrpition.setText(host.getDescription());
-        holder.points.setText(Integer.toString(point));
-
-        if (host.getProfile_image() != null) {
-            String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
-            // loading album cover using Glide library
-            Log.d("Image", pathToImageProfile);
-            Glide
-                    .with(context)
-                    .load(pathToImageProfile)
-                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
-                    .into(holder.thumbnail);
-        } else {
-            // set default
-            Glide
-                    .with(context)
-                    .load(R.drawable.test2)
-                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
-                    .into(holder.thumbnail);
+        if (host != null) {
+            holder.title.setText(host.getTitle());
+            holder.descrpition.setText(host.getDescription());
+            holder.points.setText(Integer.toString(point));
+            if (host.getProfile_image() != null) {
+                String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
+                // loading album cover using Glide library
+                Log.d("Image", pathToImageProfile);
+                Glide
+                        .with(context)
+                        .load(pathToImageProfile)
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .into(holder.thumbnail);
+            } else {
+                // set default
+                Glide
+                        .with(context)
+                        .load(R.drawable.test2)
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .into(holder.thumbnail);
+            }
         }
 
     }

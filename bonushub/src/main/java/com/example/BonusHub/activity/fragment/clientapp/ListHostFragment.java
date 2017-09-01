@@ -1,4 +1,4 @@
-package com.example.client.ui;
+package com.example.BonusHub.activity.fragment.clientapp;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,19 +16,19 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.BonusHub.activity.utils.AuthUtils;
+import com.example.BonusHub.activity.activity.ClientMainActivity;
+import com.example.BonusHub.activity.recycler.HostAdapter;
+import com.example.BonusHub.activity.recycler.RecyclerTouchListener;
+import com.example.BonusHub.activity.retrofit.ClientApiInterface;
+import com.example.BonusHub.activity.retrofit.RetrofitFactory;
+import com.example.BonusHub.activity.retrofit.clientapp.HostListResponse;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
 import com.example.BonusHub.activity.db.client.Client;
 import com.example.BonusHub.activity.db.client_host.ClientHost;
-import com.example.bonuslib.db.HelperFactory;
+import com.example.BonusHub.activity.db.HelperFactory;
 import com.example.BonusHub.activity.db.host.Host;
-import com.example.client.AuthUtils;
-import com.example.client.recycler.HostAdapter;
-import com.example.client.recycler.RecyclerTouchListener;
-import com.example.client.R;
-import com.example.client.retrofit.hosts.HostListFetcher;
-import com.example.client.retrofit.hosts.HostListResponse;
-import com.example.client.threadManager.NetworkThread;
-import com.example.client.retrofit.RetrofitFactory;
-
+import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     private List<ClientHost> clientHostsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private HostAdapter mAdapter;
-    private MainActivity mainActivity;
+    private ClientMainActivity mainActivity;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Integer hostsCallbackId;
 
@@ -52,7 +52,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivity = (MainActivity) getActivity();
+        mainActivity = (ClientMainActivity) getActivity();
     }
 
     @Override
@@ -117,6 +117,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
                 .load(R.drawable.bonus_hub_logo)
                 .fitCenter()
                 .into(imgView);
+
         return rootView;
     }
 
@@ -132,7 +133,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         clientHostsList.clear();
         Client client = null;
         int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
-                getInt(MainActivity.CLIENT_ID, -1);
+                getInt(ClientMainActivity.CLIENT_ID, -1);
         try {
             client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
         } catch (SQLException e) {
@@ -157,8 +158,8 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         // showing refresh animation before making http call
         swipeRefreshLayout.setRefreshing(true);
         clientHostsList.clear();
-        final HostListFetcher hostListFetcher = RetrofitFactory.retrofitClient().create(HostListFetcher.class);
-        final Call<HostListResponse> call = hostListFetcher.listHosts(AuthUtils.getCookie(mainActivity));
+        final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
+        final Call<HostListResponse> call = clientApiInterface.listHosts(AuthUtils.getCookie(mainActivity));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(this);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
@@ -175,7 +176,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         ClientHost clientHost = null;
         Client client = null;
         int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
-                getInt(MainActivity.CLIENT_ID, -1);
+                getInt(ClientMainActivity.CLIENT_ID, -1);
 
         try {
             client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);

@@ -1,4 +1,4 @@
-package com.example.client.ui;
+package com.example.BonusHub.activity.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -11,31 +11,32 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.client.AuthUtils;
-import com.example.client.retrofit.Login;
-import com.example.client.retrofit.login.LoginResult;
-import com.example.client.retrofit.login.Loginner;
-import com.example.client.retrofit.registration.RegistrationResult;
-import com.example.client.retrofit.registration.Registrator;
-import com.example.client.threadManager.NetworkThread;
-import com.example.bonuslib.FragmentType;
-import com.example.client.R;
+import com.example.BonusHub.activity.utils.AuthUtils;
+import com.example.BonusHub.activity.activity.ClientMainActivity;
+import com.example.BonusHub.activity.retrofit.ClientApiInterface;
+import com.example.BonusHub.activity.retrofit.HostApiInterface;
+import com.example.BonusHub.activity.retrofit.auth.Login;
+import com.example.BonusHub.activity.activity.HostMainActivity;
+import com.example.BonusHub.activity.retrofit.auth.LoginResponse;
+import com.example.BonusHub.activity.activity.LogInActivity;
+import com.example.BonusHub.activity.retrofit.registration.RegistrationResult;
+import com.example.BonusHub.activity.threadManager.NetworkThread;
+import com.example.BonusHub.activity.utils.FragmentType;
+import com.example.timur.BonusHub.R;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.client.api.RetrofitFactory.retrofitClient;
-
-/**
- * Created by mike on 05.05.17.
- */
+import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitClient;
+import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHost;
 
 public class RegisterFragment extends Fragment {
     private LogInActivity logInActivity;
 
+
     private static NetworkThread.ExecuteCallback<RegistrationResult> registrationCallback;
     private Integer registrationCallbackId;
-    private static NetworkThread.ExecuteCallback<LoginResult> loginCallback;
+    private static NetworkThread.ExecuteCallback<LoginResponse> loginCallback;
     private Integer loginCallbackId;
 
     private Button registrationButton;
@@ -57,7 +58,6 @@ public class RegisterFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
@@ -67,6 +67,7 @@ public class RegisterFragment extends Fragment {
         if (registrationCallbackId != null) {
             NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
         }
+        super.onDestroy();
     }
 
     @Override
@@ -83,10 +84,28 @@ public class RegisterFragment extends Fragment {
         return rootView;
     }
 
+
+    public void goToStartFragment() {
+        logInActivity.setCurrentFragment(FragmentType.StartHost);
+        logInActivity.pushFragment(new StartFragment(), true);
+    }
+
     public void goToMainActivity() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        startActivity(intent);
-        getActivity().finish();
+        Intent intent = null;
+        switch (AuthUtils.getRole(logInActivity)) {
+            case "Host":
+                intent = new Intent(logInActivity, HostMainActivity.class);
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                intent = new Intent(logInActivity, ClientMainActivity.class);
+                break;
+        }
+        if (intent != null) {
+            startActivity(intent);
+            logInActivity.finish();
+        }
     }
 
     private final View.OnClickListener onRegistrationClickListener = new View.OnClickListener() {
@@ -108,10 +127,23 @@ public class RegisterFragment extends Fragment {
         progressDialog.setMessage("Регистрация...");
         progressDialog.show();
 
-        final Registrator registrator = retrofitClient().create(Registrator.class);
-        final Call<RegistrationResult> call = registrator.registrate(new Login(login,password));
-        registrationCallbackId = NetworkThread.getInstance().registerCallback(registrationCallback);
-        NetworkThread.getInstance().execute(call, registrationCallbackId);
+        Call<RegistrationResult> call = null;
+        switch (AuthUtils.getRole(logInActivity)) {
+            case "Host":
+                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
+                call = hostApiInterface.registrate(new Login(login,password));
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                final ClientApiInterface clientApiInterface = retrofitClient().create(ClientApiInterface.class);
+                call = clientApiInterface.registrate(new Login(login,password));
+                break;
+        }
+        if (registrationCallbackId == null && call != null) {
+            registrationCallbackId = NetworkThread.getInstance().registerCallback(registrationCallback);
+            NetworkThread.getInstance().execute(call, registrationCallbackId);        }
+
     }
 
     public void onRegistrationResult(RegistrationResult result) {
@@ -123,19 +155,41 @@ public class RegisterFragment extends Fragment {
     private void logIn() {
         final String login = loginInput.getText().toString();
         final String password = passwordInput.getText().toString();
-        final Loginner loginner = retrofitClient().create(Loginner.class);
-        final Call<LoginResult> call = loginner.login(new Login(login,password));
-        loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
-        NetworkThread.getInstance().execute(call,loginCallbackId);
+
+        Call<LoginResponse> call = null;
+        switch (AuthUtils.getRole(logInActivity)) {
+            case "Host":
+                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
+                call = hostApiInterface.login(new Login(login,password));
+                break;
+            case "Staff":
+                break;
+            case "Client":
+                final ClientApiInterface clientApiInterface = retrofitClient().create(ClientApiInterface.class);
+                call = clientApiInterface.login(new Login(login,password));
+                break;
+        }
+        if (loginCallbackId == null && call != null) {
+            loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
+            NetworkThread.getInstance().execute(call, loginCallbackId);
+        }
     }
 
-    public void onLoginResult(LoginResult result) {
+    public void onLoginResult(LoginResponse result) {
+        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+
         if (result.getCode() == 0) {
-            AuthUtils.setAuthorized(getActivity());
-            goToMainActivity();
-        }
-        else  {
-            Toast.makeText(getActivity(), "Данный логин уже занят. Попробуйте другой", Toast.LENGTH_SHORT).show();
+            AuthUtils.setAuthorized(getActivity().getApplicationContext());
+            if (!AuthUtils.getRole(logInActivity).equals("Host")) {                  // staff or client
+                goToMainActivity();
+            } else {
+                if (!result.isHosted())
+                    goToStartFragment();
+                else {
+                    AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+                    goToMainActivity();
+                }
+            }
         }
     }
 
@@ -151,7 +205,7 @@ public class RegisterFragment extends Fragment {
         }
 
         if (password.isEmpty() || password.length() <= 5 ) {
-            passwordInput.setError("Не менее 5 символов");
+            passwordInput.setError("Не менее 6 символов");
             valid = false;
         }
         return valid;
@@ -162,7 +216,6 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onResponse(Call<RegistrationResult> call, Response<RegistrationResult> response) {
                 progressDialog.dismiss();
-                okhttp3.Headers headers = response.headers();
                 String cookie = response.headers().get("Set-Cookie");
                 AuthUtils.setCookie(getActivity(), cookie);
             }
@@ -182,7 +235,10 @@ public class RegisterFragment extends Fragment {
                 progressDialog.dismiss();
                 if (result.getCode() == 0){
                     onRegistrationResult(result);
+                } else if (result.getCode() == 1) {
+                    Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+
 
             }
 
@@ -194,22 +250,23 @@ public class RegisterFragment extends Fragment {
             }
         };
 
-        loginCallback = new NetworkThread.ExecuteCallback<LoginResult>() {
+        loginCallback = new NetworkThread.ExecuteCallback<LoginResponse>() {
             @Override
-            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 String cookie = response.headers().get("Set-Cookie");
                 AuthUtils.setCookie(getActivity(), cookie);
             }
 
             @Override
-            public void onFailure(Call<LoginResult> call, Response<LoginResult> response) {
+            public void onFailure(Call<LoginResponse> call, Response<LoginResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
             }
 
+
             @Override
-            public void onSuccess(LoginResult result) {
+            public void onSuccess(LoginResponse result) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 onLoginResult(result);
