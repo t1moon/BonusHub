@@ -58,7 +58,6 @@ public class RegisterFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
@@ -68,6 +67,7 @@ public class RegisterFragment extends Fragment {
         if (registrationCallbackId != null) {
             NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
         }
+        super.onDestroy();
     }
 
     @Override
@@ -94,17 +94,17 @@ public class RegisterFragment extends Fragment {
         Intent intent = null;
         switch (AuthUtils.getRole(logInActivity)) {
             case "Host":
-                intent = new Intent(getActivity(), HostMainActivity.class);
+                intent = new Intent(logInActivity, HostMainActivity.class);
                 break;
             case "Staff":
                 break;
             case "Client":
-                intent = new Intent(getActivity(), ClientMainActivity.class);
+                intent = new Intent(logInActivity, ClientMainActivity.class);
                 break;
         }
         if (intent != null) {
             startActivity(intent);
-            getActivity().finish();
+            logInActivity.finish();
         }
     }
 
@@ -173,7 +173,6 @@ public class RegisterFragment extends Fragment {
             loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
             NetworkThread.getInstance().execute(call, loginCallbackId);
         }
-
     }
 
     public void onLoginResult(LoginResponse result) {

@@ -46,8 +46,6 @@ public class LogInActivity extends BaseActivity implements StackListner {
             else
                 goToMainActivity();
         }
-
-
     }
 
     public void goToMainActivity() {

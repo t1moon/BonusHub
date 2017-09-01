@@ -56,11 +56,11 @@ public class LogInFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (progressDialog != null)
             progressDialog.dismiss();
         if (loginCallbackId != null)
             NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
+        super.onDestroy();
     }
 
     @Override

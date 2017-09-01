@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.BonusHub.activity.AuthUtils;
 import com.example.BonusHub.activity.activity.ClientMainActivity;
+import com.example.BonusHub.activity.activity.LogInActivity;
 import com.example.BonusHub.activity.recycler.HostAdapter;
 import com.example.BonusHub.activity.recycler.RecyclerTouchListener;
 import com.example.BonusHub.activity.retrofit.ClientApiInterface;
@@ -117,6 +118,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
                 .load(R.drawable.bonus_hub_logo)
                 .fitCenter()
                 .into(imgView);
+
         return rootView;
     }
 

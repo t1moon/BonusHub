@@ -59,15 +59,6 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
 
     private ClientMainActivity mainActivity;
 
-    static {
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectActivityLeaks()
-                .penaltyLog()
-                .penaltyDeath()
-                .build()
-        );
-    }
-
     public final static String CLIENT_NAME = "CLIENT_NAME";
     public final static String CLIENT_IDENTIFICATOR = "CLIENT_IDENTIFICATOR";
     public final static String CLIENT_ID = "CLIENT_ID";
@@ -78,7 +69,6 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mainActivity = this;
         setStackListner(this);
         if (!AuthUtils.isAuthorized(this)) {

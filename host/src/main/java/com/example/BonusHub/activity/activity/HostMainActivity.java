@@ -43,7 +43,6 @@ import static com.example.BonusHub.activity.retrofit.RetrofitFactory.retrofitHos
 
 public class HostMainActivity extends BaseActivity implements StackListner {
     private final static String TAG = HostMainActivity.class.getSimpleName();
-
     private NetworkThread.ExecuteCallback<LogoutResponse> logoutCallback;
     private Integer logoutCallbackId;
 
@@ -72,6 +71,7 @@ public class HostMainActivity extends BaseActivity implements StackListner {
     protected void onCreate(Bundle savedInstanceState) {
         prepareCallbacks();
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         setStackListner(this);
         Log.d("Main", "auth" + AuthUtils.isAuthorized(this) + " " + AuthUtils.isHosted(this));
@@ -116,7 +116,7 @@ public class HostMainActivity extends BaseActivity implements StackListner {
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         appBarLayout.setExpanded(true);
 
-        // hiding & showing the title when toolbar expanded & collapsed
+        // hiding & showing the fab when toolbar expanded & collapsed
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
             int scrollRange = -1;
@@ -127,12 +127,9 @@ public class HostMainActivity extends BaseActivity implements StackListner {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-//                    collapsingToolbar.setTitle(getString(R.string.app_name));
                     fab.hide();
-
                     isShow = true;
                 } else if (isShow) {
-//                    collapsingToolbar.setTitle(" ");
                     Fragment fragment = getSupportFragmentManager().findFragmentById(getFragmentContainerResId());
                     if (fragment instanceof ProfileFragment ||
                             fragment instanceof EditFragment)
@@ -155,13 +152,6 @@ public class HostMainActivity extends BaseActivity implements StackListner {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
         drawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggles
-        drawerToggle.onConfigurationChanged(newConfig);
     }
 
 
@@ -215,7 +205,6 @@ public class HostMainActivity extends BaseActivity implements StackListner {
 
             case MENUITEM_OWNER_SETTINGS:
                 if (fragment.getClass() != OwnerSettingsFragment.class) {
-                    setCurrentFragment(FragmentType.OwnerSettings);
                     fragment = new OwnerSettingsFragment();
                     pushFragment(fragment, true);
                 }
