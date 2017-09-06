@@ -165,10 +165,12 @@ public class StartFragment extends Fragment {
             case R.id.continue_btn:
 
                 //hide keyboard
-                InputMethodManager imm = (InputMethodManager) logInActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(logInActivity.getCurrentFocus().getWindowToken(), 0);
-
-
+                View view = logInActivity.getCurrentFocus();
+                if (view!= null) {
+                    InputMethodManager imm = (InputMethodManager) logInActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+                
                 String title = host_title.getText().toString();
                 String description = host_description.getText().toString();
                 String address = host_address.getText().toString();
