@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BonusHub.iml" filepath="$PROJECT_DIR$/BonusHub.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bonusfeed/bonusfeed.iml" filepath="$PROJECT_DIR$/bonusfeed/bonusfeed.iml" />
       <module fileurl="file://$PROJECT_DIR$/bonushub/bonushub.iml" filepath="$PROJECT_DIR$/bonushub/bonushub.iml" />
     </modules>
   </component>

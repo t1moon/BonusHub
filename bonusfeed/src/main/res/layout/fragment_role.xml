@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="24dp"
+        android:text="Войти как"
+        android:textColor="@color/white"
+        android:textSize="24sp" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/host_role_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:padding="12dp"
+        android:background="@drawable/rounded_accent"
+        android:text="Владелец заведения"
+        android:textColor="@color/colorAccent"/>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/staff_role_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:padding="12dp"
+        android:background="@drawable/rounded_accent"
+        android:text="Сотрудник"
+        android:textColor="@color/colorAccent" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/client_role_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:padding="12dp"
+        android:background="@drawable/rounded_accent"
+        android:text="Клиент"
+        android:textColor="@color/colorAccent" />
+
+</LinearLayout>

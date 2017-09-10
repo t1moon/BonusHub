@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#4e342e</color>
+    <color name="colorPrimaryDark">#260e04</color>
+    <color name="colorPrimaryLight">#8b6b61</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="navigationBarColor">#000000</color>
+    <color name="colorAccent">#546e7a</color>
+    <color name="edit_profile">#5F76BF</color>
+    <color name="colorOverlay">#78ffffff</color>
+    <color name="colorAccentOverlay">#1400bcd4</color>
+    <color name="black">#000</color>
+    <color name="white">#fff</color>
+    <color name="viewPlaceholder">#B3333333</color>
+</resources>

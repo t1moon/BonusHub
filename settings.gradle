@@ -1,1 +1,2 @@
 include ':bonushub'
+include ':bonusfeed'
