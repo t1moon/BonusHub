@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="com.example.BonusHub.activity.fragment.StatisticFragment">
+        tools:context="com.example.BonusHub.fragment.StatisticFragment">
 
         <!--<TableLayout-->
             <!--android:id="@+id/statistic_table"-->
