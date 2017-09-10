@@ -62,31 +62,4 @@ public class AuthUtils {
                 .getString(PREFERENCES_COOKIE_KEY, "");
     }
 
-    public static void setHostRole(Context context){
-        context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
-                .edit()
-                .putString(PREFERENCES_ROLE_KEY, "Host")
-                .apply();
-    }
-
-
-    public static void setStaffRole(Context context){
-        context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
-                .edit()
-                .putString(PREFERENCES_ROLE_KEY, "Staff")
-                .apply();
-    }
-
-    public static void setClientRole(Context context){
-        context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
-                .edit()
-                .putString(PREFERENCES_ROLE_KEY, "Client")
-                .apply();
-    }
-
-    public static String getRole(Context context) {
-        return context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
-                .getString(PREFERENCES_ROLE_KEY, "");
-    }
-
 }

@@ -23,8 +23,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.example.BonusHub.activity.HostMainActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name="com.example.BonusHub.activity.ClientMainActivity" />
     </application>
 

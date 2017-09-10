@@ -6,9 +6,8 @@ import android.os.StrictMode;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.example.BonusHub.fragment.LogInFragment;
 import com.example.BonusHub.utils.AuthUtils;
-import com.example.BonusHub.fragment.RoleFragment;
-import com.example.BonusHub.fragment.StartFragment;
 import com.example.BonusHub.utils.FragmentType;
 import com.example.BonusHub.utils.StackListner;
 import com.example.timur.BonusHub.R;
@@ -37,32 +36,17 @@ public class LogInActivity extends BaseActivity implements StackListner {
             getSupportActionBar().setTitle("");
 
         if (!AuthUtils.isAuthorized(this)) {
-            setupRoleFragment();
+            setupLoginFragment();
         }
         else {
-            if(AuthUtils.getRole(this).equals("Host") && !AuthUtils.isHosted(this))
-                setupStartFragment();
-            else
-                goToMainActivity();
+            goToMainActivity();
         }
     }
 
     public void goToMainActivity() {
-        Intent intent = null;
-        switch (AuthUtils.getRole(this)) {
-            case "Host":
-                intent = new Intent(this, HostMainActivity.class);
-                break;
-            case "Staff":
-                break;
-            case "Client":
-                intent = new Intent(this, ClientMainActivity.class);
-                break;
-        }
-        if (intent != null) {
-            startActivity(intent);
-            this.finish();
-        }
+        Intent intent = new Intent(this, ClientMainActivity.class);
+        startActivity(intent);
+        this.finish();
     }
 
     @Override
@@ -70,14 +54,9 @@ public class LogInActivity extends BaseActivity implements StackListner {
         super.onDestroy();
     }
 
-    private void setupRoleFragment() {
+    private void setupLoginFragment() {
         setCurrentFragment(FragmentType.RoleFragment);
-        pushFragment(new RoleFragment(), true);
-    }
-
-    private void setupStartFragment() {
-        setCurrentFragment(FragmentType.StartHost);
-        pushFragment(new StartFragment(), true);
+        pushFragment(new LogInFragment(), true);
     }
 
 

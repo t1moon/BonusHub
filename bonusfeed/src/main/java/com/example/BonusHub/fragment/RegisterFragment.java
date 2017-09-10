@@ -12,13 +12,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.ClientMainActivity;
-import com.example.BonusHub.activity.HostMainActivity;
 import com.example.BonusHub.activity.LogInActivity;
 import com.example.BonusHub.retrofit.ClientApiInterface;
 import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.utils.FragmentType;
 import com.example.BonusHub.utils.AuthUtils;
-import com.example.BonusHub.retrofit.HostApiInterface;
 import com.example.BonusHub.retrofit.auth.Login;
 import com.example.BonusHub.retrofit.auth.LoginResponse;
 import com.example.BonusHub.retrofit.registration.RegistrationResult;
@@ -82,24 +80,8 @@ public class RegisterFragment extends Fragment {
         return rootView;
     }
 
-
-    public void goToStartFragment() {
-        logInActivity.setCurrentFragment(FragmentType.StartHost);
-        logInActivity.pushFragment(new StartFragment(), true);
-    }
-
     public void goToMainActivity() {
-        Intent intent = null;
-        switch (AuthUtils.getRole(logInActivity)) {
-            case "Host":
-                intent = new Intent(logInActivity, HostMainActivity.class);
-                break;
-            case "Staff":
-                break;
-            case "Client":
-                intent = new Intent(logInActivity, ClientMainActivity.class);
-                break;
-        }
+        Intent intent = new Intent(logInActivity, ClientMainActivity.class);
         if (intent != null) {
             startActivity(intent);
             logInActivity.finish();
@@ -125,19 +107,8 @@ public class RegisterFragment extends Fragment {
         progressDialog.setMessage("Регистрация...");
         progressDialog.show();
 
-        Call<RegistrationResult> call = null;
-        switch (AuthUtils.getRole(logInActivity)) {
-            case "Host":
-                final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
-                call = hostApiInterface.registrate(new Login(login,password));
-                break;
-            case "Staff":
-                break;
-            case "Client":
-                final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-                call = clientApiInterface.registrate(new Login(login,password));
-                break;
-        }
+        final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
+        Call<RegistrationResult> call = clientApiInterface.registrate(new Login(login,password));
         if (registrationCallbackId == null && call != null) {
             registrationCallbackId = NetworkThread.getInstance().registerCallback(registrationCallback);
             NetworkThread.getInstance().execute(call, registrationCallbackId);        }
@@ -154,19 +125,9 @@ public class RegisterFragment extends Fragment {
         final String login = loginInput.getText().toString();
         final String password = passwordInput.getText().toString();
 
-        Call<LoginResponse> call = null;
-        switch (AuthUtils.getRole(logInActivity)) {
-            case "Host":
-                final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
-                call = hostApiInterface.login(new Login(login,password));
-                break;
-            case "Staff":
-                break;
-            case "Client":
-                final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-                call = clientApiInterface.login(new Login(login,password));
-                break;
-        }
+        final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
+        Call<LoginResponse> call = clientApiInterface.login(new Login(login,password));
+
         if (loginCallbackId == null && call != null) {
             loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
             NetworkThread.getInstance().execute(call, loginCallbackId);
@@ -178,16 +139,8 @@ public class RegisterFragment extends Fragment {
 
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            if (!AuthUtils.getRole(logInActivity).equals("Host")) {                  // staff or client
-                goToMainActivity();
-            } else {
-                if (!result.isHosted())
-                    goToStartFragment();
-                else {
-                    AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-                    goToMainActivity();
-                }
-            }
+            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+            goToMainActivity();
         }
     }
 

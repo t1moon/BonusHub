@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BonusHub.utils.AuthUtils;
-import com.example.BonusHub.activity.ClientMainActivity;
 import com.example.BonusHub.retrofit.ClientApiInterface;
 import com.example.BonusHub.retrofit.HostApiInterface;
 import com.example.BonusHub.retrofit.auth.Login;
@@ -160,9 +159,6 @@ public class LogInFragment extends Fragment {
                 intent = new Intent(getActivity(), HostMainActivity.class);
                 break;
             case "Staff":
-                break;
-            case "Client":
-                intent = new Intent(getActivity(), ClientMainActivity.class);
                 break;
         }
         if (intent != null) {

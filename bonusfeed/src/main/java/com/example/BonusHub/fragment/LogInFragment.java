@@ -13,14 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.ClientMainActivity;
-import com.example.BonusHub.activity.HostMainActivity;
 import com.example.BonusHub.activity.LogInActivity;
 import com.example.BonusHub.retrofit.ClientApiInterface;
 import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.threadManager.NetworkThread;
-import com.example.BonusHub.utils.FragmentType;
 import com.example.BonusHub.utils.AuthUtils;
-import com.example.BonusHub.retrofit.HostApiInterface;
 import com.example.BonusHub.retrofit.auth.Login;
 import com.example.BonusHub.retrofit.auth.LoginResponse;
 import com.example.timur.BonusHub.R;
@@ -105,19 +102,8 @@ public class LogInFragment extends Fragment {
         progressDialog.show();
 
 
-        Call<LoginResponse> call = null;
-        switch (AuthUtils.getRole(logInActivity)) {
-            case "Host":
-                final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
-                call = hostApiInterface.login(new Login(login, password));
-                break;
-            case "Staff":
-                break;
-            case "Client":
-                final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-                call = clientApiInterface.login(new Login(login, password));
-                break;
-        }
+        final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
+        Call<LoginResponse> call = clientApiInterface.login(new Login(login, password));
         if (loginCallbackId == null && call != null) {
             loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
             NetworkThread.getInstance().execute(call, loginCallbackId);
@@ -146,26 +132,11 @@ public class LogInFragment extends Fragment {
         logInActivity.pushFragment(new RegisterFragment(), true);
     }
 
-    public void goToStartFragment() {
-        logInActivity.setCurrentFragment(FragmentType.StartHost);
-        logInActivity.pushFragment(new StartFragment(), false);
-    }
-
     public void goToMainActivity() {
-        Intent intent = null;
-        switch (AuthUtils.getRole(logInActivity)) {
-            case "Host":
-                intent = new Intent(getActivity(), HostMainActivity.class);
-                break;
-            case "Staff":
-                break;
-            case "Client":
-                intent = new Intent(getActivity(), ClientMainActivity.class);
-                break;
-        }
+        Intent intent = new Intent(getActivity(), ClientMainActivity.class);
         if (intent != null) {
             startActivity(intent);
-            getActivity().finish();
+            logInActivity.finish();
         }
     }
 
@@ -207,16 +178,7 @@ public class LogInFragment extends Fragment {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            if (!AuthUtils.getRole(logInActivity).equals("Host")) {                  // staff or client
-                goToMainActivity();
-            } else {
-                if (!result.isHosted())
-                    goToStartFragment();
-                else {
-                    AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-                    goToMainActivity();
-                }
-            }
+            goToMainActivity();
         }
     }
 }

@@ -1,12 +1,10 @@
-package com.example.BonusHub.activity.retrofit.updatePoints;
+package com.example.BonusHub.retrofit.updatePoints;
 
 /**
  * Created by Timur on 12-May-17.
  */
 
 import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
 
 public class UpdatePointsResponse {
 

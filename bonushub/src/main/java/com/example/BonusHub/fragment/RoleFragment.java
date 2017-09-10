@@ -16,7 +16,6 @@ public class RoleFragment extends Fragment {
     private LogInActivity logInActivity;
     private Button hostButton;
     private Button staffButton;
-    private Button clientButton;
 
     View rootView;
     public RoleFragment() {
@@ -36,11 +35,9 @@ public class RoleFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_role, container, false);
         hostButton = (Button) rootView.findViewById(R.id.host_role_btn);
         staffButton = (Button) rootView.findViewById(R.id.staff_role_btn);
-        clientButton= (Button) rootView.findViewById(R.id.client_role_btn);
 
         hostButton.setOnClickListener(onHostButtonClickListener);
         staffButton.setOnClickListener(onStaffButtonClickListener);
-        clientButton.setOnClickListener(onClientButtonClickListener);
 
         return rootView;
     }
@@ -57,14 +54,6 @@ public class RoleFragment extends Fragment {
         @Override
         public void onClick(View v) {
             AuthUtils.setStaffRole(getActivity());
-        }
-    };
-
-    private View.OnClickListener onClientButtonClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            AuthUtils.setClientRole(getActivity());
-            goToLoginFragment();
         }
     };
 

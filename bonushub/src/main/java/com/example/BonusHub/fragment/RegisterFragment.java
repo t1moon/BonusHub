@@ -16,7 +16,6 @@ import com.example.BonusHub.retrofit.HostApiInterface;
 import com.example.BonusHub.retrofit.auth.LoginResponse;
 import com.example.BonusHub.threadManager.NetworkThread;
 import com.example.BonusHub.utils.AuthUtils;
-import com.example.BonusHub.activity.ClientMainActivity;
 import com.example.BonusHub.retrofit.ClientApiInterface;
 import com.example.BonusHub.retrofit.auth.Login;
 import com.example.BonusHub.activity.LogInActivity;
@@ -97,9 +96,6 @@ public class RegisterFragment extends Fragment {
                 intent = new Intent(logInActivity, HostMainActivity.class);
                 break;
             case "Staff":
-                break;
-            case "Client":
-                intent = new Intent(logInActivity, ClientMainActivity.class);
                 break;
         }
         if (intent != null) {
