@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,6 +163,14 @@ public class RegisterFragment extends Fragment {
         return valid;
     }
 
+    private void showError(Throwable error) {
+        new AlertDialog.Builder(logInActivity)
+                .setTitle("Упс!")
+                .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
     private void prepareCallbacks() {
         registrationCallback = new NetworkThread.ExecuteCallback<RegistrationResult>() {
             @Override
@@ -176,7 +185,13 @@ public class RegisterFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
                 registrationCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                if (response.code() == 409) {
+                    Toast.makeText(getActivity(), "Пользователь с таким именем уже существует. Выберите другое", Toast.LENGTH_SHORT).show();
+                }
+                else if (response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
+
             }
 
             @Override
@@ -212,7 +227,7 @@ public class RegisterFragment extends Fragment {
             public void onFailure(Call<LoginResponse> call, Response<LoginResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
-                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
             }
 
 
@@ -227,7 +242,8 @@ public class RegisterFragment extends Fragment {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
-                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+                showError(ex);
+                //Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
             }
         };
     }

@@ -19,7 +19,6 @@ public class RetrofitFactory {
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
-
     public static Retrofit retrofitHost() {
         return HOST_INSTANCE;
     }

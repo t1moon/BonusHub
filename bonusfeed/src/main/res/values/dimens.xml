@@ -24,4 +24,5 @@
         <dimen name="material_vertical">24dp</dimen>
         <dimen name="material_vertical_between">16dp</dimen>
         <dimen name="material_horizontal">16dp</dimen>
+        <dimen name="square_map_size">120dp</dimen>
 </resources>

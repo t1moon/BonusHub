@@ -324,9 +324,15 @@ public class EditFragment extends Fragment {
             public void onFailure(Call<UploadResponse> call, Response<UploadResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
                 uploadCallbackId = null;
-                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
-                AuthUtils.logout(getActivity().getApplicationContext());
-                goToLogin();
+                if (response.code() == 403) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -344,7 +350,11 @@ public class EditFragment extends Fragment {
                 uploadCallbackId = null;
                 NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
                 uploadCallbackId = null;
-                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Упс!")
+                        .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
+                        .setPositiveButton("OK", null)
+                        .show();
             }
         };
 
@@ -358,9 +368,15 @@ public class EditFragment extends Fragment {
             public void onFailure(Call<EditResponse> call, Response<EditResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(editCallbackId);
                 editCallbackId = null;
-                Toast.makeText(getActivity(), response.body().toString(), Toast.LENGTH_SHORT).show();
-                AuthUtils.logout(getActivity().getApplicationContext());
-                goToLogin();
+                if (response.code() == 403) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
 
@@ -375,7 +391,11 @@ public class EditFragment extends Fragment {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(editCallbackId);
                 editCallbackId = null;
-                showError(ex);
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Упс!")
+                        .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
+                        .setPositiveButton("OK", null)
+                        .show();
             }
         };
 

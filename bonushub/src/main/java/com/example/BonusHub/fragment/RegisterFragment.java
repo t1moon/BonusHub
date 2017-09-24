@@ -272,7 +272,7 @@ public class RegisterFragment extends Fragment {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
-                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
             }
         };
     }

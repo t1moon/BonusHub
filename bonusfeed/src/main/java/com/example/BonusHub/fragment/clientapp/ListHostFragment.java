@@ -238,9 +238,15 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     public void onFailure(Call<HostListResponse> call, Response<HostListResponse> response) {
         NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
         hostsCallbackId = null;
-        Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
-        AuthUtils.logout(getActivity());
-        AuthUtils.setCookie(getActivity(), "");
+        if (response.code() == 403) {
+            Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+            AuthUtils.logout(getActivity());
+            AuthUtils.setCookie(getActivity(), "");
+
+        }
+        else if(response.code() > 500) {
+            Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

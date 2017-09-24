@@ -55,7 +55,7 @@ public class LogInActivity extends BaseActivity implements StackListner {
     }
 
     private void setupLoginFragment() {
-        setCurrentFragment(FragmentType.RoleFragment);
+        setCurrentFragment(FragmentType.LogInFragment);
         pushFragment(new LogInFragment(), true);
     }
 

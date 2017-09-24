@@ -183,7 +183,7 @@ public class LogInFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -196,7 +196,7 @@ public class LogInFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Ошибка соединения с сервером. Проверьте интернет подключение.", Toast.LENGTH_SHORT).show();
             }
         };
     }

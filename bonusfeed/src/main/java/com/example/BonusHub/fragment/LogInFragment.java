@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -136,8 +138,16 @@ public class LogInFragment extends Fragment {
         Intent intent = new Intent(getActivity(), ClientMainActivity.class);
         if (intent != null) {
             startActivity(intent);
-            logInActivity.finish();
+            getActivity().finish();
         }
+    }
+
+    private void showError(Throwable error) {
+        new AlertDialog.Builder(logInActivity)
+                .setTitle("Упс!")
+                .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private void prepareCallbacks() {
@@ -156,7 +166,7 @@ public class LogInFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -169,7 +179,8 @@ public class LogInFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Ошибка соединения с сервером. Проверьте интернет подключение.", Toast.LENGTH_SHORT).show();
+                showError(ex);
             }
         };
     }

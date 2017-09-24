@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -264,7 +265,7 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
     }
 
     private void onLogoutResult() {
-        Toast.makeText(this, "You are logged out", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Вы успешно вышли из системы", Toast.LENGTH_SHORT).show();
         AuthUtils.logout(this);
         goToLogIn();
     }
@@ -312,9 +313,9 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
         String message;
 
         if (isConnected) {
-            message = "Connected to internet";
+            message = "Есть соединение";
         } else {
-            message = "Sorry! No connection to internet";
+            message = "Ожидание подключения";
         }
 
         Snackbar snackbar = Snackbar
@@ -322,6 +323,13 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
         snackbar.show();
     }
 
+    private void showError(Throwable error) {
+        new AlertDialog.Builder(this)
+                .setTitle("Упс!")
+                .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
+                .setPositiveButton("OK", null)
+                .show();
+    }
 
     private void prepareCallbacks() {
         logoutCallback = new NetworkThread.ExecuteCallback<LogoutResponse>() {
@@ -348,7 +356,8 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
-                Toast.makeText(ClientMainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                showError(ex);
+                //Toast.makeText(ClientMainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -363,7 +372,16 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
             public void onFailure(Call<ClientInfoResponse> call, Response<ClientInfoResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(clientCallbackId);
                 clientCallbackId = null;
-                Toast.makeText(mainActivity, response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                if (response.code() == 403) {
+                    Toast.makeText(mainActivity, "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(mainActivity);
+                    AuthUtils.setCookie(mainActivity, "");
+                    goToLogIn();
+
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(mainActivity, "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -393,7 +411,8 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(clientCallbackId);
                 clientCallbackId = null;
-                Toast.makeText(ClientMainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                showError(ex);
+                //Toast.makeText(ClientMainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
         };
 

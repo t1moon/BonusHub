@@ -8,12 +8,7 @@ public enum FragmentType {
     QR,
     ListHost,
     AboutHost,
-    ProfileHost,
-    StartHost,
     RegisterFragment,
     LogInFragment,
-    RoleFragment,
-    EditHost,
-    Statistic,
-    OwnerSettings
+    ProfileHost
 }
