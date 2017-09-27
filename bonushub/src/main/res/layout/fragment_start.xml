@@ -62,7 +62,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Адрес" />
+                <fragment
+                    android:id="@+id/place_autocomplete_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment" />
             </android.support.design.widget.TextInputLayout>
+            <!--<com.seatgeek.placesautocomplete.PlacesAutocompleteTextView-->
+                <!--android:id="@+id/places_autocomplete"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--app:pacv_googleMapsApiKey="@string/google_maps_key"/>-->
         </LinearLayout>
 
         <LinearLayout

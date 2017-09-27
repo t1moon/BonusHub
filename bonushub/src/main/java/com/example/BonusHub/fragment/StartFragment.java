@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -31,7 +33,15 @@ import com.example.BonusHub.utils.FragmentType;
 import com.example.BonusHub.activity.LogInActivity;
 import com.example.BonusHub.executor.DbExecutorService;
 import com.example.timur.BonusHub.R;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -67,6 +77,7 @@ public class StartFragment extends Fragment {
         super.onCreate(savedInstanceState);
         logInActivity = (LogInActivity) getActivity();
         prepareCallbacks();
+
     }
 
     @Override
@@ -174,12 +185,34 @@ public class StartFragment extends Fragment {
                 String title = host_title.getText().toString();
                 String description = host_description.getText().toString();
                 String address = host_address.getText().toString();
+                Boolean geoResult = false;
+                Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
+                Integer lat;
+                Integer lon;
+                List<Address> addresses;
+                try {
+                    addresses = geoCoder.getFromLocationName(address, 3);
+                    if (addresses.size() > 0) {
+                        lat = (int) (addresses.get(0).getLatitude() * 1E6);
+                        lon = (int) (addresses.get(0).getLongitude() * 1E6);
+                        Toast.makeText(logInActivity, addresses.get(0).getCountryName(), Toast.LENGTH_SHORT).show();
+                        geoResult = true;
+                    }
+                    else {
+                        geoResult = false;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    geoResult = false;
+                }
                 if (title.equals(""))
                     host_title.setError("Введите название");
                 else if (description.equals(""))
                     host_description.setError("Введите описание");
                 else if (address.equals(""))
                     host_address.setError("Введите адрес");
+                else if (!geoResult)
+                    host_address.setError("Неверный адрес");
                 else {
                     Host host = new Host(title, description, address);
                     host.setTime_open(open_hour * 60 + open_minute);
