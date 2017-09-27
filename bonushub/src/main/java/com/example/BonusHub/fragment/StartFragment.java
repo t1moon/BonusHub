@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.BonusHub.Location;
 import com.example.BonusHub.activity.HostMainActivity;
 import com.example.BonusHub.db.host.Host;
 import com.example.BonusHub.retrofit.HostApiInterface;
@@ -33,11 +34,12 @@ import com.example.BonusHub.utils.FragmentType;
 import com.example.BonusHub.activity.LogInActivity;
 import com.example.BonusHub.executor.DbExecutorService;
 import com.example.timur.BonusHub.R;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
@@ -50,7 +52,7 @@ import retrofit2.Response;
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitHost;
 
-public class StartFragment extends Fragment {
+public class StartFragment extends Fragment  implements OnMapReadyCallback {
 
     private static DbExecutorService.DbExecutorCallback dBHostCallback;
     private static NetworkThread.ExecuteCallback<HostResult> netHostCallback;
@@ -66,6 +68,10 @@ public class StartFragment extends Fragment {
     private LogInActivity logInActivity;
     private ProgressDialog progressDialog;
 
+    private SupportMapFragment mapFragment;
+    private GoogleMap map;
+    private Location location;
+
     View rootView;
 
     public StartFragment() {
@@ -77,7 +83,6 @@ public class StartFragment extends Fragment {
         super.onCreate(savedInstanceState);
         logInActivity = (LogInActivity) getActivity();
         prepareCallbacks();
-
     }
 
     @Override
@@ -121,6 +126,28 @@ public class StartFragment extends Fragment {
             }
         });
 
+        mapFragment = (SupportMapFragment) (getChildFragmentManager()
+                .findFragmentById(R.id.mini_map));
+        mapFragment.getMapAsync(this);
+
+        host_address.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    if (map != null) {
+                        Location currentLocation = getLocation();
+                        if (currentLocation != null) {
+                            map.clear();
+                            LatLng pos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongtitude());
+                            map.addMarker(new MarkerOptions()
+                                    .position(pos)
+                                    .title("Ваше кафе"));
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
+                        }
+                    }
+                }
+            }
+        });
         setHasOptionsMenu(true);
 
         return rootView;
@@ -169,6 +196,27 @@ public class StartFragment extends Fragment {
         timePickerDialog.show();
     }
 
+    private Location getLocation() {
+        String address = host_address.getText().toString();
+        Boolean geoResult = false;
+        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
+        List<Address> addresses;
+        try {
+            addresses = geoCoder.getFromLocationName(address, 3);
+            if (addresses.size() > 0) {
+                Location currentLoc = new Location(addresses.get(0).getAddressLine(0),
+                        addresses.get(0).getLatitude(),
+                        addresses.get(0).getLongitude());
+                return currentLoc;
+            }
+            else {
+                return null;
+            }
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -185,33 +233,15 @@ public class StartFragment extends Fragment {
                 String title = host_title.getText().toString();
                 String description = host_description.getText().toString();
                 String address = host_address.getText().toString();
-                Boolean geoResult = false;
-                Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
-                Integer lat;
-                Integer lon;
-                List<Address> addresses;
-                try {
-                    addresses = geoCoder.getFromLocationName(address, 3);
-                    if (addresses.size() > 0) {
-                        lat = (int) (addresses.get(0).getLatitude() * 1E6);
-                        lon = (int) (addresses.get(0).getLongitude() * 1E6);
-                        Toast.makeText(logInActivity, addresses.get(0).getCountryName(), Toast.LENGTH_SHORT).show();
-                        geoResult = true;
-                    }
-                    else {
-                        geoResult = false;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    geoResult = false;
-                }
+                Location hubLocation = getLocation();
+                address = hubLocation.getAddress();
                 if (title.equals(""))
                     host_title.setError("Введите название");
                 else if (description.equals(""))
                     host_description.setError("Введите описание");
                 else if (address.equals(""))
                     host_address.setError("Введите адрес");
-                else if (!geoResult)
+                else if (hubLocation == null)
                     host_address.setError("Неверный адрес");
                 else {
                     Host host = new Host(title, description, address);
@@ -249,6 +279,8 @@ public class StartFragment extends Fragment {
         getActivity().getPreferences(MODE_PRIVATE).edit()
                 .putInt("host_id", host_id).apply();
     }
+
+
 
 
     private void prepareCallbacks() {
@@ -301,4 +333,20 @@ public class StartFragment extends Fragment {
             }
         };
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                map.clear();
+                map.addMarker(new MarkerOptions()
+                        .position(point)
+                        .title("Ваше кафе"));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(point,17));
+            }
+        });
+    }
+
 }
