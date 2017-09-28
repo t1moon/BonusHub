@@ -194,19 +194,6 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `t1moon$bonus_db`.`transactiontype`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `t1moon$bonus_db`.`transactiontype` ;
-
-CREATE TABLE IF NOT EXISTS `t1moon$bonus_db`.`transactiontype` (
-  `transactiontype_id` INT(11) NOT NULL,
-  `transactionTypeName` VARCHAR(50) NULL DEFAULT NULL,
-  PRIMARY KEY (`transactiontype_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
 -- Table `t1moon$bonus_db`.`transactions`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `t1moon$bonus_db`.`transactions` ;
@@ -219,7 +206,6 @@ CREATE TABLE IF NOT EXISTS `t1moon$bonus_db`.`transactions` (
   `amount` INT(11) NOT NULL,
   PRIMARY KEY (`host_id`, `client_id`, `transactionTime`),
   INDEX `fk_client_id_idx` (`client_id` ASC),
-  INDEX `fk_type_idx` (`type_id` ASC),
   CONSTRAINT `fk_client_id`
     FOREIGN KEY (`client_id`)
     REFERENCES `t1moon$bonus_db`.`client` (`client_id`)
@@ -228,11 +214,6 @@ CREATE TABLE IF NOT EXISTS `t1moon$bonus_db`.`transactions` (
   CONSTRAINT `fk_host_id`
     FOREIGN KEY (`host_id`)
     REFERENCES `t1moon$bonus_db`.`host` (`host_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_type`
-    FOREIGN KEY (`type_id`)
-    REFERENCES `t1moon$bonus_db`.`transactiontype` (`transactiontype_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
