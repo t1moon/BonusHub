@@ -81,7 +81,7 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
                 // set default
                 Glide
                         .with(context)
-                        .load(R.drawable.test2)
+                        .load(R.drawable.test3)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(holder.thumbnail);
             }
