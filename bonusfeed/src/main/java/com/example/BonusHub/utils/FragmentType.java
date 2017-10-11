@@ -10,5 +10,6 @@ public enum FragmentType {
     AboutHost,
     RegisterFragment,
     LogInFragment,
-    ProfileHost
+    ProfileHost,
+    MapFragment
 }

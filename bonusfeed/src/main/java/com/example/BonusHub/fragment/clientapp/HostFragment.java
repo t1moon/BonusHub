@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.BonusHub.Location;
+import com.example.BonusHub.activity.ClientMainActivity;
 import com.example.BonusHub.db.host.Host;
 import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.db.HelperFactory;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class HostFragment extends Fragment implements OnMapReadyCallback {
+
+    private ClientMainActivity mainActivity;
 
     private TextView host_open_time_tv;
     private TextView host_close_time_tv;
@@ -49,6 +52,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mainActivity = (ClientMainActivity) getActivity();
     }
 
 
@@ -127,8 +131,14 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
                     .load(pathToImageProfile)
                     .fitCenter()
                     .into(imgView);
+        }
+    }
 
-            if (map != null) {
+    private void setMap() {
+        String address = host_address.getText().toString();
+        String title = host_title.getText().toString();
+        host_address.setText(address);
+        if (map != null) {
                 Location currentLocation = getLocation(address);
                 if (currentLocation != null) {
                     LatLng pos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongtitude());
@@ -137,8 +147,19 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
                             .title(title));
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
                 }
-            }
         }
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                goToMapFragment();
+            }
+        });
+    }
+
+    private void goToMapFragment() {
+        final Bundle bundle = new Bundle();
+        bundle.putInt("host_id", host_id);
+        mainActivity.pushFragment(new MapFragment(), true, bundle);
     }
 
     private Location getLocation(String address) {
@@ -163,6 +184,6 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        setInfo();
+        setMap();
     }
 }
