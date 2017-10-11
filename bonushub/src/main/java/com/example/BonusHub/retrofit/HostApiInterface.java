@@ -6,11 +6,7 @@ import com.example.BonusHub.retrofit.editInfo.UploadResponse;
 import com.example.BonusHub.retrofit.getInfo.GetInfoResponse;
 import com.example.BonusHub.retrofit.updatePoints.UpdatePointsPojo;
 import com.example.BonusHub.retrofit.updatePoints.UpdatePointsResponse;
-import com.example.BonusHub.retrofit.auth.Login;
-import com.example.BonusHub.retrofit.auth.LoginResponse;
-import com.example.BonusHub.retrofit.auth.LogoutResponse;
 import com.example.BonusHub.retrofit.host.HostResult;
-import com.example.BonusHub.retrofit.registration.RegistrationResult;
 import com.example.BonusHub.retrofit.statistic.StatisticResponse;
 import com.example.BonusHub.db.host.Host;
 
@@ -27,23 +23,6 @@ import retrofit2.http.Path;
 
 
 public interface HostApiInterface {
-    @POST("register/")
-    @Headers({
-            "Accept: application/json"
-    })
-    Call<RegistrationResult> registrate(@Body Login login);
-
-    @POST("login/")
-    @Headers({
-            "Accept: application/json"
-    })
-    Call<LoginResponse> login(@Body Login login);
-
-    @POST("logout/")
-    @Headers({
-            "Accept: application/json"
-    })
-    Call<LogoutResponse> logout(@Header("Cookie")String cookie);
 
     @POST("create/")
     @Headers({

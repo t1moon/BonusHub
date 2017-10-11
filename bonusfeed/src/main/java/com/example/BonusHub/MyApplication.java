@@ -1,6 +1,7 @@
 package com.example.BonusHub;
 
 import android.app.Application;
+import android.content.Intent;
 
 import com.example.BonusHub.db.HelperFactory;
 
@@ -16,6 +17,8 @@ public class MyApplication extends Application {
         super.onCreate();
         HelperFactory.setHelper(getApplicationContext());
         mInstance = this;
+        final Intent intent = new Intent(this, MyService.class);
+        startService(intent);
     }
 
     @Override

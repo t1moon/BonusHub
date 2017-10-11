@@ -12,8 +12,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.BonusHub.retrofit.CommonApiInterface;
+import com.example.BonusHub.retrofit.RetrofitFactory;
+import com.example.BonusHub.retrofit.getInfo.GetInfoResponse;
 import com.example.BonusHub.utils.AuthUtils;
-import com.example.BonusHub.retrofit.ClientApiInterface;
 import com.example.BonusHub.retrofit.HostApiInterface;
 import com.example.BonusHub.retrofit.auth.Login;
 import com.example.BonusHub.retrofit.auth.LoginResponse;
@@ -26,7 +28,6 @@ import com.example.timur.BonusHub.R;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitClient;
 import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitHost;
 
 public class LogInFragment extends Fragment {
@@ -34,6 +35,8 @@ public class LogInFragment extends Fragment {
 
     private static NetworkThread.ExecuteCallback<LoginResponse> loginCallback;
     private Integer loginCallbackId;
+    private static NetworkThread.ExecuteCallback<GetInfoResponse> netInfoCallback;
+    private Integer netInfoCallbackId;
 
     private Button logInButton;
     private TextView registrationButton;
@@ -109,14 +112,10 @@ public class LogInFragment extends Fragment {
         Call<LoginResponse> call = null;
         switch (AuthUtils.getRole(logInActivity)) {
             case "Host":
-                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
-                call = hostApiInterface.login(new Login(login, password));
+                final CommonApiInterface commonApiInterface = retrofitHost().create(CommonApiInterface.class);
+                call = commonApiInterface.login(new Login(login, password));
                 break;
             case "Staff":
-                break;
-            case "Client":
-                final ClientApiInterface clientApiInterface = retrofitClient().create(ClientApiInterface.class);
-                call = clientApiInterface.login(new Login(login, password));
                 break;
         }
         if (loginCallbackId == null && call != null) {
@@ -167,7 +166,45 @@ public class LogInFragment extends Fragment {
         }
     }
 
+    public void onInfoResult(GetInfoResponse result) {
+        if (result.getTitle() == null) {
+            goToStartFragment();
+        }
+        else {
+            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+            goToMainActivity();
+        }
+    }
+
     private void prepareCallbacks() {
+        netInfoCallback = new NetworkThread.ExecuteCallback<GetInfoResponse>() {
+            @Override
+            public void onResponse(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
+                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
+                netInfoCallbackId = null;
+                progressDialog.dismiss();
+                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(GetInfoResponse result) {
+                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
+                netInfoCallbackId = null;
+                onInfoResult(result);
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
+                netInfoCallbackId = null;
+            }
+        };
+
         loginCallback = new NetworkThread.ExecuteCallback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
@@ -208,11 +245,15 @@ public class LogInFragment extends Fragment {
             if (!AuthUtils.getRole(logInActivity).equals("Host")) {                  // staff or client
                 goToMainActivity();
             } else {
-                if (!result.isHosted())
-                    goToStartFragment();
-                else {
-                    AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-                    goToMainActivity();
+                final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
+                final Call<GetInfoResponse> call = hostApiInterface.getInfo(AuthUtils.getCookie(logInActivity.getApplicationContext()));
+                if (netInfoCallbackId == null) {
+                    progressDialog = new ProgressDialog(logInActivity);
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setMessage("Получаем данные о заведении...");
+                    progressDialog.show();
+                    netInfoCallbackId = NetworkThread.getInstance().registerCallback(netInfoCallback);
+                    NetworkThread.getInstance().execute(call, netInfoCallbackId);
                 }
             }
         }

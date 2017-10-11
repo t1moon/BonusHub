@@ -7,7 +7,14 @@ package com.example.BonusHub.retrofit.auth;
 public class LogoutResponse {
     private int code;
 
+    private String message;
+
     public int getCode() {
         return code;
     }
+
+    public String getMessage() {
+        return message;
+    }
+
 }

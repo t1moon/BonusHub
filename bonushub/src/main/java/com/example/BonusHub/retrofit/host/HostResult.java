@@ -7,7 +7,19 @@ package com.example.BonusHub.retrofit.host;
 public class HostResult {
     private int code;
 
+    private String host_id;
+
+    private String message;
+
     public int getCode() {
         return code;
+    }
+
+    public String getHostId() {
+        return host_id;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

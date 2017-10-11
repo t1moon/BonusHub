@@ -14,7 +14,7 @@ public class Client {
     public final static String CLIENT_NAME_FIELD_NAME = "name";
     public final static String CLIENT_IDENTIFICATOR_FIELD_NAME = "identificator";
     @DatabaseField(generatedId = true, columnName = CLIENT_ID_FIELD_NAME)
-    private int Id;
+    private String Id;
 
     @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = CLIENT_NAME_FIELD_NAME)
     private String name;
@@ -30,7 +30,7 @@ public class Client {
         this.identificator = description;
     }
 
-    public int getId() {
+    public String getId() {
         return Id;
     }
 

@@ -7,9 +7,11 @@ package com.example.BonusHub.retrofit.auth;
 public class LoginResponse {
     private int code;
 
-    private boolean isHosted;
-
     private String message;
+
+    private String user_id;
+
+    private String host_id;
 
     public int getCode() {
         return code;
@@ -19,7 +21,13 @@ public class LoginResponse {
         return message;
     }
 
-    public boolean isHosted() {
-        return isHosted;
+    public String getUserId() {
+        return user_id;
     }
+
+    public String getHostId() {
+        return host_id;
+    }
+
+
 }
