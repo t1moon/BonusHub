@@ -296,7 +296,7 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                 progressDialog.dismiss();
                 NetworkThread.getInstance().unRegisterCallback(netHostCallbackId);
                 netHostCallbackId = null;
-                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), String.valueOf(response.code()), Toast.LENGTH_SHORT).show();
                 AuthUtils.logout(getActivity().getApplicationContext());
                 goToLogin();
             }
@@ -306,6 +306,9 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
             public void onSuccess(HostResult result) {
                 if (result.getCode() == 0) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+                    getActivity().getPreferences(MODE_PRIVATE).edit()
+                            .putString("host_ident", result.getHostId()).apply();
+                    Toast.makeText(getActivity(), result.getHostId(), Toast.LENGTH_SHORT).show();
                     goToMainActivity();
                 }
                 else

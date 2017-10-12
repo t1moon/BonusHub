@@ -65,6 +65,6 @@ public interface HostApiInterface {
     @Headers({
             "Accept: application/json"
     })
-    Call<GetInfoResponse> getInfo(@Header("Cookie")String cookie);
+    Call<GetInfoResponse> getInfo(@Body Identificator host_id, @Header("Cookie")String cookie);
 
 }

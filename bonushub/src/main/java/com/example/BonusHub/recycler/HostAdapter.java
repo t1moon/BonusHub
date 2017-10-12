@@ -69,7 +69,7 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
             holder.descrpition.setText(host.getDescription());
             holder.points.setText(Integer.toString(point));
             if (host.getProfile_image() != null) {
-                String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
+                String pathToImageProfile = RetrofitFactory.retrofitHost().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
                 // loading album cover using Glide library
                 Log.d("Image", pathToImageProfile);
                 Glide
