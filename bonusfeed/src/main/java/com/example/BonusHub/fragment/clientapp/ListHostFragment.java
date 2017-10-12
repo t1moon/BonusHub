@@ -159,7 +159,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         swipeRefreshLayout.setRefreshing(true);
         clientHostsList.clear();
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(AuthUtils.getCookie(mainActivity));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(AuthUtils.getCookie(mainActivity.getApplicationContext()));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(this);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
@@ -240,8 +240,8 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         hostsCallbackId = null;
         if (response.code() == 403) {
             Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
-            AuthUtils.logout(getActivity());
-            AuthUtils.setCookie(getActivity(), "");
+            AuthUtils.logout(getActivity().getApplicationContext());
+            AuthUtils.setCookie(getActivity().getApplicationContext(), "");
 
         }
         else if(response.code() > 500) {

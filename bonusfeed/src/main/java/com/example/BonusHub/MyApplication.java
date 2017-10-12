@@ -17,8 +17,6 @@ public class MyApplication extends Application {
         super.onCreate();
         HelperFactory.setHelper(getApplicationContext());
         mInstance = this;
-        final Intent intent = new Intent(this, MyService.class);
-        startService(intent);
     }
 
     @Override

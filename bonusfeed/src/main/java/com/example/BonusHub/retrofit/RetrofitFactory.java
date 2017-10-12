@@ -9,18 +9,28 @@ public class RetrofitFactory {
     }
 
     private final static Retrofit HOST_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://t1moon.pythonanywhere.com/api/host/")
+            .baseUrl("http://195.19.44.158:11250/api/host/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
     public final static String MEDIA_URL = "media/";
 
-    private final static Retrofit CLIENT_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://t1moon.pythonanywhere.com/api/client/")
+    private final static Retrofit COMMON_INSTANCE = new Retrofit.Builder()
+            .baseUrl("http://195.19.44.158:11250/api/user/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
+    private final static Retrofit CLIENT_INSTANCE = new Retrofit.Builder()
+            .baseUrl("http://195.19.44.158:11250/api/client/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+
     public static Retrofit retrofitHost() {
         return HOST_INSTANCE;
+    }
+
+    public static Retrofit retrofitCommon() {
+        return COMMON_INSTANCE;
     }
 
     public static Retrofit retrofitClient() {

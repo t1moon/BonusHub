@@ -9,6 +9,10 @@ public class LoginResponse {
 
     private boolean isHosted;
 
+    private String user_id;
+
+    private String host_id;
+
     private String message;
 
     public int getCode() {
@@ -21,5 +25,13 @@ public class LoginResponse {
 
     public boolean isHosted() {
         return isHosted;
+    }
+
+    public String getUserId() {
+        return user_id;
+    }
+
+    public String getHostId() {
+        return host_id;
     }
 }

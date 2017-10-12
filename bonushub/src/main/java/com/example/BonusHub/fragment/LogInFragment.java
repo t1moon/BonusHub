@@ -222,7 +222,7 @@ public class LogInFragment extends Fragment {
                 }
                 else {
                     AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
-                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getHostId());
+                    AuthUtils.setHostId(getActivity().getApplicationContext(), result.getHostId());
                     AuthUtils.setHosted(getActivity().getApplicationContext(), true);
                     goToMainActivity();
                 }
