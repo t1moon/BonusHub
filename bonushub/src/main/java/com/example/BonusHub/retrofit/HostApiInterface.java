@@ -5,6 +5,11 @@ import com.example.BonusHub.retrofit.client.ClientResponse;
 import com.example.BonusHub.retrofit.editInfo.EditResponse;
 import com.example.BonusHub.retrofit.editInfo.UploadResponse;
 import com.example.BonusHub.retrofit.getInfo.GetInfoResponse;
+import com.example.BonusHub.retrofit.staff.GetStaffResponse;
+import com.example.BonusHub.retrofit.staff.Hire;
+import com.example.BonusHub.retrofit.staff.HireResponse;
+import com.example.BonusHub.retrofit.staff.Retire;
+import com.example.BonusHub.retrofit.staff.RetireResponse;
 import com.example.BonusHub.retrofit.updatePoints.UpdatePointsPojo;
 import com.example.BonusHub.retrofit.updatePoints.UpdatePointsResponse;
 import com.example.BonusHub.retrofit.host.HostResult;
@@ -79,8 +84,20 @@ public interface HostApiInterface {
     @Headers({
             "Accept: application/json"
     })
-    Call<GetInfoResponse> getStaff(@Header("Cookie")String cookie);
+    Call<GetStaffResponse> getStaff(@Header("Cookie")String cookie);
 
+    @POST("hire/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<HireResponse> hire(@Body Hire hire, @Header("Cookie")String cookie);
+
+
+    @POST("retire/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<RetireResponse> retire(@Body Retire retire, @Header("Cookie")String cookie);
 
 
 }

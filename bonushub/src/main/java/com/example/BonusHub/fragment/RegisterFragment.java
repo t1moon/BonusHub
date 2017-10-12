@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.HostMainActivity;
+import com.example.BonusHub.activity.StaffMainActivity;
 import com.example.BonusHub.retrofit.CommonApiInterface;
 import com.example.BonusHub.retrofit.HostApiInterface;
 import com.example.BonusHub.retrofit.RetrofitFactory;
@@ -99,6 +100,7 @@ public class RegisterFragment extends Fragment {
                 intent = new Intent(logInActivity, HostMainActivity.class);
                 break;
             case "Staff":
+                intent = new Intent(logInActivity, StaffMainActivity.class);
                 break;
         }
         if (intent != null) {
@@ -127,12 +129,13 @@ public class RegisterFragment extends Fragment {
         progressDialog.show();
 
         Call<RegistrationResult> call = null;
+        final CommonApiInterface commonApiInterface = retrofitCommon().create(CommonApiInterface.class);
         switch (AuthUtils.getRole(logInActivity)) {
             case "Host":
-                final CommonApiInterface commonApiInterface = retrofitCommon().create(CommonApiInterface.class);
                 call = commonApiInterface.registrate(new Login(login,password));
                 break;
             case "Staff":
+                call = commonApiInterface.registrate(new Login(login,password));
                 break;
         }
         if (registrationCallbackId == null && call != null) {
@@ -153,12 +156,13 @@ public class RegisterFragment extends Fragment {
         final String password = passwordInput.getText().toString();
 
         Call<LoginResponse> call = null;
+        final CommonApiInterface commonApiInterface = retrofitCommon().create(CommonApiInterface.class);
         switch (AuthUtils.getRole(logInActivity)) {
             case "Host":
-                final CommonApiInterface commonApiInterface = retrofitCommon().create(CommonApiInterface.class);
                 call = commonApiInterface.login(new Login(login,password));
                 break;
             case "Staff":
+                call = commonApiInterface.login(new Login(login,password));
                 break;
         }
         if (loginCallbackId == null && call != null) {
@@ -173,6 +177,7 @@ public class RegisterFragment extends Fragment {
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
             if (!AuthUtils.getRole(logInActivity).equals("Host")) {
+                AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
                 goToMainActivity();
             } else {
                 if (result.getHostId() == null) {

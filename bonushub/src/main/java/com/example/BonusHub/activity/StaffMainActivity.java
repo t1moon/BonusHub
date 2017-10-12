@@ -84,10 +84,15 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
         nvDrawer = (NavigationView) findViewById(R.id.navigation_view);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
-
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        prepareQrFragment();
+    }
 
-        setupProfileFragment();
+    private void prepareQrFragment() {
+        Fragment fragment;
+        setCurrentFragment(FragmentType.StaffQR);
+        fragment = new QRFragment();
+        pushFragment(fragment, true);
     }
 
     @Override
@@ -133,13 +138,6 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
                 }
             }
         });
-    }
-
-    private void setupProfileFragment() {
-        Fragment fragment;
-        setCurrentFragment(FragmentType.ProfileHost);
-        fragment = new ProfileFragment();
-        pushFragment(fragment, true);
     }
 
     @Override

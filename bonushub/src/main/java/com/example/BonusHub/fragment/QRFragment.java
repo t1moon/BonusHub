@@ -3,13 +3,16 @@ package com.example.BonusHub.fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.BonusHub.utils.AuthUtils;
 import com.example.timur.BonusHub.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -41,12 +44,12 @@ public class QRFragment extends Fragment {
         final ProgressBar spinner;
         spinner = (ProgressBar)rootView.findViewById(R.id.progressBar);
         spinner.setVisibility(View.VISIBLE);
+        Toast.makeText(getActivity(),AuthUtils.getUserId(getActivity().getApplicationContext()), Toast.LENGTH_LONG).show();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    bitmap = TextToImageEncode(getActivity().getPreferences(Context.MODE_PRIVATE).
-                            getString("", ""));
+                    bitmap = TextToImageEncode(AuthUtils.getUserId(getActivity().getApplicationContext()));
                     imageView.post(new Runnable() {
                         @Override
                         public void run() {

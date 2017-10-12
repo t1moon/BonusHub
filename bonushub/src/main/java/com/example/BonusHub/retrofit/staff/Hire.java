@@ -5,4 +5,9 @@ package com.example.BonusHub.retrofit.staff;
  */
 
 public class Hire {
+    String worker_id;
+
+    public Hire(String worker_id){
+        this.worker_id = worker_id;
+    }
 }

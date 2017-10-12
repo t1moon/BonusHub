@@ -54,6 +54,7 @@ public class RoleFragment extends Fragment {
         @Override
         public void onClick(View v) {
             AuthUtils.setStaffRole(getActivity());
+            goToLoginFragment();
         }
     };
 

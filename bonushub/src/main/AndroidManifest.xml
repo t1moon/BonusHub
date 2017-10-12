@@ -29,6 +29,8 @@
 
         <activity android:name="com.example.BonusHub.activity.HostMainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity android:name="com.example.BonusHub.activity.StaffMainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
 
 </manifest>

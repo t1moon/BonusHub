@@ -5,4 +5,9 @@ package com.example.BonusHub.retrofit.staff;
  */
 
 public class Retire {
+    String worker_id;
+
+    public Retire(String worker_id){
+        this.worker_id = worker_id;
+    }
 }

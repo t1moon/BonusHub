@@ -68,23 +68,23 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
             holder.title.setText(host.getTitle());
             holder.descrpition.setText(host.getDescription());
             holder.points.setText(Integer.toString(point));
-//            if (host.getProfile_image() != null) {
-//                String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
-//                // loading album cover using Glide library
-//                Log.d("Image", pathToImageProfile);
-//                Glide
-//                        .with(context)
-//                        .load(pathToImageProfile)
-//                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
-//                        .into(holder.thumbnail);
-//            } else {
-//                // set default
-//                Glide
-//                        .with(context)
-//                        .load(R.drawable.test2)
-//                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
-//                        .into(holder.thumbnail);
-//            }
+            if (host.getProfile_image() != null) {
+                String pathToImageProfile = RetrofitFactory.retrofitHost().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();
+                // loading album cover using Glide library
+                Log.d("Image", pathToImageProfile);
+                Glide
+                        .with(context)
+                        .load(pathToImageProfile)
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .into(holder.thumbnail);
+            } else {
+                // set default
+                Glide
+                        .with(context)
+                        .load(R.drawable.test2)
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .into(holder.thumbnail);
+            }
         }
 
     }

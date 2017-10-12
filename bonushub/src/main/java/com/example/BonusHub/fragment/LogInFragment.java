@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.StaffMainActivity;
 import com.example.BonusHub.retrofit.CommonApiInterface;
 import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.retrofit.getInfo.GetInfoResponse;
@@ -112,12 +113,13 @@ public class LogInFragment extends Fragment {
 
 
         Call<LoginResponse> call = null;
+        final CommonApiInterface commonApiInterface = retrofitCommon().create(CommonApiInterface.class);
         switch (AuthUtils.getRole(logInActivity)) {
             case "Host":
-                final CommonApiInterface commonApiInterface = retrofitCommon().create(CommonApiInterface.class);
                 call = commonApiInterface.login(new Login(login, password));
                 break;
             case "Staff":
+                call = commonApiInterface.login(new Login(login, password));
                 break;
         }
         if (loginCallbackId == null && call != null) {
@@ -160,6 +162,7 @@ public class LogInFragment extends Fragment {
                 intent = new Intent(getActivity(), HostMainActivity.class);
                 break;
             case "Staff":
+                intent = new Intent(getActivity(), StaffMainActivity.class);
                 break;
         }
         if (intent != null) {
@@ -207,7 +210,9 @@ public class LogInFragment extends Fragment {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            if (!AuthUtils.getRole(logInActivity).equals("Host")) {                  // staff or client
+            if (!AuthUtils.getRole(logInActivity).equals("Host")) {
+                // staff
+                AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
                 goToMainActivity();
             } else {
                 if (result.getHostId() == null) {

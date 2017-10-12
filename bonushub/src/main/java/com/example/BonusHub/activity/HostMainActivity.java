@@ -20,6 +20,7 @@ import android.view.View;
 
 import com.example.BonusHub.fragment.EditFragment;
 import com.example.BonusHub.fragment.ScanQrFragment;
+import com.example.BonusHub.fragment.StaffListFragment;
 import com.example.BonusHub.retrofit.CommonApiInterface;
 import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.MyApplication;
@@ -212,7 +213,7 @@ public class HostMainActivity extends BaseActivity implements StackListner {
                 break;
             case MENUITEM_STAFF:
                 if (fragment.getClass() != OwnerSettingsFragment.class) {
-                    fragment = new OwnerSettingsFragment();
+                    fragment = new StaffListFragment();
                     pushFragment(fragment, true);
                 }
                 break;

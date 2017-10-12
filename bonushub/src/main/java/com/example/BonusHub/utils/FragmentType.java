@@ -9,7 +9,7 @@ public enum FragmentType {
     ListHost,
     AboutHost,
     ProfileHost,
-    StaffProfile,
+    StaffQR,
     StartHost,
     RegisterFragment,
     LogInFragment,
