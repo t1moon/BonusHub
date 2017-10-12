@@ -54,6 +54,7 @@ public class LogInActivity extends BaseActivity implements StackListner {
                 intent = new Intent(this, HostMainActivity.class);
                 break;
             case "Staff":
+                intent = new Intent(this, StaffMainActivity.class);
                 break;
         }
         if (intent != null) {

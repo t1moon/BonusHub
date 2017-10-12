@@ -1,5 +1,6 @@
 package com.example.BonusHub.retrofit;
 
+import com.example.BonusHub.retrofit.auth.LogoutResponse;
 import com.example.BonusHub.retrofit.client.ClientResponse;
 import com.example.BonusHub.retrofit.editInfo.EditResponse;
 import com.example.BonusHub.retrofit.editInfo.UploadResponse;
@@ -66,5 +67,19 @@ public interface HostApiInterface {
             "Accept: application/json"
     })
     Call<GetInfoResponse> getInfo(@Header("Cookie")String cookie);
+
+    @POST("logout/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<LogoutResponse> logout(@Header("Cookie")String cookie);
+
+    @GET("get_staff/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<GetInfoResponse> getStaff(@Header("Cookie")String cookie);
+
+
 
 }

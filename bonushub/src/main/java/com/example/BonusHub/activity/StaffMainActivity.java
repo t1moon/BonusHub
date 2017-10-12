@@ -1,6 +1,7 @@
 package com.example.BonusHub.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -11,36 +12,35 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-import com.example.BonusHub.fragment.EditFragment;
-import com.example.BonusHub.fragment.ScanQrFragment;
-import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.MyApplication;
-import com.example.BonusHub.retrofit.HostApiInterface;
-import com.example.BonusHub.retrofit.auth.LogoutResponse;
+import com.example.BonusHub.fragment.EditFragment;
 import com.example.BonusHub.fragment.OwnerSettingsFragment;
 import com.example.BonusHub.fragment.ProfileFragment;
+import com.example.BonusHub.fragment.QRFragment;
+import com.example.BonusHub.fragment.ScanQrFragment;
 import com.example.BonusHub.fragment.StatisticFragment;
+import com.example.BonusHub.retrofit.HostApiInterface;
+import com.example.BonusHub.retrofit.auth.LogoutResponse;
 import com.example.BonusHub.threadManager.NetworkThread;
+import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.utils.FragmentType;
 import com.example.BonusHub.utils.StackListner;
 import com.example.timur.BonusHub.R;
-
-import android.widget.Toast;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
 import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitHost;
 
-public class HostMainActivity extends BaseActivity implements StackListner {
-    private final static String TAG = HostMainActivity.class.getSimpleName();
+public class StaffMainActivity extends BaseActivity implements StackListner {
+    private final static String TAG = StaffMainActivity.class.getSimpleName();
     private NetworkThread.ExecuteCallback<LogoutResponse> logoutCallback;
     private Integer logoutCallbackId;
 
@@ -50,12 +50,8 @@ public class HostMainActivity extends BaseActivity implements StackListner {
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
     private FloatingActionButton fab;
-    public final static int MENUITEM_READ_QR = 0;
-    public final static int MENUITEM_SHOW_PROFILE = 1;
-    public final static int MENUITEM_OWNER_SETTINGS = 2;
-    public final static int MENUITEM_STATISTIC = 3;
-    public final static int MENUITEM_STAFF = 4;
-    public final static int MENUITEM_LOGOUT = 5;
+    public final static int MENUITEM_SHOW_QR = 0;
+    public final static int MENUITEM_LOGOUT = 1;
 
     static {
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -157,12 +153,8 @@ public class HostMainActivity extends BaseActivity implements StackListner {
     private void setupDrawerContent(final NavigationView navigationView) {
         Menu drawerMenu = navigationView.getMenu();
 
-        drawerMenu.add(0, MENUITEM_READ_QR, 0, "Считать QR-код");
-        drawerMenu.add(0, MENUITEM_SHOW_PROFILE, 1, "Профиль заведения");
-        drawerMenu.add(0, MENUITEM_OWNER_SETTINGS, 2, "Параметры акций");
-        drawerMenu.add(0, MENUITEM_STATISTIC, 3, "Статистика");
-        drawerMenu.add(0, MENUITEM_STAFF, 4, "Сотрудники");
-        drawerMenu.add(0, MENUITEM_LOGOUT, 5, "Выход");
+        drawerMenu.add(0, MENUITEM_SHOW_QR, 0, "Показать QR-код");
+        drawerMenu.add(0, MENUITEM_LOGOUT, 1, "Выход");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -187,35 +179,10 @@ public class HostMainActivity extends BaseActivity implements StackListner {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
         switch (menuItem.getItemId()) {
-            case MENUITEM_READ_QR:
-                fragment = new ScanQrFragment();
+            case MENUITEM_SHOW_QR:
+                fragment = new QRFragment();
                 pushFragment(fragment, true);
                 break;
-            case MENUITEM_STATISTIC:
-                fragment = new StatisticFragment();
-                pushFragment(fragment, true);
-                break;
-            case MENUITEM_SHOW_PROFILE:
-                if (fragment.getClass() != ProfileFragment.class) {
-                    setCurrentFragment(FragmentType.ProfileHost);
-                    fragment = new ProfileFragment();
-                    pushFragment(fragment, false);
-                }
-                break;
-
-            case MENUITEM_OWNER_SETTINGS:
-                if (fragment.getClass() != OwnerSettingsFragment.class) {
-                    fragment = new OwnerSettingsFragment();
-                    pushFragment(fragment, true);
-                }
-                break;
-            case MENUITEM_STAFF:
-                if (fragment.getClass() != OwnerSettingsFragment.class) {
-                    fragment = new OwnerSettingsFragment();
-                    pushFragment(fragment, true);
-                }
-                break;
-
             case MENUITEM_LOGOUT:
                 Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
                 final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
@@ -264,7 +231,7 @@ public class HostMainActivity extends BaseActivity implements StackListner {
         });
         uncheckAllMenuItems(nvDrawer);
         if (getCurrentFragment() == FragmentType.ProfileHost) {
-            nvDrawer.getMenu().getItem(MENUITEM_SHOW_PROFILE).setChecked(true);
+            nvDrawer.getMenu().getItem(MENUITEM_SHOW_QR).setChecked(true);
         }
 
 
@@ -317,7 +284,7 @@ public class HostMainActivity extends BaseActivity implements StackListner {
             public void onFailure(Call<LogoutResponse> call, Response<LogoutResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
-                AuthUtils.logout(HostMainActivity.this);
+                AuthUtils.logout(StaffMainActivity.this);
                 goToLogIn();
             }
 
@@ -332,8 +299,8 @@ public class HostMainActivity extends BaseActivity implements StackListner {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
-                Toast.makeText(HostMainActivity.this, "Ошибка соединения с сервером. Проверьте интернет подключение.", Toast.LENGTH_SHORT).show();
-                AuthUtils.logout(HostMainActivity.this);
+                Toast.makeText(StaffMainActivity.this, "Ошибка соединения с сервером. Проверьте интернет подключение.", Toast.LENGTH_SHORT).show();
+                AuthUtils.logout(StaffMainActivity.this);
                 goToLogIn();
             }
         };
