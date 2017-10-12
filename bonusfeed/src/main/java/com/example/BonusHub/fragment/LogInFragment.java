@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.example.BonusHub.activity.ClientMainActivity;
 import com.example.BonusHub.activity.LogInActivity;
-import com.example.BonusHub.retrofit.ClientApiInterface;
+import com.example.BonusHub.retrofit.CommonApiInterface;
 import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.threadManager.NetworkThread;
 import com.example.BonusHub.utils.AuthUtils;
@@ -104,8 +104,8 @@ public class LogInFragment extends Fragment {
         progressDialog.show();
 
 
-        final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        Call<LoginResponse> call = clientApiInterface.login(new Login(login, password));
+        final CommonApiInterface commonApiInterface = RetrofitFactory.retrofitClient().create(CommonApiInterface.class);
+        Call<LoginResponse> call = commonApiInterface.login(new Login(login, password));
         if (loginCallbackId == null && call != null) {
             loginCallbackId = NetworkThread.getInstance().registerCallback(loginCallback);
             NetworkThread.getInstance().execute(call, loginCallbackId);
@@ -189,6 +189,7 @@ public class LogInFragment extends Fragment {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
+            AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
             goToMainActivity();
         }
     }

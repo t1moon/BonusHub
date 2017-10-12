@@ -19,6 +19,11 @@ public class RetrofitFactory {
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
+    private final static Retrofit SCORE_INSTANCE = new Retrofit.Builder()
+            .baseUrl("http://195.19.44.158:11250/api/user/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
 
     public static Retrofit retrofitHost() {
         return HOST_INSTANCE;

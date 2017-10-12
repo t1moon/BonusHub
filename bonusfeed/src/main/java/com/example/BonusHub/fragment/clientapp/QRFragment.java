@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.example.BonusHub.activity.ClientMainActivity;
+import com.example.BonusHub.utils.AuthUtils;
 import com.example.timur.BonusHub.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -46,8 +47,7 @@ public class QRFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    bitmap = TextToImageEncode(getActivity().getPreferences(Context.MODE_PRIVATE).
-                            getString(ClientMainActivity.CLIENT_IDENTIFICATOR, ""));
+                    bitmap = TextToImageEncode(AuthUtils.getUserId(getActivity().getApplicationContext()));
                     imageView.post(new Runnable() {
                         @Override
                         public void run() {
