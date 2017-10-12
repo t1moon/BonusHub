@@ -26,7 +26,6 @@ import com.example.BonusHub.db.HelperFactory;
 import com.example.BonusHub.db.host.Host;
 import com.example.BonusHub.executor.DbExecutorService;
 import com.example.BonusHub.retrofit.HostApiInterface;
-import com.example.BonusHub.retrofit.Identificator;
 import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.retrofit.getInfo.GetInfoResponse;
 import com.example.BonusHub.threadManager.NetworkThread;
@@ -128,11 +127,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getFromInternet() {
-        identificator = getActivity().getPreferences(MODE_PRIVATE).getString("host_ident", "");
+        identificator = AuthUtils.getHostId(hostMainActivity.getApplicationContext());
         progressDialog = ProgressDialog.show(hostMainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
         final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
-        Identificator iD = new Identificator(identificator);
-        final Call<GetInfoResponse> call = hostApiInterface.getInfo(iD, AuthUtils.getCookie(hostMainActivity.getApplicationContext()));
+        final Call<GetInfoResponse> call = hostApiInterface.getInfo(AuthUtils.getCookie(hostMainActivity.getApplicationContext()));
         if (netInfoCallbackId == null) {
             netInfoCallbackId = NetworkThread.getInstance().registerCallback(netInfoCallback);
             NetworkThread.getInstance().execute(call, netInfoCallbackId);
@@ -280,6 +278,7 @@ public class ProfileFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
                 netInfoCallbackId = null;
                 progressDialog.dismiss();
+                Toast.makeText(getActivity(), String.valueOf(response.code()), Toast.LENGTH_SHORT).show();
                 AuthUtils.logout(getActivity());
                 goToLogIn();
             }

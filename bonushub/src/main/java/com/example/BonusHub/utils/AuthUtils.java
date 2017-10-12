@@ -7,6 +7,8 @@ public class AuthUtils {
     private static final String PREFERENCES_ROLE_KEY = "";
     private static final String PREFERENCES_HOSTED_KEY = "isHosted";
     private static final String PREFERENCES_COOKIE_KEY = "cookie";
+    private static final String PREFERENCES_HOST_ID = "host_ident";
+    private static final String PREFERENCES_USER_ID = "user_ident";
     private static final String LOGIN_PREFERENCES = "LoginData";
 
     public static void setCookie(Context context, String cookie)
@@ -14,6 +16,22 @@ public class AuthUtils {
         context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
                 .edit()
                 .putString(PREFERENCES_COOKIE_KEY, cookie)
+                .apply();
+    }
+
+    public static void setHostId(Context context, String host_id)
+    {
+        context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
+                .edit()
+                .putString(PREFERENCES_HOST_ID, host_id)
+                .apply();
+    }
+
+    public static void setUserId(Context context, String user_id)
+    {
+        context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
+                .edit()
+                .putString(PREFERENCES_USER_ID, user_id)
                 .apply();
     }
 
@@ -87,6 +105,18 @@ public class AuthUtils {
     public static String getRole(Context context) {
         return context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
                 .getString(PREFERENCES_ROLE_KEY, "");
+    }
+
+    public static String getHostId(Context context)
+    {
+        return context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
+                .getString(PREFERENCES_HOST_ID, "");
+    }
+
+    public static String getUserId(Context context)
+    {
+        return context.getSharedPreferences(LOGIN_PREFERENCES, Context.MODE_PRIVATE)
+                .getString(PREFERENCES_USER_ID, "");
     }
 
 }

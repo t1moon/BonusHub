@@ -212,15 +212,12 @@ public class LogInFragment extends Fragment {
             } else {
                 if (result.getHostId() == null) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), false);
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putString("user_ident", result.getUserId()).apply();
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
                     goToStartFragment();
                 }
                 else {
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putString("host_ident", result.getHostId()).apply();
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putString("user_ident", result.getUserId()).apply();
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getHostId());
                     AuthUtils.setHosted(getActivity().getApplicationContext(), true);
                     goToMainActivity();
                 }

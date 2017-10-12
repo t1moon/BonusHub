@@ -30,7 +30,7 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitCommon;
-import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitHost;
+//import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitHost;
 
 public class RegisterFragment extends Fragment {
     private LogInActivity logInActivity;
@@ -129,7 +129,7 @@ public class RegisterFragment extends Fragment {
         Call<RegistrationResult> call = null;
         switch (AuthUtils.getRole(logInActivity)) {
             case "Host":
-                final CommonApiInterface commonApiInterface = retrofitHost().create(CommonApiInterface.class);
+                final CommonApiInterface commonApiInterface = retrofitCommon().create(CommonApiInterface.class);
                 call = commonApiInterface.registrate(new Login(login,password));
                 break;
             case "Staff":
@@ -178,15 +178,12 @@ public class RegisterFragment extends Fragment {
                 if (result.getHostId() == null) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), false);
                     goToStartFragment();
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putString("user_ident", result.getUserId()).apply();
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
                 }
                 else {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putString("host_ident", result.getHostId()).apply();
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putString("user_ident", result.getUserId()).apply();
+                    AuthUtils.setHostId(getActivity().getApplicationContext(), result.getHostId());
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
                     goToMainActivity();
                 }
             }
@@ -217,8 +214,6 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onResponse(Call<RegistrationResult> call, Response<RegistrationResult> response) {
                 progressDialog.dismiss();
-                String cookie = response.headers().get("Set-Cookie");
-                AuthUtils.setCookie(getActivity(), cookie);
             }
 
             @Override
@@ -226,7 +221,7 @@ public class RegisterFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
                 registrationCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), response.code(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), response.code(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -255,7 +250,7 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 String cookie = response.headers().get("Set-Cookie");
-                AuthUtils.setCookie(getActivity(), cookie);
+                AuthUtils.setCookie(getActivity().getApplicationContext(), cookie);
             }
 
             @Override

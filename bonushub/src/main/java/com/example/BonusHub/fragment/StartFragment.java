@@ -306,8 +306,7 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
             public void onSuccess(HostResult result) {
                 if (result.getCode() == 0) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-                    getActivity().getPreferences(MODE_PRIVATE).edit()
-                            .putString("host_ident", result.getHostId()).apply();
+                    AuthUtils.setHostId(getActivity().getApplicationContext(), result.getHostId());
                     Toast.makeText(getActivity(), result.getHostId(), Toast.LENGTH_SHORT).show();
                     goToMainActivity();
                 }

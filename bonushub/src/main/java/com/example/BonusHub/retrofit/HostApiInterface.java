@@ -20,6 +20,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 
 public interface HostApiInterface {
@@ -65,6 +66,6 @@ public interface HostApiInterface {
     @Headers({
             "Accept: application/json"
     })
-    Call<GetInfoResponse> getInfo(@Body Identificator host_id, @Header("Cookie")String cookie);
+    Call<GetInfoResponse> getInfo(@Header("Cookie")String cookie);
 
 }

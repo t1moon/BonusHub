@@ -210,7 +210,6 @@ public class HostMainActivity extends BaseActivity implements StackListner {
                 break;
 
             case MENUITEM_LOGOUT:
-                Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
                 final CommonApiInterface commonApiInterface = retrofitHost().create(CommonApiInterface.class);
                 final Call<LogoutResponse> call = commonApiInterface.logout(AuthUtils.getCookie(this));
                 logoutCallbackId = NetworkThread.getInstance().registerCallback(logoutCallback);
