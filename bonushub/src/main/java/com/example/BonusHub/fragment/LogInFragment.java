@@ -28,6 +28,8 @@ import com.example.timur.BonusHub.R;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import static android.content.Context.MODE_PRIVATE;
+import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitCommon;
 import static com.example.BonusHub.retrofit.RetrofitFactory.retrofitHost;
 
 public class LogInFragment extends Fragment {
@@ -112,7 +114,7 @@ public class LogInFragment extends Fragment {
         Call<LoginResponse> call = null;
         switch (AuthUtils.getRole(logInActivity)) {
             case "Host":
-                final CommonApiInterface commonApiInterface = retrofitHost().create(CommonApiInterface.class);
+                final CommonApiInterface commonApiInterface = retrofitCommon().create(CommonApiInterface.class);
                 call = commonApiInterface.login(new Login(login, password));
                 break;
             case "Staff":
@@ -166,44 +168,7 @@ public class LogInFragment extends Fragment {
         }
     }
 
-    public void onInfoResult(GetInfoResponse result) {
-        if (result.getTitle() == null) {
-            goToStartFragment();
-        }
-        else {
-            AuthUtils.setHosted(getActivity().getApplicationContext(), true);
-            goToMainActivity();
-        }
-    }
-
     private void prepareCallbacks() {
-        netInfoCallback = new NetworkThread.ExecuteCallback<GetInfoResponse>() {
-            @Override
-            public void onResponse(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
-
-            }
-
-            @Override
-            public void onFailure(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
-                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
-                netInfoCallbackId = null;
-                progressDialog.dismiss();
-                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSuccess(GetInfoResponse result) {
-                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
-                netInfoCallbackId = null;
-                onInfoResult(result);
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
-                netInfoCallbackId = null;
-            }
-        };
 
         loginCallback = new NetworkThread.ExecuteCallback<LoginResponse>() {
             @Override
@@ -245,15 +210,16 @@ public class LogInFragment extends Fragment {
             if (!AuthUtils.getRole(logInActivity).equals("Host")) {                  // staff or client
                 goToMainActivity();
             } else {
-                final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
-                final Call<GetInfoResponse> call = hostApiInterface.getInfo(AuthUtils.getCookie(logInActivity.getApplicationContext()));
-                if (netInfoCallbackId == null) {
-                    progressDialog = new ProgressDialog(logInActivity);
-                    progressDialog.setIndeterminate(true);
-                    progressDialog.setMessage("Получаем данные о заведении...");
-                    progressDialog.show();
-                    netInfoCallbackId = NetworkThread.getInstance().registerCallback(netInfoCallback);
-                    NetworkThread.getInstance().execute(call, netInfoCallbackId);
+                if (result.getHostId() == null) {
+                    AuthUtils.setHosted(getActivity().getApplicationContext(), false);
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
+                    goToStartFragment();
+                }
+                else {
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getHostId());
+                    AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+                    goToMainActivity();
                 }
             }
         }

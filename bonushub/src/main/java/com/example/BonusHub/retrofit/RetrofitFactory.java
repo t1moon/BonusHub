@@ -14,13 +14,8 @@ public class RetrofitFactory {
             .build();
     public final static String MEDIA_URL = "media/";
 
-    private final static Retrofit CLIENT_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://195.19.44.158:11250/api/client/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-
     private final static Retrofit COMMON_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://195.19.44.158:11250/api/")
+            .baseUrl("http://195.19.44.158:11250/api/user/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

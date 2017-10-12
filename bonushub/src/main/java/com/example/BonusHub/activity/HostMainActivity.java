@@ -20,6 +20,7 @@ import android.view.View;
 
 import com.example.BonusHub.fragment.EditFragment;
 import com.example.BonusHub.fragment.ScanQrFragment;
+import com.example.BonusHub.retrofit.CommonApiInterface;
 import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.MyApplication;
 import com.example.BonusHub.retrofit.HostApiInterface;
@@ -217,9 +218,8 @@ public class HostMainActivity extends BaseActivity implements StackListner {
                 break;
 
             case MENUITEM_LOGOUT:
-                Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
-                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
-                final Call<LogoutResponse> call = hostApiInterface.logout(AuthUtils.getCookie(this));
+                final CommonApiInterface commonApiInterface = retrofitHost().create(CommonApiInterface.class);
+                final Call<LogoutResponse> call = commonApiInterface.logout(AuthUtils.getCookie(this));
                 logoutCallbackId = NetworkThread.getInstance().registerCallback(logoutCallback);
                 NetworkThread.getInstance().execute(call, logoutCallbackId);
                 break;

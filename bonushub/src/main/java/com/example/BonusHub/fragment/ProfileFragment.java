@@ -56,6 +56,7 @@ public class ProfileFragment extends Fragment {
     private TextView host_address;
     FloatingActionButton fab_edit;
     private int host_id;
+    private String identificator;
     private HostMainActivity hostMainActivity;
     ProgressDialog progressDialog;
     String pathToImageProfile;
@@ -126,6 +127,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getFromInternet() {
+        identificator = AuthUtils.getHostId(hostMainActivity.getApplicationContext());
         progressDialog = ProgressDialog.show(hostMainActivity, "Загрузка", "Подождите пока загрузится информация о Вас", true);
         final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
         final Call<GetInfoResponse> call = hostApiInterface.getInfo(AuthUtils.getCookie(hostMainActivity.getApplicationContext()));
@@ -276,6 +278,7 @@ public class ProfileFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
                 netInfoCallbackId = null;
                 progressDialog.dismiss();
+                Toast.makeText(getActivity(), String.valueOf(response.code()), Toast.LENGTH_SHORT).show();
                 AuthUtils.logout(getActivity());
                 goToLogIn();
             }
