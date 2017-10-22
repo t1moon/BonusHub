@@ -62,11 +62,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Адрес" />
-                <!--<fragment-->
-                    <!--android:id="@+id/place_autocomplete_fragment"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment" />-->
             </android.support.design.widget.TextInputLayout>
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="horizontal" android:layout_width="match_parent"
@@ -86,11 +81,6 @@
                     </fragment>
                 </com.example.BonusHub.fragment.SquareLinearLayout>
             </LinearLayout>
-            <!--<com.seatgeek.placesautocomplete.PlacesAutocompleteTextView-->
-                <!--android:id="@+id/places_autocomplete"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--app:pacv_googleMapsApiKey="@string/google_maps_key"/>-->
         </LinearLayout>
 
         <LinearLayout
@@ -118,18 +108,48 @@
                 android:text="Время закрытия" />
         </LinearLayout>
 
-        <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-        <!--<Button-->
-        <!--android:id="@+id/save_btn"-->
-        <!--style="?android:attr/borderlessButtonStyle"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="SAVE"-->
-        <!--android:layout_gravity="bottom"-->
-        <!--android:textColor="@color/colorAccent"/>-->
-        <!--</LinearLayout>-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context="com.example.BonusHub.fragment.StartFragment">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="24dp"
+                android:text="Выберите программу лояльности"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/proglist"
+                />
+            <TextView
+                android:id="@+id/prog_descr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bonus_description"
+                android:textColor="@color/white"
+                />
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:textColorHint="@color/white"
+                app:errorEnabled="true"
+                style="@style/StyledTilEditText">
+                <EditText android:id="@+id/host_param"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Процент бонусов с каждой покупки" />
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
 
 
     </LinearLayout>

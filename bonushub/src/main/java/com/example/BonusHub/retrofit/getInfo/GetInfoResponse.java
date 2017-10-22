@@ -20,6 +20,10 @@ public class GetInfoResponse {
     private String time_close;
     @SerializedName("profile_image")
     private String profile_image;
+    @SerializedName("loyality_param")
+    private Float loyality_param;
+    @SerializedName("loyality_type")
+    private int loyality_type;
 
     public String getTitle() {
         return title;
@@ -67,5 +71,21 @@ public class GetInfoResponse {
 
     public void setProfile_image(String profile_image) {
         this.profile_image = profile_image;
+    }
+
+    public void setLoyalityType(int loy_prog) {
+        loyality_type = loy_prog;
+    }
+
+    public void setLoyalityParam(float loy_param) {
+        loyality_param = loy_param;
+    }
+
+    public int getLoyalityType() {
+        return loyality_type;
+    }
+
+    public float getLoyalityParam() {
+        return loyality_param;
     }
 }

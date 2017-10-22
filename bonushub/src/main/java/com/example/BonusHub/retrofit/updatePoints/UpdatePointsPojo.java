@@ -5,16 +5,12 @@ package com.example.BonusHub.retrofit.updatePoints;
  */
 
 public class UpdatePointsPojo {
-    private int host_id;
-    private int bill;
-    private boolean is_add;
-    private String client_identificator;
+    private Float score;
+    private String user_id;
 
 
-    public UpdatePointsPojo(String client_identificator, int bill, boolean isAdd) {
-        this.host_id = host_id;
-        this.bill = bill;
-        this.is_add = isAdd;
-        this.client_identificator = client_identificator;
+    public UpdatePointsPojo(String client_identificator, float bill) {
+        this.score = bill;
+        this.user_id = client_identificator;
     }
 }

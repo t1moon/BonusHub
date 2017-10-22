@@ -20,7 +20,7 @@ public class RetrofitFactory {
             .build();
 
     private final static Retrofit SCORE_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://195.19.44.158:11250/api/user/")
+            .baseUrl("http://195.19.44.158:11250/api/score/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
@@ -31,6 +31,10 @@ public class RetrofitFactory {
 
     public static Retrofit retrofitCommon() {
         return COMMON_INSTANCE;
+    }
+
+    public static Retrofit retrofitScore() {
+        return SCORE_INSTANCE;
     }
 
 }

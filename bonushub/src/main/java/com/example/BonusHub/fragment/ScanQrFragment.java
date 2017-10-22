@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.BonusHub.retrofit.ScoreApiInterface;
 import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.activity.HostMainActivity;
 import com.example.BonusHub.activity.LogInActivity;
@@ -27,6 +28,8 @@ import com.google.zxing.integration.android.IntentResult;
 
 import retrofit2.Call;
 import retrofit2.Response;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -114,15 +117,20 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     private void updatePoints(boolean isAddTo) {
 
-        final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
+        final ScoreApiInterface scoreApiInterface = RetrofitFactory.retrofitScore().create(ScoreApiInterface.class);
         final Call<UpdatePointsResponse> call;
 
-        int bill = Integer.parseInt(et_bill.getText().toString());
-        call = hostApiInterface.update_points(new UpdatePointsPojo(client_identificator, bill, isAddTo), AuthUtils.getCookie(hostMainActivity));
-
+        Float bill = Float.parseFloat(et_bill.getText().toString());
+        int loyality_type = getActivity().getPreferences(MODE_PRIVATE).getInt("loy_type", -1);
+        if ((loyality_type == -1) || (loyality_type == 1)) {
+            call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(hostMainActivity));
+        }
+        else {
+            call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(hostMainActivity));
+        }
         if (updatePointsCallbackId == null) {
             updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);
-            NetworkThread.getInstance().execute(call,updatePointsCallbackId);
+            NetworkThread.getInstance().execute(call, updatePointsCallbackId);
         }
     }
 

@@ -17,15 +17,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.BonusHub.Location;
 import com.example.BonusHub.activity.HostMainActivity;
 import com.example.BonusHub.db.host.Host;
+import com.example.BonusHub.db.host.LoyalitySettings;
 import com.example.BonusHub.retrofit.HostApiInterface;
 import com.example.BonusHub.retrofit.host.HostResult;
 import com.example.BonusHub.threadManager.NetworkThread;
@@ -247,7 +251,6 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                     host.setTime_open(open_time);
                     host.setTime_close(close_time);
                     host.setProfile_image(null);
-
 
                     progressDialog = new ProgressDialog(logInActivity);
                     progressDialog.setIndeterminate(true);

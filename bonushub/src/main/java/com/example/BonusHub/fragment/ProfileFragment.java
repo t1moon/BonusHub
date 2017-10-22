@@ -155,6 +155,8 @@ public class ProfileFragment extends Fragment {
 
     private void showResponse(GetInfoResponse result) {
         progressDialog.dismiss();
+        getActivity().getPreferences(MODE_PRIVATE).edit()
+                .putInt("loy_type", result.getLoyalityType()).apply();
         // clear tables
         HelperFactory.getHelper().clearHostTable(HelperFactory.getHelper().getConnectionSource());
 

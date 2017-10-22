@@ -37,12 +37,6 @@ public interface HostApiInterface {
     })
     Call<HostResult> createHost(@Body Host host, @Header("Cookie")String cookie);
 
-    @POST("update_points/")
-    @Headers({
-            "Accept: application/json"
-    })
-    Call<UpdatePointsResponse> update_points(@Body UpdatePointsPojo updatePointsPojo, @Header("Cookie")String cookie);
-
     @POST("edit_host/")
     @Headers({
             "Accept: application/json"
