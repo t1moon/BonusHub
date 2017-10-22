@@ -31,12 +31,12 @@ public class Host{
     private String address;
 
     // in minutes
-    @DatabaseField(columnName = HOST_TIMEOPEN_FIELD_NAME, dataType = DataType.INTEGER)
-    private int time_open;
+    @DatabaseField(columnName = HOST_TIMEOPEN_FIELD_NAME, dataType = DataType.STRING)
+    private String time_open;
 
     // in minutes
-    @DatabaseField(columnName = HOST_TIMECLOSE_FIELD_NAME, dataType = DataType.INTEGER)
-    private int time_close;
+    @DatabaseField(columnName = HOST_TIMECLOSE_FIELD_NAME, dataType = DataType.STRING)
+    private String time_close;
 
     @DatabaseField(columnName = HOST_IMAGE_FIELD_NAME, dataType = DataType.STRING)
     private String profile_image;
@@ -51,7 +51,7 @@ public class Host{
         this.address = address;
     }
 
-    public Host(String title, String description, String address, int time_open, int time_close){
+    public Host(String title, String description, String address, String time_open, String time_close){
         this.title = title;
         this.description = description;
         this.address = address;
@@ -82,19 +82,19 @@ public class Host{
         this.address = address;
     }
 
-    public int getTime_open() {
+    public String getTime_open() {
         return time_open;
     }
 
-    public void setTime_open(int time_open) {
+    public void setTime_open(String time_open) {
         this.time_open = time_open;
     }
 
-    public int getTime_close() {
+    public String getTime_close() {
         return time_close;
     }
 
-    public void setTime_close(int time_close) {
+    public void setTime_close(String time_close) {
         this.time_close = time_close;
     }
 

@@ -9,6 +9,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -193,6 +194,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            Log.d("User's Points", Integer.toString(hp.getPoints()));
             clientHost = new ClientHost(client, host, hp.getPoints());
             try {
                 HelperFactory.getHelper().getClientHostDAO().createClientHost(client, host, hp.getPoints());

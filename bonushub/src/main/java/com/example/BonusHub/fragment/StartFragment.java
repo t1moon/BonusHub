@@ -58,7 +58,8 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
     private static NetworkThread.ExecuteCallback<HostResult> netHostCallback;
     private Integer netHostCallbackId;
 
-    private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
+    //private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
+    private String open_time = "00:00", close_time = "00:00";
     private Button open_time_btn;
     private Button close_time_btn;
     private EditText host_title;
@@ -178,8 +179,7 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                                 open_time_btn.setText(hourOfDay + ":" + minute);
                             else
                                 open_time_btn.setText(hourOfDay + ":" + "00");
-                            open_hour = hourOfDay;
-                            open_minute = minute;
+                            open_time = String.format("%02d:%02d", hourOfDay, minute);
 
                         } else {
                             close_time_btn.setTextSize(20);
@@ -187,8 +187,7 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                                 close_time_btn.setText(hourOfDay + ":" + minute);
                             else
                                 close_time_btn.setText(hourOfDay + ":" + "00");
-                            close_hour = hourOfDay;
-                            close_minute = minute;
+                            close_time = String.format("%02d:%02d", hourOfDay, minute);
                         }
 
                     }
@@ -245,8 +244,8 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                     host_address.setError("Неверный адрес");
                 else {
                     Host host = new Host(title, description, address);
-                    host.setTime_open(open_hour * 60 + open_minute);
-                    host.setTime_close(close_hour * 60 + close_minute);
+                    host.setTime_open(open_time);
+                    host.setTime_close(close_time);
                     host.setProfile_image(null);
 
 

@@ -15,9 +15,9 @@ public class GetInfoResponse {
     @SerializedName("address")
     private String address;
     @SerializedName("time_open")
-    private int time_open;
+    private String time_open;
     @SerializedName("time_close")
-    private int time_close;
+    private String time_close;
     @SerializedName("profile_image")
     private String profile_image;
 
@@ -45,19 +45,19 @@ public class GetInfoResponse {
         this.address = address;
     }
 
-    public int getTime_open() {
+    public String getTime_open() {
         return time_open;
     }
 
-    public void setTime_open(int time_open) {
+    public void setTime_open(String time_open) {
         this.time_open = time_open;
     }
 
-    public int getTime_close() {
+    public String getTime_close() {
         return time_close;
     }
 
-    public void setTime_close(int time_close) {
+    public void setTime_close(String time_close) {
         this.time_close = time_close;
     }
 

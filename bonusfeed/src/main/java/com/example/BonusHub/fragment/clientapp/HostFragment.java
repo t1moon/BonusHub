@@ -107,22 +107,16 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
             String title = host.getTitle();
             String description = host.getDescription();
             String address = host.getAddress();
-            int open_hour = host.getTime_open() / 60;
-            int open_minute = host.getTime_open() % 60;
-            int close_hour = host.getTime_close() / 60;
-            int close_minute = host.getTime_close() % 60;
+            //int open_hour = host.getTime_open() / 60;
+            //int open_minute = host.getTime_open() % 60;
+            //int close_hour = host.getTime_close() / 60;
+            //int close_minute = host.getTime_close() % 60;
 
             host_title.setText(title);
             host_description.setText(description);
             host_address.setText(address);
-            if (open_minute != 0)
-                host_open_time_tv.setText(open_hour + ":" + open_minute);
-            else
-                host_open_time_tv.setText(open_hour + ":" + "00");
-            if (close_minute != 0)
-                host_close_time_tv.setText(close_hour + ":" + close_minute);
-            else
-                host_close_time_tv.setText(close_hour + ":" + "00");
+            host_open_time_tv.setText(host.getTime_open());
+            host_close_time_tv.setText(host.getTime_close());
 
             ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
             String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();

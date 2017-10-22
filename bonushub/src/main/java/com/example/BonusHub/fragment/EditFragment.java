@@ -58,6 +58,8 @@ public class EditFragment extends Fragment {
     private static DbExecutorService.DbExecutorCallback dBUploadCallback;
     private static DbExecutorService.DbExecutorCallback dBInfoCallback;
 
+    //private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
+    private String open_time = "00:00", close_time = "00:00";
     private int open_hour = 0, open_minute = 0, close_hour = 0, close_minute = 0;
     private Button open_time_btn;
     private Button close_time_btn;
@@ -155,17 +157,17 @@ public class EditFragment extends Fragment {
             String title = host.getTitle();
             String description = host.getDescription();
             String address = host.getAddress();
-            open_hour = host.getTime_open() / 60;
-            open_minute = host.getTime_open() % 60;
-            close_hour = host.getTime_close() / 60;
-            close_minute = host.getTime_close() % 60;
+            //open_hour = host.getTime_open() / 60;
+            //open_minute = host.getTime_open() % 60;
+            //close_hour = host.getTime_close() / 60;
+            //close_minute = host.getTime_close() % 60;
 
             host_title_et.setText(title);
             host_description_et.setText(description);
             host_address_et.setText(address);
 
-            String open_time = String.format("%02d:%02d", open_hour, open_minute);
-            String close_time = String.format("%02d:%02d", close_hour, close_minute);
+            open_time = host.getTime_open();
+            close_time = host.getTime_close();
             open_time_btn.setText(open_time);
             close_time_btn.setText(close_time);
 
@@ -182,15 +184,15 @@ public class EditFragment extends Fragment {
                     public void onTimeSet(TimePicker view, int hourOfDay,
                                           int minute) {
                         if (v == open_time_btn) {
-                            String open_time = String.format("%02d:%02d", hourOfDay, minute);
+                            open_time = String.format("%02d:%02d", hourOfDay, minute);
                             open_time_btn.setText(open_time);
-                            open_hour = hourOfDay;
-                            open_minute = minute;
+                            //open_hour = hourOfDay;
+                            //open_minute = minute;
                         } else {
-                            String close_time = String.format("%02d:%02d", hourOfDay, minute);
+                            close_time = String.format("%02d:%02d", hourOfDay, minute);
                             close_time_btn.setText(close_time);
-                            close_hour = hourOfDay;
-                            close_minute = minute;
+                            //close_hour = hourOfDay;
+                            //close_minute = minute;
                         }
                     }
                 }, 0, 0, true);
@@ -210,8 +212,8 @@ public class EditFragment extends Fragment {
                 host.setTitle(host_title_et.getText().toString());
                 host.setDescription(host_description_et.getText().toString());
                 host.setAddress(host_address_et.getText().toString());
-                host.setTime_open(open_hour * 60 + open_minute);
-                host.setTime_close(close_hour * 60 + close_minute);
+                host.setTime_open(open_time);
+                host.setTime_close(close_time);
 
                 final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
                 Call<EditResponse> call = hostApiInterface.editHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));

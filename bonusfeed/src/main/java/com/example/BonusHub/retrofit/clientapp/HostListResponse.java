@@ -46,13 +46,11 @@ public class HostListResponse {
         @SerializedName("address")
         private String address;
 
-        // in minutes
-//        @SerializedName("time_open")
-//        private int time_open;
-//
-//        // in minutes
-//        @SerializedName("time_close")
-//        private int time_close;
+        @SerializedName("time_open")
+        private String time_open;
+
+        @SerializedName("time_close")
+        private String time_close;
 
         @SerializedName("profile_image")
         private String profile_image;
@@ -76,28 +74,20 @@ public class HostListResponse {
             this.description = description;
         }
 
-        public int getTime_close() {
-            return 0;
+        public String getTime_close() {
+            return time_close;
         }
 
-        public int getTime_open() {
-            return 0;
+        public String getTime_open() {
+            return time_open;
         }
 
-//        public int getTime_close() {
-//            return time_close;
-//        }
-//
-//        public int getTime_open() {
-//            return time_open;
-//        }
-
-        public void setTime_close(int time_close) {
-            //this.time_close = time_close;
+        public void setTime_close(String time_close) {
+            this.time_close = time_close;
         }
 
-        public void setTime_open(int time_open) {
-            //this.time_open = time_open;
+        public void setTime_open(String time_open) {
+            this.time_open = time_open;
         }
 
         public String getAddress() {

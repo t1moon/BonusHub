@@ -186,22 +186,18 @@ public class ProfileFragment extends Fragment {
         String title = host.getTitle();
         String description = host.getDescription();
         String address = host.getAddress();
-        int open_hour = host.getTime_open() / 60;
-        int open_minute = host.getTime_open() % 60;
-        int close_hour = host.getTime_close() / 60;
-        int close_minute = host.getTime_close() % 60;
+        //int open_hour = host.getTime_open() / 60;
+        //int open_minute = host.getTime_open() % 60;
+        //int close_hour = host.getTime_close() / 60;
+        //int close_minute = host.getTime_close() % 60;
+        String open_time = host.getTime_open();
+        String close_time = host.getTime_close();
         String imageUriString = host.getProfile_image();
         host_title.setText(title);
         host_description.setText(description);
         host_address.setText(address);
-        if (open_minute != 0)
-            host_open_time_tv.setText(open_hour + ":" + open_minute);
-        else
-            host_open_time_tv.setText(open_hour + "0:" + "00");
-        if (close_minute != 0)
-            host_close_time_tv.setText(close_hour + ":" + close_minute);
-        else
-            host_close_time_tv.setText(close_hour + "0:" + "00");
+        host_open_time_tv.setText(open_time);
+        host_close_time_tv.setText(close_time);
 
         ImageView imgView = (ImageView) hostMainActivity.findViewById(R.id.backdrop);
         Glide
@@ -224,17 +220,17 @@ public class ProfileFragment extends Fragment {
         String title = host.getTitle();
         String description = host.getDescription();
         String address = host.getAddress();
-        int open_hour = host.getTime_open() / 60;
-        int open_minute = host.getTime_open() % 60;
-        int close_hour = host.getTime_close() / 60;
-        int close_minute = host.getTime_close() % 60;
+        //int open_hour = host.getTime_open() / 60;
+        //int open_minute = host.getTime_open() % 60;
+        //int close_hour = host.getTime_close() / 60;
+        //int close_minute = host.getTime_close() % 60;
         String imageUriString = host.getProfile_image();
         host_title.setText(title);
         host_description.setText(description);
         host_address.setText(address);
 
-        String open_time = String.format("%02d:%02d", open_hour, open_minute);
-        String close_time = String.format("%02d:%02d", close_hour, close_minute);
+        String open_time = host.getTime_open();
+        String close_time = host.getTime_close();
         host_open_time_tv.setText(open_time);
         host_close_time_tv.setText(close_time);
 
