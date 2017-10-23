@@ -39,6 +39,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
     private TextView host_title;
     private TextView host_description;
     private TextView host_address;
+    private TextView host_loy_descr;
     private int host_id = -1;
 
     private SupportMapFragment mapFragment;
@@ -68,6 +69,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
         host_address = (TextView) rootView.findViewById(R.id.host_address_tv);
         host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
         host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
+        host_loy_descr = (TextView) rootView.findViewById(R.id.host_loy_descr);
 
         mapFragment = (SupportMapFragment) (getChildFragmentManager()
                 .findFragmentById(R.id.mini_map));
@@ -107,6 +109,9 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
             String title = host.getTitle();
             String description = host.getDescription();
             String address = host.getAddress();
+            int loyality_type = host.getLoyalityType();
+            float param = host.getLoyalityParam();
+            String loyality_descr = "";
             //int open_hour = host.getTime_open() / 60;
             //int open_minute = host.getTime_open() % 60;
             //int close_hour = host.getTime_close() / 60;
@@ -117,6 +122,14 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
             host_address.setText(address);
             host_open_time_tv.setText(host.getTime_open());
             host_close_time_tv.setText(host.getTime_close());
+
+            if (loyality_type == 1) {
+                loyality_descr = getResources().getString(R.string.bonus_feed_description) + Float.toString(param);
+            }
+            else {
+                loyality_descr = getResources().getString(R.string.cup_feed_description) + Integer.toString(Math.round(param));
+            }
+            host_loy_descr.setText(loyality_descr);
 
             ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
             String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();

@@ -188,6 +188,8 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         for (HostListResponse.HostPoints hp : hostPoints) {
             Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
             host.setProfile_image(hp.getProfile_image());
+            host.setLoyalityParam(hp.getLoyalityParam());
+            host.setLoyalityType(hp.getLoyalityType());
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
 

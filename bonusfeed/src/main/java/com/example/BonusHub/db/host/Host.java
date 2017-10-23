@@ -17,6 +17,8 @@ public class Host{
     public final static String HOST_TIMEOPEN_FIELD_NAME = "time_open";
     public final static String HOST_TIMECLOSE_FIELD_NAME = "time_close";
     public final static String HOST_IMAGE_FIELD_NAME = "profile_image";
+    public final static String HOST_LOYALITY_PROGRAMM = "loyality_programm";
+    public final static String HOST_LOYALITY_PARAM = "loyality_param";
 
     @DatabaseField(generatedId = true, columnName = HOST_ID_FIELD_NAME)
     private int Id;
@@ -40,6 +42,12 @@ public class Host{
 
     @DatabaseField(columnName = HOST_IMAGE_FIELD_NAME, dataType = DataType.STRING)
     private String profile_image;
+
+    @DatabaseField(columnName = HOST_LOYALITY_PROGRAMM, dataType = DataType.INTEGER)
+    private int loyality_type;
+
+    @DatabaseField(columnName = HOST_LOYALITY_PARAM, dataType = DataType.FLOAT)
+    private float loyality_param;
 
 
     public Host() {
@@ -108,5 +116,21 @@ public class Host{
 
     public void setProfile_image(String profile_image) {
         this.profile_image = profile_image;
+    }
+
+    public void setLoyalityType(int loy_prog) {
+        loyality_type = loy_prog;
+    }
+
+    public void setLoyalityParam(float loy_param) {
+        loyality_param = loy_param;
+    }
+
+    public int getLoyalityType() {
+        return loyality_type;
+    }
+
+    public float getLoyalityParam() {
+        return loyality_param;
     }
 }

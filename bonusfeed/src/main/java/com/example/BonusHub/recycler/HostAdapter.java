@@ -68,7 +68,12 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
             holder.title.setText(host.getTitle());
             holder.descrpition.setText(host.getDescription());
             Log.d("User's Points", Integer.toString(point));
-            holder.points.setText(Integer.toString(point));
+            if (host.getLoyalityType() == 1) {
+                holder.points.setText(Integer.toString(point));
+            }
+            else {
+                holder.points.setText(Integer.toString(point) + "/" + Integer.toString(Math.round(host.getLoyalityParam())));
+            }
 
             if (host.getProfile_image() != null) {
                 String pathToImageProfile = RetrofitFactory.retrofitClient().baseUrl() + RetrofitFactory.MEDIA_URL + host.getProfile_image();

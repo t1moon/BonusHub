@@ -193,8 +193,8 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
                 pushFragment(fragment, true);
                 break;
             case MENUITEM_SHOW_PROFILE:
-                if (fragment.getClass() != ProfileFragment.class) {
-                    setCurrentFragment(FragmentType.ProfileHost);
+                if (fragment.getClass() != ProfileStaffFragment.class) {
+                    setCurrentFragment(FragmentType.ProfileStaff);
                     fragment = new ProfileFragment();
                     pushFragment(fragment, false);
                 }

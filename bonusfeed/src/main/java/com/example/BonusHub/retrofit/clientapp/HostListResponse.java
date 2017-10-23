@@ -58,6 +58,12 @@ public class HostListResponse {
         @SerializedName("points")
         private int points;
 
+        @SerializedName("loyality_type")
+        private int loyality_type;
+
+        @SerializedName("loyality_param")
+        private float loyality_param;
+
         public String getTitle() {
             return title;
         }
@@ -112,6 +118,22 @@ public class HostListResponse {
 
         public void setProfile_image(String profile_image) {
             this.profile_image = profile_image;
+        }
+
+        public int getLoyalityType() {
+            return loyality_type;
+        }
+
+        public void setLoyalityType(int type) {
+            this.loyality_type = type ;
+        }
+
+        public float getLoyalityParam() {
+            return loyality_param;
+        }
+
+        public void setLoyalityParam(float param) {
+            this.loyality_param = param ;
         }
     }
 

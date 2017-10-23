@@ -148,6 +148,7 @@ public class QRFragment extends Fragment {
     }
 
     public void goToMainActivity() {
+        swipeRefreshLayout.setRefreshing(false);
         Intent intent = null;
 
         intent = new Intent(getActivity(), StaffMainActivity.class);
@@ -193,6 +194,7 @@ public class QRFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
                 netInfoCallbackId = null;
                 if (response.code() == 400) {
+                    swipeRefreshLayout.setRefreshing(false);
                     Toast.makeText(getActivity(), "Вы еще не приписаны ни к одному заведению", Toast.LENGTH_SHORT).show();
                 }
                 //Toast.makeText(getActivity(), String.valueOf(response.code()), Toast.LENGTH_SHORT).show();
