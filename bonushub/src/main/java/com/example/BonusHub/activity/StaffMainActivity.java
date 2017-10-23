@@ -23,9 +23,12 @@ import com.example.BonusHub.MyApplication;
 import com.example.BonusHub.fragment.EditFragment;
 import com.example.BonusHub.fragment.OwnerSettingsFragment;
 import com.example.BonusHub.fragment.ProfileFragment;
+import com.example.BonusHub.fragment.ProfileStaffFragment;
 import com.example.BonusHub.fragment.QRFragment;
 import com.example.BonusHub.fragment.ScanQrFragment;
+import com.example.BonusHub.fragment.StaffListFragment;
 import com.example.BonusHub.fragment.StatisticFragment;
+import com.example.BonusHub.retrofit.CommonApiInterface;
 import com.example.BonusHub.retrofit.HostApiInterface;
 import com.example.BonusHub.retrofit.auth.LogoutResponse;
 import com.example.BonusHub.threadManager.NetworkThread;
@@ -50,8 +53,9 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
     private FloatingActionButton fab;
-    public final static int MENUITEM_SHOW_QR = 0;
-    public final static int MENUITEM_LOGOUT = 1;
+    public final static int MENUITEM_READ_QR = 0;
+    public final static int MENUITEM_SHOW_PROFILE = 1;
+    public final static int MENUITEM_LOGOUT = 2;
 
     static {
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -85,13 +89,19 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
         // Setup drawer view
         setupDrawerContent(nvDrawer);
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        prepareQrFragment();
+        setupProfileFragment();
     }
 
-    private void prepareQrFragment() {
+    private void setupProfileFragment() {
         Fragment fragment;
-        setCurrentFragment(FragmentType.StaffQR);
-        fragment = new QRFragment();
+        setCurrentFragment(FragmentType.ProfileStaff);
+        fragment = new ProfileStaffFragment();
+        pushFragment(fragment, true);
+    }
+
+    private void prepareScanQrFragment() {
+        Fragment fragment;
+        fragment = new ScanQrFragment();
         pushFragment(fragment, true);
     }
 
@@ -151,8 +161,9 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
     private void setupDrawerContent(final NavigationView navigationView) {
         Menu drawerMenu = navigationView.getMenu();
 
-        drawerMenu.add(0, MENUITEM_SHOW_QR, 0, "Показать QR-код");
-        drawerMenu.add(0, MENUITEM_LOGOUT, 1, "Выход");
+        drawerMenu.add(0, MENUITEM_READ_QR, 0, "Считать QR-код");
+        drawerMenu.add(0, MENUITEM_SHOW_PROFILE, 1, "Профиль заведения");
+        drawerMenu.add(0, MENUITEM_LOGOUT, 2, "Выход");
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -177,14 +188,20 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_body);
         switch (menuItem.getItemId()) {
-            case MENUITEM_SHOW_QR:
-                fragment = new QRFragment();
+            case MENUITEM_READ_QR:
+                fragment = new ScanQrFragment();
                 pushFragment(fragment, true);
                 break;
+            case MENUITEM_SHOW_PROFILE:
+                if (fragment.getClass() != ProfileFragment.class) {
+                    setCurrentFragment(FragmentType.ProfileHost);
+                    fragment = new ProfileFragment();
+                    pushFragment(fragment, false);
+                }
+                break;
             case MENUITEM_LOGOUT:
-                Toast.makeText(this, AuthUtils.getCookie(this), Toast.LENGTH_SHORT).show();
-                final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
-                final Call<LogoutResponse> call = hostApiInterface.logout(AuthUtils.getCookie(this));
+                final CommonApiInterface commonApiInterface = retrofitHost().create(CommonApiInterface.class);
+                final Call<LogoutResponse> call = commonApiInterface.logout(AuthUtils.getCookie(this));
                 logoutCallbackId = NetworkThread.getInstance().registerCallback(logoutCallback);
                 NetworkThread.getInstance().execute(call, logoutCallbackId);
                 break;
@@ -229,7 +246,7 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
         });
         uncheckAllMenuItems(nvDrawer);
         if (getCurrentFragment() == FragmentType.ProfileHost) {
-            nvDrawer.getMenu().getItem(MENUITEM_SHOW_QR).setChecked(true);
+            nvDrawer.getMenu().getItem(MENUITEM_SHOW_PROFILE).setChecked(true);
         }
 
 

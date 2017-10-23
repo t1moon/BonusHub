@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -282,8 +283,15 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                 .putInt("host_id", host_id).apply();
     }
 
+    private void showError(Exception error) {
+        progressDialog.dismiss();
+        new AlertDialog.Builder(logInActivity)
+                .setTitle("Ошибка")
+                .setMessage(error.getMessage())
+                .setPositiveButton("OK", null)
+                .show();
 
-
+    }
 
     private void prepareCallbacks() {
         netHostCallback = new NetworkThread.ExecuteCallback <HostResult>() {

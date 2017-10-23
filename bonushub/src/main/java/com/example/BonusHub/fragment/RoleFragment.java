@@ -45,7 +45,7 @@ public class RoleFragment extends Fragment {
     private View.OnClickListener onHostButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            AuthUtils.setHostRole(getActivity());
+            AuthUtils.setHostRole(getActivity().getApplicationContext());
             goToLoginFragment();
         }
     };
@@ -53,7 +53,7 @@ public class RoleFragment extends Fragment {
     private View.OnClickListener onStaffButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            AuthUtils.setStaffRole(getActivity());
+            AuthUtils.setStaffRole(getActivity().getApplicationContext());
             goToLoginFragment();
         }
     };

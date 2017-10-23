@@ -155,6 +155,10 @@ public class LogInFragment extends Fragment {
         logInActivity.pushFragment(new StartFragment(), false);
     }
 
+    public void goToQr() {
+        logInActivity.pushFragment(new QRFragment(), true);
+    }
+
     public void goToMainActivity() {
         Intent intent = null;
         switch (AuthUtils.getRole(logInActivity)) {
@@ -210,10 +214,10 @@ public class LogInFragment extends Fragment {
         Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
-            if (!AuthUtils.getRole(logInActivity).equals("Host")) {
+            if (!AuthUtils.getRole(getActivity().getApplicationContext()).equals("Host")) {
                 // staff
                 AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
-                goToMainActivity();
+                goToQr();
             } else {
                 if (result.getHostId() == null) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), false);

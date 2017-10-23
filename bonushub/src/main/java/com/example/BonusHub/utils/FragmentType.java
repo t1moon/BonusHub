@@ -16,5 +16,6 @@ public enum FragmentType {
     RoleFragment,
     EditHost,
     Statistic,
-    OwnerSettings
+    OwnerSettings,
+    ProfileStaff
 }

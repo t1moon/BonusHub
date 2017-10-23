@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.BonusHub.activity.StaffMainActivity;
 import com.example.BonusHub.retrofit.ScoreApiInterface;
 import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.activity.HostMainActivity;
@@ -43,7 +44,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     String client_identificator = null;
     private static Fragment fragmentInstance;
     HostMainActivity hostMainActivity;
-
+    StaffMainActivity staffMainActivity;
     EditText et_bill;
     SwitchCompat switchCompat;
 
@@ -54,7 +55,12 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hostMainActivity = (HostMainActivity) getActivity();
+        if (!AuthUtils.getRole(getActivity().getApplicationContext()).equals("Host")) {
+            staffMainActivity = (StaffMainActivity) getActivity();
+        }
+        else {
+            hostMainActivity = (HostMainActivity) getActivity();
+        }
     }
 
     @Override
@@ -105,7 +111,12 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         if (result != null) {
             if (result.getContents() == null) {
                 Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_LONG).show();
-                hostMainActivity.popFragment();
+                if (hostMainActivity != null) {
+                    hostMainActivity.popFragment();
+                }
+                else {
+                    staffMainActivity.popFragment();
+                }
             } else {
                 Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 client_identificator = result.getContents();
@@ -123,10 +134,10 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         Float bill = Float.parseFloat(et_bill.getText().toString());
         int loyality_type = getActivity().getPreferences(MODE_PRIVATE).getInt("loy_type", -1);
         if ((loyality_type == -1) || (loyality_type == 1)) {
-            call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(hostMainActivity));
+            call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
         }
         else {
-            call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(hostMainActivity));
+            call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
         }
         if (updatePointsCallbackId == null) {
             updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);
