@@ -211,13 +211,18 @@ public class LogInFragment extends Fragment {
     }
 
     public void onLoginResult(LoginResponse result) {
-        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
             if (!AuthUtils.getRole(getActivity().getApplicationContext()).equals("Host")) {
                 // staff
-                AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
-                goToQr();
+                if (!AuthUtils.isHosted(getActivity().getApplicationContext())) {
+                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
+                    goToQr();
+                }
+                else {
+                    goToMainActivity();
+                }
             } else {
                 if (result.getHostId() == null) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), false);

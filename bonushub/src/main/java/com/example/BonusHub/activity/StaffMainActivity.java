@@ -57,14 +57,14 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
     public final static int MENUITEM_SHOW_PROFILE = 1;
     public final static int MENUITEM_LOGOUT = 2;
 
-    static {
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectActivityLeaks()
-                .penaltyLog()
-                .penaltyDeath()
-                .build()
-        );
-    }
+//    static {
+//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                .detectActivityLeaks()
+//                .penaltyLog()
+//                .penaltyDeath()
+//                .build()
+//        );
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,7 +253,7 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
     }
 
     private void onLogoutResult() {
-        Toast.makeText(this, "You are logged out", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Вы успешно вышли из системы", Toast.LENGTH_SHORT).show();
         AuthUtils.logout(this);
         goToLogIn();
     }

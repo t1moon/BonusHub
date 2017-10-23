@@ -13,14 +13,14 @@ import com.example.BonusHub.utils.StackListner;
 import com.example.timur.BonusHub.R;
 
 public class LogInActivity extends BaseActivity implements StackListner {
-    static {
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectActivityLeaks()
-                .penaltyLog()
-                .penaltyDeath()
-                .build()
-        );
-    }
+//    static {
+//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                .detectActivityLeaks()
+//                .penaltyLog()
+//                .penaltyDeath()
+//                .build()
+//        );
+//    }
 
     private Toolbar mToolbar;
 

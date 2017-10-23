@@ -6,6 +6,7 @@ import android.os.StrictMode;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.example.BonusHub.fragment.QRFragment;
 import com.example.BonusHub.fragment.RoleFragment;
 import com.example.BonusHub.fragment.StartFragment;
 import com.example.BonusHub.utils.AuthUtils;
@@ -14,14 +15,14 @@ import com.example.BonusHub.utils.StackListner;
 import com.example.timur.BonusHub.R;
 
 public class LogInActivity extends BaseActivity implements StackListner {
-    static {
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectActivityLeaks()
-                .penaltyLog()
-                .penaltyDeath()
-                .build()
-        );
-    }
+//    static {
+//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                .detectActivityLeaks()
+//                .penaltyLog()
+//                .penaltyDeath()
+//                .build()
+//        );
+//    }
 
     private Toolbar mToolbar;
 
@@ -42,8 +43,12 @@ public class LogInActivity extends BaseActivity implements StackListner {
         else {
             if(AuthUtils.getRole(this).equals("Host") && !AuthUtils.isHosted(this))
                 setupStartFragment();
-            else
+            else if((AuthUtils.getRole(this).equals("Staff"))){
+                setupQRFragment();
+            }
+            else {
                 goToMainActivity();
+            }
         }
     }
 
@@ -75,7 +80,14 @@ public class LogInActivity extends BaseActivity implements StackListner {
 
     private void setupStartFragment() {
         setCurrentFragment(FragmentType.StartHost);
+        pushFragment(new RoleFragment(), true);
         pushFragment(new StartFragment(), true);
+    }
+
+    private void setupQRFragment() {
+        setCurrentFragment(FragmentType.StaffQR);
+        pushFragment(new RoleFragment(), true);
+        pushFragment(new QRFragment(), true);
     }
 
 

@@ -205,6 +205,7 @@ public class QRFragment extends Fragment {
             @Override
             public void onSuccess(GetInfoResponse result) {
                 NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
+                AuthUtils.setHosted(getActivity().getApplicationContext(), true);
                 netInfoCallbackId = null;
                 goToMainActivity();
             }
