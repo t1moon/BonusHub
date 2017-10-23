@@ -132,7 +132,7 @@
                 android:id="@+id/prog_descr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/bonus_description"
+                android:text="@string/percent_description"
                 android:textColor="@color/white"
                 />
             <android.support.design.widget.TextInputLayout

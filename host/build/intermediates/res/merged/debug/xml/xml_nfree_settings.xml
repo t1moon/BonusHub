@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.example.bonuslib.preferenceExtensions.NumberPreference.NumberPreference
+        android:key="free_n"
+        android:title="Номер бесплатной покупки"
+        android:defaultValue="6">
+    </com.example.bonuslib.preferenceExtensions.NumberPreference.NumberPreference>
+</PreferenceScreen>

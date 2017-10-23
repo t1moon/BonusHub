@@ -5,5 +5,14 @@ package com.example.BonusHub.retrofit.loyality;
  */
 
 public class EditLoyalityResponse {
+    private int code;
+    private String message;
 
+    public int getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

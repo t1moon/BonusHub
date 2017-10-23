@@ -9,9 +9,17 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
+import com.example.BonusHub.activity.HostMainActivity;
+import com.example.BonusHub.retrofit.HostApiInterface;
+import com.example.BonusHub.retrofit.RetrofitFactory;
+import com.example.BonusHub.retrofit.loyality.EditLoyalityRequest;
+import com.example.BonusHub.retrofit.loyality.EditLoyalityResponse;
+import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.utils.NumberPreference.NumberPickerPreferenceDialog;
 import com.example.BonusHub.utils.NumberPreference.NumberPreference;
 import com.example.timur.BonusHub.R;
+
+import retrofit2.Call;
 
 
 /**
@@ -29,11 +37,12 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
     protected final int BONUS_SYSTEM_KEY_ADDRESS = R.string.bonus_system_key;
     protected final int TYPED_SETTINGS_KEY = R.string.typed_settings_key;
     protected final int TYPED_SETTINGS[] = {
-            R.xml.xml_nfree_settings,
-            R.xml.xml_bonus_account_settings,
-            R.xml.xml_total_discout_settings
+            R.xml.xml_cup_settings,
+            R.xml.xml_percent_settings//,
+//            R.xml.xml_total_discout_settings
     };
     protected int bst = -1; // bonus system type
+    HostApiInterface hostApiInterface;
 
     public OwnerSettingsFragment() {
         // Required empty public constructor
@@ -49,6 +58,9 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
         // on bonus system type
         sp.registerOnSharedPreferenceChangeListener(this);
         // find preferences for chosen bonus type
+
+        // retrifit init
+        hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
     }
 
     // register listener for bonus type change
@@ -79,7 +91,16 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
         if (getString(BONUS_SYSTEM_KEY_ADDRESS).equals(key)) {
             int bonusSystemType = Integer.parseInt(sharedPreferences.getString(key, ""));
             bst = bonusSystemType;
+
             render();
+        }
+
+        if (getString(BONUS_SYSTEM_KEY_ADDRESS).equals(key) ||
+                getString(TYPED_SETTINGS_KEY).equals(key)) {
+            int loyalityParam = Integer.parseInt(sharedPreferences.getString(getString(TYPED_SETTINGS_KEY), "10"));
+            final Call<EditLoyalityResponse> call =
+                    hostApiInterface.editLoyality(new EditLoyalityRequest(bst, loyalityParam, ""),
+                    AuthUtils.getCookie(((HostMainActivity) getActivity()).getApplicationContext()));
         }
     }
 

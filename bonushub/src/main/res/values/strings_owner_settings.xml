@@ -7,11 +7,13 @@
     <string-array name="bonus_system">
         <item>N-ая покупка в подарок</item>
         <item>Накопление баллов</item>
-        <item>Скидка по сумме покупок</item>
+        <!--<item>Скидка по сумме покупок</item>-->
     </string-array>
     <string-array name="bonus_system_type">
         <item>0</item>
         <item>1</item>
-        <item>2</item>
+        <!--<item>2</item>-->
     </string-array>
+    <string name="bonus_system_offer_key">bonus_offer</string>
+    <string name="bonus_system_offer_title">Описание Вашей программы лояльности</string>
 </resources>
