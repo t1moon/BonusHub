@@ -73,9 +73,24 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
         // retrofit init
         hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
 
-//        final Call<GetInfoResponse> call =
-//                hostApiInterface.getInfo(AuthUtils.getCookie(((HostMainActivity) getActivity()).getApplicationContext()));
-//        call.enqueue(new Callback<Host>() {
+        final Call<GetInfoResponse> call =
+                hostApiInterface.getInfo(AuthUtils.getCookie(((HostMainActivity) getActivity()).getApplicationContext()));
+        call.enqueue(new Callback<GetInfoResponse>() {
+            @Override
+            public void onResponse(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
+                bst = response.body().getLoyalityType();
+                if (bst != 0 && bst != 1) return;
+                bsp = (int) response.body().getLoyalityParam();
+                ((ListPreference) findPreference(getString(BONUS_SYSTEM_KEY_ADDRESS))).setValueIndex(bst);
+                render();
+                ((NumberPreference) findPreference(getString(TYPED_SETTINGS_KEYS[bst]))).setValue(bsp);
+            }
+
+            @Override
+            public void onFailure(Call<GetInfoResponse> call, Throwable t) {
+
+            }
+        });
     }
 
     // register listener for bonus type change
@@ -116,7 +131,7 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
                     getString(TYPED_SETTINGS_KEYS[loyalityType]), 10);
             // make a request with them
             final Call<EditLoyalityResponse> call =
-                    hostApiInterface.editLoyality(new EditLoyalityRequest(bst, loyalityParam, ""),
+                    hostApiInterface.editLoyality(new EditLoyalityRequest(loyalityType, loyalityParam, ""),
                     AuthUtils.getCookie(((HostMainActivity) getActivity()).getApplicationContext()));
             // success => ok, failure => we need to reset values
             call.enqueue(new Callback<EditLoyalityResponse>() {
