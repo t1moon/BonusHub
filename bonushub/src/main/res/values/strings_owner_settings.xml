@@ -2,8 +2,10 @@
 <resources>
     <string name="owner_settings_screen">owner_settings_screen</string>
     <string name="bonus_system_header">Тип бонусной системы</string>
-    <string name="typed_settings_key">typed_settings</string>
     <string name="bonus_system_key">bonus_system</string>
+    <string name="cup_param_key">cup_param</string>
+    <string name="percent_param_key">percent_param</string>
+    <string name="discount_param_key">discount_param</string>
     <string-array name="bonus_system">
         <item>N-ая покупка в подарок</item>
         <item>Накопление баллов</item>
