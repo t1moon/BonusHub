@@ -146,9 +146,9 @@ public class ProfileStaffFragment extends Fragment {
 
     private void showError(Exception error) {
         progressDialog.dismiss();
-        new AlertDialog.Builder(staffMainActivity)
-                .setTitle("Ошибка")
-                .setMessage(error.getMessage())
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Упс!")
+                .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
                 .setPositiveButton("OK", null)
                 .show();
 
@@ -307,7 +307,7 @@ public class ProfileStaffFragment extends Fragment {
             public void onError(Exception ex) {
                 new AlertDialog.Builder(staffMainActivity)
                         .setTitle("Ошибка при записи в кэш")
-                        .setMessage(ex.getMessage())
+                        .setMessage("Ошибка сервера. Попробуйте повторить запрос позже")
                         .setPositiveButton("OK", null)
                         .show();
             }

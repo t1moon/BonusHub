@@ -187,7 +187,7 @@ public class StaffListFragment extends Fragment implements RecyclerItemTouchHelp
     private void showError(Exception error) {
         new AlertDialog.Builder(getActivity())
                 .setTitle("Ошибка")
-                .setMessage(error.getMessage())
+                .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
                 .setPositiveButton("OK", null)
                 .show();
 

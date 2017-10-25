@@ -164,7 +164,7 @@ public class QRFragment extends Fragment {
     private void showError(Exception error) {
         new AlertDialog.Builder(logInActivity)
                 .setTitle("Ошибка")
-                .setMessage(error.getMessage())
+                .setMessage("Ошибка сервера. Попробуйте повторить запрос позже")
                 .setPositiveButton("OK", null)
                 .show();
 
@@ -193,8 +193,8 @@ public class QRFragment extends Fragment {
             public void onFailure(Call<GetInfoResponse> call, Response<GetInfoResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
                 netInfoCallbackId = null;
+                swipeRefreshLayout.setRefreshing(false);
                 if (response.code() == 400) {
-                    swipeRefreshLayout.setRefreshing(false);
                     Toast.makeText(getActivity(), "Вы еще не приписаны ни к одному заведению", Toast.LENGTH_SHORT).show();
                 }
                 //Toast.makeText(getActivity(), String.valueOf(response.code()), Toast.LENGTH_SHORT).show();
@@ -205,7 +205,7 @@ public class QRFragment extends Fragment {
             @Override
             public void onSuccess(GetInfoResponse result) {
                 NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
-                AuthUtils.setHosted(getActivity().getApplicationContext(), true);
+                //AuthUtils.setHosted(getActivity().getApplicationContext(), true);
                 netInfoCallbackId = null;
                 goToMainActivity();
             }
@@ -214,6 +214,7 @@ public class QRFragment extends Fragment {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
                 netInfoCallbackId = null;
+                swipeRefreshLayout.setRefreshing(false);
                 showError(ex);
             }
         };

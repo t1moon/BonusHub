@@ -20,18 +20,15 @@ package="com.example.timur.BonusHub">
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name="com.example.BonusHub.activity.MapsActivity" android:label="@string/title_activity_maps">
-
-        </activity>
-        <activity android:name="com.example.BonusHub.activity.LogInActivity">
+        <activity android:name="com.example.BonusHub.activity.LogInActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name="com.example.BonusHub.activity.ClientMainActivity" />
-        <service android:name="com.example.BonusHub.MyService" android:process=":my_service" />
+        <activity android:name="com.example.BonusHub.activity.ClientMainActivity" android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

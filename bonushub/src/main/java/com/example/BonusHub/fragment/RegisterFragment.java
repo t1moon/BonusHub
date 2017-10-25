@@ -172,7 +172,8 @@ public class RegisterFragment extends Fragment {
     }
 
     public void onLoginResult(LoginResponse result) {
-        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+        AuthUtils.setLogin(getActivity().getApplicationContext(), loginInput.getText().toString());
+        //Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
 
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
@@ -247,6 +248,7 @@ public class RegisterFragment extends Fragment {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
                 registrationCallbackId = null;
+                progressDialog.dismiss();
                 Toast.makeText(getActivity(), "Ошибка соединения с сервером", Toast.LENGTH_SHORT).show();
             }
         };

@@ -19,7 +19,8 @@
             android:value="@integer/google_play_services_version" />
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-        <activity android:name="com.example.BonusHub.activity.LogInActivity">
+        <activity android:name="com.example.BonusHub.activity.LogInActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,9 +29,9 @@
         </activity>
 
         <activity android:name="com.example.BonusHub.activity.HostMainActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+            android:configChanges="orientation|screenSize|keyboardHidden" android:screenOrientation="portrait"/>
         <activity android:name="com.example.BonusHub.activity.StaffMainActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+            android:configChanges="orientation|screenSize|keyboardHidden" android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

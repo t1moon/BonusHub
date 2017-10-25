@@ -147,7 +147,7 @@ public class ProfileFragment extends Fragment {
         progressDialog.dismiss();
         new AlertDialog.Builder(hostMainActivity)
                 .setTitle("Ошибка")
-                .setMessage(error.getMessage())
+                .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
                 .setPositiveButton("OK", null)
                 .show();
 

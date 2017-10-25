@@ -147,7 +147,7 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
 
                 @Override
                 public void onFailure(Call<EditLoyalityResponse> call, Throwable t) {
-                    Snackbar snackbar = Snackbar.make(getView(), getString(R.string.loyality_change_failed), Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(getView(), "Ошибка соединения с сервером. Проверьте интернет подключение.", Snackbar.LENGTH_LONG);
                     snackbar.show();
                     if (resumed) sp.unregisterOnSharedPreferenceChangeListener(OwnerSettingsFragment.this);
                     // change back

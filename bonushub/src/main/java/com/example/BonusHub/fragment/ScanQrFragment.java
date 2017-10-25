@@ -118,7 +118,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
                     staffMainActivity.popFragment();
                 }
             } else {
-                Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 client_identificator = result.getContents();
             }
         } else {
@@ -134,10 +134,20 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         Float bill = Float.parseFloat(et_bill.getText().toString());
         int loyality_type = getActivity().getPreferences(MODE_PRIVATE).getInt("loy_type", -1);
         if ((loyality_type == -1) || (loyality_type == 1)) {
-            call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+            if (switchCompat.isChecked()) {
+                call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, -bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+            }
+            else {
+                call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, -bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+            }
         }
         else {
-            call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+            if (switchCompat.isChecked()) {
+                call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, -1), AuthUtils.getCookie(getActivity().getApplicationContext()));
+            }
+            else {
+                call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, 1), AuthUtils.getCookie(getActivity().getApplicationContext()));
+            }
         }
         if (updatePointsCallbackId == null) {
             updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);
@@ -172,7 +182,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     public void onFailure(Call<UpdatePointsResponse> call, Response<UpdatePointsResponse> response) {
         NetworkThread.getInstance().unRegisterCallback(updatePointsCallbackId);
         updatePointsCallbackId = null;
-        Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Ошибка аутентификации. Попробуйте пройти повторную авторизацию", Toast.LENGTH_SHORT).show();
         AuthUtils.logout(getActivity());
         goToLogin();
     }
@@ -188,7 +198,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     public void onError(Exception ex) {
         NetworkThread.getInstance().unRegisterCallback(updatePointsCallbackId);
         updatePointsCallbackId = null;
-        showError(ex);
+        Toast.makeText(getActivity(), "Ошибка соединения с сервером. Проверьте интернет подключение.", Toast.LENGTH_SHORT).show();
     }
 
 

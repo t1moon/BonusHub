@@ -13,7 +13,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <RelativeLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:padding="10dp"
+            android:layout_gravity="center"
+            android:text="Покажите этот код хозяину заведения, чтобы получить доступ к функциям сотрудника. Используйте свайп, чтобы обновить информацию"
+            android:textColor="@android:color/white"
+            android:textSize="20dp" />
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
@@ -29,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true" />
-        </RelativeLayout>
+        </LinearLayout>
 
     </LinearLayout>
 </android.support.v4.widget.SwipeRefreshLayout  >
