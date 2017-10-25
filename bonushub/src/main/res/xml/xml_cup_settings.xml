@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Выбор количества покупок">
+        <com.example.BonusHub.utils.NumberPreference.NumberPreference
+            android:key="@string/cup_param_key"
+            android:title="Номер бесплатной покупки"
+            android:defaultValue="6">
+        </com.example.BonusHub.utils.NumberPreference.NumberPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

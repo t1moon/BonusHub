@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/home/ivan/Documents/Coupon/BonusHub/host/build/intermediates/res/merged/debug/xml/xml_total_discout_settings.xml",
+        "source": "/home/ivan/Documents/Coupon/BonusHub/host/src/main/res/xml/xml_total_discout_settings.xml"
+    },
+    {
+        "merged": "/home/ivan/Documents/Coupon/BonusHub/host/build/intermediates/res/merged/debug/xml/xml_nfree_settings.xml",
+        "source": "/home/ivan/Documents/Coupon/BonusHub/host/src/main/res/xml/xml_nfree_settings.xml"
+    },
+    {
+        "merged": "/home/ivan/Documents/Coupon/BonusHub/host/build/intermediates/res/merged/debug/xml/xml_bonus_account_settings.xml",
+        "source": "/home/ivan/Documents/Coupon/BonusHub/host/src/main/res/xml/xml_bonus_account_settings.xml"
+    },
+    {
+        "merged": "/home/ivan/Documents/Coupon/BonusHub/host/build/intermediates/res/merged/debug/xml/xml_owner_settings.xml",
+        "source": "/home/ivan/Documents/Coupon/BonusHub/host/src/main/res/xml/xml_owner_settings.xml"
+    }
+]

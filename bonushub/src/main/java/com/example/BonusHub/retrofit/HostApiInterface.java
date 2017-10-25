@@ -5,6 +5,8 @@ import com.example.BonusHub.retrofit.client.ClientResponse;
 import com.example.BonusHub.retrofit.editInfo.EditResponse;
 import com.example.BonusHub.retrofit.editInfo.UploadResponse;
 import com.example.BonusHub.retrofit.getInfo.GetInfoResponse;
+import com.example.BonusHub.retrofit.loyality.EditLoyalityRequest;
+import com.example.BonusHub.retrofit.loyality.EditLoyalityResponse;
 import com.example.BonusHub.retrofit.staff.GetStaffResponse;
 import com.example.BonusHub.retrofit.staff.Hire;
 import com.example.BonusHub.retrofit.staff.HireResponse;
@@ -42,6 +44,13 @@ public interface HostApiInterface {
             "Accept: application/json"
     })
     Call<EditResponse> editHost(@Body Host host, @Header("Cookie")String cookie);
+
+    @POST("edit_loyality/")
+    @Headers({
+            "Accept: application/json"
+    })
+    Call<EditLoyalityResponse> editLoyality(@Body EditLoyalityRequest editLoyalityRequest,
+                                            @Header("Cookie") String cookie);
 
     @Multipart
     @POST("upload/")

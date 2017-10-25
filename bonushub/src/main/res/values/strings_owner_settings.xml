@@ -2,16 +2,20 @@
 <resources>
     <string name="owner_settings_screen">owner_settings_screen</string>
     <string name="bonus_system_header">Тип бонусной системы</string>
-    <string name="typed_settings_key">typed_settings</string>
     <string name="bonus_system_key">bonus_system</string>
+    <string name="cup_param_key">cup_param</string>
+    <string name="percent_param_key">percent_param</string>
+    <string name="discount_param_key">discount_param</string>
     <string-array name="bonus_system">
         <item>N-ая покупка в подарок</item>
         <item>Накопление баллов</item>
-        <item>Скидка по сумме покупок</item>
+        <!--<item>Скидка по сумме покупок</item>-->
     </string-array>
     <string-array name="bonus_system_type">
         <item>0</item>
         <item>1</item>
-        <item>2</item>
+        <!--<item>2</item>-->
     </string-array>
+    <string name="bonus_system_offer_key">bonus_offer</string>
+    <string name="bonus_system_offer_title">Описание Вашей программы лояльности</string>
 </resources>

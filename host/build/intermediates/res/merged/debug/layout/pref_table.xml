@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/table_pref_root"
+    android:theme="@style/AppTheme.CustomPreferences"
+    android:background="@color/windowBackground"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="false"
+    tools:context=".BaseActivity">
+
+    <android.support.design.widget.FloatingActionButton
+    android:id="@+id/table_fab"
+    android:src="@drawable/ic_add_black_24dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_gravity="bottom|right"
+    app:fabSize="normal"
+    app:layout_behavior="com.example.bonuslib.preferenceExtensions.TablePreference.ScrollAwareFABBehavior" />
+
+    <TextView
+    android:id="@+id/here_will_be"
+    style="@style/AppTheme.CustomPreference.viewPlaceholder"
+    android:text="Здесь Вы укажете процент от покупки, зачисляемый клиенту в зависимости от суммы покупки"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/prices_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </android.support.v7.widget.RecyclerView>
+
+
+</android.support.design.widget.CoordinatorLayout>

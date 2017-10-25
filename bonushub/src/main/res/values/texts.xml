@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bonus_description">Данная программа лояльности подразумевает фиксированный процент бонусов с каждой покупки. Выберите процент:</string>
+    <string name="percent_description">Данная программа лояльности подразумевает фиксированный процент бонусов с каждой покупки. Выберите процент:</string>
     <string name="cup_description">Данная программа лояльности подразумевает N-ый товар бесплатно. Выберите N:</string>
 </resources>

@@ -16,6 +16,9 @@
     <string name="delete_undo">Задача удалена</string>
     <string name="delete">Удалить</string>
 
+    <string name="loyality_changed">Параметры программы лояльности изменены</string>
+    <string name="loyality_change_failed">Неудача =(</string>
+
     <string-array name="proglist">
         <item>Бонусный товар</item>
         <item>Накопление бонусов</item>

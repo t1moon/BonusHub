@@ -1,0 +1,61 @@
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.BonusHub.activity.fragment.ScanQrFragment">
+
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/et_bill"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_gravity="center"
+        android:hint="Введите сумму заказа"
+        android:textAlignment="center"
+        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15sp">
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch_gprs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:paddingBottom="15dp"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="5sp"
+            android:layout_toLeftOf="@+id/switch_gprs"
+            android:text="Снять"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5sp"
+            android:layout_toRightOf="@+id/switch_gprs"
+            android:text="Начислить"/>
+
+
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/update_points_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Выполнить" />
+
+
+</LinearLayout>
+</android.support.v4.widget.NestedScrollView>

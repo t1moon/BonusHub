@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Начисление процентов">
+        <com.example.BonusHub.utils.NumberPreference.NumberPreference
+            android:key="@string/percent_param_key"
+            android:title="Процент от покупки:"
+            android:defaultValue="10">
+        </com.example.BonusHub.utils.NumberPreference.NumberPreference>
+    </PreferenceCategory>
+</PreferenceScreen>
