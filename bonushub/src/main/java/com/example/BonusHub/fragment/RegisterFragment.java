@@ -227,7 +227,15 @@ public class RegisterFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(registrationCallbackId);
                 registrationCallbackId = null;
                 progressDialog.dismiss();
-                //Toast.makeText(getActivity(), response.code(), Toast.LENGTH_SHORT).show();
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Не указан логин или пароль", Toast.LENGTH_SHORT).show();
+                }
+                if (response.code() == 409) {
+                    Toast.makeText(getActivity(), "Пользователь с таким логином уже существует", Toast.LENGTH_SHORT).show();
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -238,7 +246,8 @@ public class RegisterFragment extends Fragment {
                 if (result.getCode() == 0){
                     onRegistrationResult(result);
                 } else if (result.getCode() == 1) {
-                    Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Данный аккаунт уже существует", Toast.LENGTH_SHORT).show();
+                    onRegistrationResult(result);
                 }
 
 
@@ -264,7 +273,9 @@ public class RegisterFragment extends Fragment {
             public void onFailure(Call<LoginResponse> call, Response<LoginResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
-                Toast.makeText(getActivity(), response.errorBody().toString(), Toast.LENGTH_SHORT).show();
+                if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
 

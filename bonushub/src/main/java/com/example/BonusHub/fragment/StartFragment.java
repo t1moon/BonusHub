@@ -238,15 +238,18 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                 String description = host_description.getText().toString();
                 String address = host_address.getText().toString();
                 Location hubLocation = getLocation();
-                address = hubLocation.getAddress();
+                if (hubLocation != null) {
+                    address = hubLocation.getAddress();
+                }
                 if (title.equals(""))
                     host_title.setError("Введите название");
                 else if (description.equals(""))
                     host_description.setError("Введите описание");
-                else if (address.equals(""))
+                else if (address.equals("") || (address == null))
                     host_address.setError("Введите адрес");
                 else if (hubLocation == null)
                     host_address.setError("Неверный адрес");
+
                 else {
                     Host host = new Host(title, description, address);
                     host.setTime_open(open_time);
@@ -260,7 +263,7 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
 
 
                     final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
-                    final Call<HostResult> call = hostApiInterface.createHost(host, AuthUtils.getCookie(getActivity()));
+                    final Call<HostResult> call = hostApiInterface.createHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));
                     if (netHostCallbackId == null) {
                         netHostCallbackId = NetworkThread.getInstance().registerCallback(netHostCallback);
                         NetworkThread.getInstance().execute(call, netHostCallbackId);
@@ -306,9 +309,22 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                 progressDialog.dismiss();
                 NetworkThread.getInstance().unRegisterCallback(netHostCallbackId);
                 netHostCallbackId = null;
-                Toast.makeText(getActivity(), String.valueOf(response.code()), Toast.LENGTH_SHORT).show();
-                AuthUtils.logout(getActivity().getApplicationContext());
-                goToLogin();
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Не указано название заведения", Toast.LENGTH_SHORT).show();
+                }
+                if (response.code() == 401) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+                }
+                if (response.code() == 403) {
+                    Toast.makeText(getActivity(), "К сожалению, вы не можете создать свое заведение, являясь сотрудником чужого", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
 
@@ -317,7 +333,7 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                 if (result.getCode() == 0) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), true);
                     AuthUtils.setHostId(getActivity().getApplicationContext(), result.getHostId());
-                    Toast.makeText(getActivity(), result.getHostId(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), result.getHostId(), Toast.LENGTH_SHORT).show();
                     goToMainActivity();
                 }
                 else

@@ -157,10 +157,10 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
     private void showResponse(UpdatePointsResponse result) {
         if (result.getCode() == 0) {
-            Toast.makeText(getActivity().getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), "Транзакция успешно проведена", Toast.LENGTH_SHORT).show();
         } else {
             // if something went wrong
-            Toast.makeText(getActivity().getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), "Нехватка средств на балансе", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -182,9 +182,26 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
     public void onFailure(Call<UpdatePointsResponse> call, Response<UpdatePointsResponse> response) {
         NetworkThread.getInstance().unRegisterCallback(updatePointsCallbackId);
         updatePointsCallbackId = null;
-        Toast.makeText(getActivity(), "Ошибка аутентификации. Попробуйте пройти повторную авторизацию", Toast.LENGTH_SHORT).show();
-        AuthUtils.logout(getActivity());
-        goToLogin();
+        //Toast.makeText(getActivity(), "Ошибка аутентификации. Попробуйте пройти повторную авторизацию", Toast.LENGTH_SHORT).show();
+        if (response.code() == 400) {
+            Toast.makeText(getActivity(), "Некорректный User_ID", Toast.LENGTH_SHORT).show();
+
+        }
+        if (response.code() == 401) {
+            Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+            AuthUtils.logout(getActivity());
+            goToLogin();
+
+        }
+        if (response.code() == 403) {
+            Toast.makeText(getActivity(), "Вы не имеете прав доступа", Toast.LENGTH_SHORT).show();
+            AuthUtils.logout(getActivity());
+            goToLogin();
+
+        }
+        else if(response.code() > 500) {
+            Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

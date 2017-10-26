@@ -166,7 +166,12 @@ public class LogInFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Не указан логин или пароль", Toast.LENGTH_SHORT).show();
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override

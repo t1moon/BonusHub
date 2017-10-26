@@ -242,7 +242,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     public void onFailure(Call<HostListResponse> call, Response<HostListResponse> response) {
         NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
         hostsCallbackId = null;
-        if (response.code() == 403) {
+        if (response.code() == 401) {
             Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
             AuthUtils.logout(getActivity().getApplicationContext());
             AuthUtils.setCookie(getActivity().getApplicationContext(), "");
