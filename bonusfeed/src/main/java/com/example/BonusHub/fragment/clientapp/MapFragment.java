@@ -5,6 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
-    private Location location;
     private List<ClientHost> clientHostsList = new ArrayList<>();
     private List<Host> hostsList = new ArrayList<>();
 
@@ -105,50 +105,66 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void setMap() {
         Bundle args = getArguments();
-        Host host = null;
-        if (args  != null && args.containsKey("host_id")) {
+        if (args  != null && args.containsKey("host_id"))
             host_id = args.getInt("host_id", -1);
-            try {
-                host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        Host host = null;
+        try {
+            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        if ((host != null) && (map != null)) {
-            Location currentLocation = getLocation(host.getAddress());
-            if (currentLocation != null) {
-                LatLng pos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongtitude());
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10));
-            }
+        if ((map != null) && (host != null)) {
+            Log.d("Longitude", Double.toString(host.getLongitude()));
+            LatLng pos = new LatLng(host.getLatitude(), host.getLongitude());
+            map.addMarker(new MarkerOptions()
+                    .position(pos)
+                    .title(host.getTitle()));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
         }
-
-        for (ClientHost clientHost : clientHostsList) {
-            try {
-                hostsList.add(HelperFactory.getHelper().getHostDAO().getHostById(clientHost.getHost().getId()));
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        for (Host currHost : hostsList) {
-            if (currHost != null) {
-                String address = currHost.getAddress();
-                String title = currHost.getTitle();
-                Location currentLocation = getLocation(address);
-                if ((map != null) && ((currentLocation != null))) {
-                    if (currentLocation != null) {
-                        LatLng pos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongtitude());
-                        map.addMarker(new MarkerOptions()
-                                .position(pos)
-                                .title(title));
-                        map.setOnMarkerClickListener(markerClickListener);
-                    }
-                }
-            }
-        }
-
     }
+
+//    private void setMap() {
+//        Bundle args = getArguments();
+//        Host host = null;
+//        if (args  != null && args.containsKey("host_id")) {
+//            host_id = args.getInt("host_id", -1);
+//            try {
+//                host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        //Log.d("address", host.getAddress());
+//        //Log.d("Longitude", Double.toString(host.getLongitude()));
+//        if ((host != null) && (map != null)) {
+//            LatLng pos = new LatLng(host.getLatitude(), host.getLongitude());
+//            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10));
+//        }
+//
+//        for (ClientHost clientHost : clientHostsList) {
+//            try {
+//                hostsList.add(HelperFactory.getHelper().getHostDAO().getHostById(clientHost.getHost().getId()));
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        for (Host currHost : hostsList) {
+//            if (currHost != null) {
+//                String address = currHost.getAddress();
+//                String title = currHost.getTitle();
+//                //Location currentLocation = getLocation(address);
+//                if (map != null) {
+//                    LatLng pos = new LatLng(currHost.getLatitude(), currHost.getLongitude());
+//                    map.addMarker(new MarkerOptions()
+//                            .position(pos)
+//                            .title(title));
+//                    map.setOnMarkerClickListener(markerClickListener);
+//                }
+//            }
+//        }
+//
+//    }
 
     private Location getLocation(String address) {
         Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
@@ -230,6 +246,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         for (HostListResponse.HostPoints hp : hostPoints) {
             Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            host.setLongitude(hp.getLongitude());
+            host.setLatitude(hp.getLatitude());
             host.setProfile_image(hp.getProfile_image());
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);

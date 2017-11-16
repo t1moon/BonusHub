@@ -5,6 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
-    private Location location;
+    private Host host;
 
     public HostFragment() {
         // Required empty public constructor
@@ -98,8 +99,6 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
         Bundle args = getArguments();
         if (args  != null && args.containsKey("host_id"))
             host_id = args.getInt("host_id", -1);
-
-        Host host = null;
         try {
             host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
         } catch (SQLException e) {
@@ -112,10 +111,6 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
             int loyality_type = host.getLoyalityType();
             float param = host.getLoyalityParam();
             String loyality_descr = "";
-            //int open_hour = host.getTime_open() / 60;
-            //int open_minute = host.getTime_open() % 60;
-            //int close_hour = host.getTime_close() / 60;
-            //int close_minute = host.getTime_close() % 60;
 
             host_title.setText(title);
             host_description.setText(description);
@@ -146,14 +141,12 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
         String title = host_title.getText().toString();
         host_address.setText(address);
         if (map != null) {
-                Location currentLocation = getLocation(address);
-                if (currentLocation != null) {
-                    LatLng pos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongtitude());
-                    map.addMarker(new MarkerOptions()
-                            .position(pos)
-                            .title(title));
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
-                }
+            Log.d("Longitude", Double.toString(host.getLongitude()));
+            LatLng pos = new LatLng(host.getLatitude(), host.getLongitude());
+            map.addMarker(new MarkerOptions()
+                    .position(pos)
+                    .title(title));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
         }
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -167,25 +160,6 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
         final Bundle bundle = new Bundle();
         bundle.putInt("host_id", host_id);
         mainActivity.pushFragment(new MapFragment(), true, bundle);
-    }
-
-    private Location getLocation(String address) {
-        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = geoCoder.getFromLocationName(address, 3);
-            if (addresses.size() > 0) {
-                Location currentLoc = new Location(addresses.get(0).getAddressLine(0),
-                        addresses.get(0).getLatitude(),
-                        addresses.get(0).getLongitude());
-                return currentLoc;
-            }
-            else {
-                return null;
-            }
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     @Override

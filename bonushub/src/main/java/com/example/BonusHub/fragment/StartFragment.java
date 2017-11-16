@@ -255,7 +255,8 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                     host.setTime_open(open_time);
                     host.setTime_close(close_time);
                     host.setProfile_image(null);
-
+                    host.setLongitude(hubLocation.getLongtitude());
+                    host.setLatitude(hubLocation.getLatitude());
                     progressDialog = new ProgressDialog(logInActivity);
                     progressDialog.setIndeterminate(true);
                     progressDialog.setMessage("Отправка информации на сервер...");
