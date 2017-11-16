@@ -121,72 +121,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .title(host.getTitle()));
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
         }
-    }
 
-//    private void setMap() {
-//        Bundle args = getArguments();
-//        Host host = null;
-//        if (args  != null && args.containsKey("host_id")) {
-//            host_id = args.getInt("host_id", -1);
-//            try {
-//                host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        //Log.d("address", host.getAddress());
-//        //Log.d("Longitude", Double.toString(host.getLongitude()));
-//        if ((host != null) && (map != null)) {
-//            LatLng pos = new LatLng(host.getLatitude(), host.getLongitude());
-//            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10));
-//        }
-//
-//        for (ClientHost clientHost : clientHostsList) {
-//            try {
-//                hostsList.add(HelperFactory.getHelper().getHostDAO().getHostById(clientHost.getHost().getId()));
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        for (Host currHost : hostsList) {
-//            if (currHost != null) {
-//                String address = currHost.getAddress();
-//                String title = currHost.getTitle();
-//                //Location currentLocation = getLocation(address);
-//                if (map != null) {
-//                    LatLng pos = new LatLng(currHost.getLatitude(), currHost.getLongitude());
-//                    map.addMarker(new MarkerOptions()
-//                            .position(pos)
-//                            .title(title));
-//                    map.setOnMarkerClickListener(markerClickListener);
-//                }
-//            }
-//        }
-//
-//    }
-
-    private Location getLocation(String address) {
-        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
-        List<Address> addresses;
-        if (address == null) {
-            return null;
-        }
-        else {
+        for (ClientHost clientHost : clientHostsList) {
             try {
-                addresses = geoCoder.getFromLocationName(address, 3);
-                if (addresses.size() > 0) {
-                    Location currentLoc = new Location(addresses.get(0).getAddressLine(0),
-                            addresses.get(0).getLatitude(),
-                            addresses.get(0).getLongitude());
-                    return currentLoc;
-                } else {
-                    return null;
-                }
-            } catch (IOException e) {
-                return null;
+                hostsList.add(HelperFactory.getHelper().getHostDAO().getHostById(clientHost.getHost().getId()));
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
+
+        for (Host currHost : hostsList) {
+            if (currHost != null) {
+                String address = currHost.getAddress();
+                String title = currHost.getTitle();
+                //Location currentLocation = getLocation(address);
+                if (map != null) {
+                    LatLng pos = new LatLng(currHost.getLatitude(), currHost.getLongitude());
+                    map.addMarker(new MarkerOptions()
+                            .position(pos)
+                            .title(title));
+                    map.setOnMarkerClickListener(markerClickListener);
+                }
+            }
+        }
+
     }
 
     private void getFromCache() {
@@ -329,10 +287,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        if (mainActivity.hasConnection()) {
-            getFromInternet();
-        } else {
-            getFromCache();
-        }
+        getFromCache();
+//        if (mainActivity.hasConnection()) {
+//            getFromInternet();
+//        } else {
+//            getFromCache();
+//        }
     }
 }

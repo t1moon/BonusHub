@@ -7,7 +7,7 @@ import com.j256.ormlite.table.DatabaseTable;
 /**
  * Created by Timur on 13-Apr-17.
  */
-@DatabaseTable(tableName = "host")
+//@DatabaseTable(tableName = "host")
 public class Host{
 
     public final static String HOST_ID_FIELD_NAME = "host_id";

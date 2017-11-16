@@ -140,7 +140,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
         String address = host_address.getText().toString();
         String title = host_title.getText().toString();
         host_address.setText(address);
-        if (map != null) {
+        if ((map != null) && (host != null)) {
             Log.d("Longitude", Double.toString(host.getLongitude()));
             LatLng pos = new LatLng(host.getLatitude(), host.getLongitude());
             map.addMarker(new MarkerOptions()
