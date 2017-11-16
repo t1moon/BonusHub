@@ -76,18 +76,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         final View rootView = inflater.inflate(R.layout.fragment_list_host, container, false);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (mainActivity.hasConnection()) {
-                    getFromInternet();
-                } else {
-                    swipeRefreshLayout.setRefreshing(false);
-
-                }
-
-            }
-        });
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mAdapter = new HostAdapter(getActivity(), clientHostsList);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
@@ -102,6 +90,20 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
                 loadNextData(totalItemsCount);
             }
         };
+        recyclerView.addOnScrollListener(scrollListener);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (mainActivity.hasConnection()) {
+                    scrollListener.resetState();
+                    getFromInternet();
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+
+                }
+
+            }
+        });
         recyclerView.setAdapter(mAdapter);
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -194,9 +196,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     }
 
     private void showNewData(HostListResponse response) {
-        // clear tables
-        HelperFactory.getHelper().clearTablesForClient(HelperFactory.getHelper().getConnectionSource());
-
         List<HostListResponse.HostPoints> hostPoints = response.getHosts();
         List<ClientHost> clientHosts = new ArrayList<>();
         ClientHost clientHost = null;
@@ -215,6 +214,9 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             host.setProfile_image(hp.getProfile_image());
             host.setLoyalityParam(hp.getLoyalityParam());
             host.setLoyalityType(hp.getLoyalityType());
+            host.setLatitude(hp.getLatitude());
+            host.setLongitude(hp.getLongitude());
+            //Log.d("Longitude", Double.toString(hp.getLongitude()));
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
 
