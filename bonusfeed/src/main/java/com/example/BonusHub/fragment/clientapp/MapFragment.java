@@ -203,7 +203,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void getFromInternet() {
         clientHostsList.clear();
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(AuthUtils.getCookie(mainActivity));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(0,AuthUtils.getCookie(mainActivity));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(listHostsCallback);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
