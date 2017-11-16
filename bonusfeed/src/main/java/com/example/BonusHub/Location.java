@@ -19,7 +19,7 @@ public class Location {
         return address;
     }
 
-    public double getLongtitude() {
+    public double getLongitude() {
         return longitude;
     }
 

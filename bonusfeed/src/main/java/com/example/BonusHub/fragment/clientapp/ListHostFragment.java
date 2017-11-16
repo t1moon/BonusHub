@@ -190,6 +190,9 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             host.setProfile_image(hp.getProfile_image());
             host.setLoyalityParam(hp.getLoyalityParam());
             host.setLoyalityType(hp.getLoyalityType());
+            host.setLatitude(hp.getLatitude());
+            host.setLongitude(hp.getLongitude());
+            //Log.d("Longitude", Double.toString(hp.getLongitude()));
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
 

@@ -4,6 +4,8 @@ package com.example.BonusHub.retrofit.clientapp;
  * Created by Timur on 12-May-17.
  */
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
 
 import java.util.List;
 
@@ -63,6 +65,12 @@ public class HostListResponse {
 
         @SerializedName("loyality_param")
         private float loyality_param;
+
+        @SerializedName("longitude")
+        private double longitude;
+
+        @SerializedName("latitude")
+        private double latitude;
 
         public String getTitle() {
             return title;
@@ -134,6 +142,22 @@ public class HostListResponse {
 
         public void setLoyalityParam(float param) {
             this.loyality_param = param ;
+        }
+
+        public void setLongitude(double longt) {
+            longitude = longt;
+        }
+
+        public void setLatitude(double lat) {
+            latitude = lat;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public double getLatitude() {
+            return latitude;
         }
     }
 

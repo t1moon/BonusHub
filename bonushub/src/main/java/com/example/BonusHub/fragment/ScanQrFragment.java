@@ -138,7 +138,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
                 call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, -bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
             }
             else {
-                call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, -bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+                call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
             }
         }
         else {
