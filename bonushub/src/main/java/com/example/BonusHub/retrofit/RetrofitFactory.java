@@ -8,38 +8,38 @@ public class RetrofitFactory {
     private RetrofitFactory() {
     }
 
-//    private final static Retrofit HOST_INSTANCE = new Retrofit.Builder()
-//            .baseUrl("http://195.19.44.158:11250/api/host/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build();
-//    public final static String MEDIA_URL = "media/";
-//
-//    private final static Retrofit COMMON_INSTANCE = new Retrofit.Builder()
-//            .baseUrl("http://195.19.44.158:11250/api/user/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build();
-//
-//    private final static Retrofit SCORE_INSTANCE = new Retrofit.Builder()
-//            .baseUrl("http://195.19.44.158:11250/api/score/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build();
-
-
     private final static Retrofit HOST_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://192.168.0.104:5000/api/host/")
+            .baseUrl("http://195.19.44.158:11250/api/host/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
     public final static String MEDIA_URL = "media/";
 
     private final static Retrofit COMMON_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://192.168.0.104:5000/api/user/")
+            .baseUrl("http://195.19.44.158:11250/api/user/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
     private final static Retrofit SCORE_INSTANCE = new Retrofit.Builder()
-            .baseUrl("http://192.168.0.104:5000/api/score/")
+            .baseUrl("http://195.19.44.158:11250/api/score/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
+
+
+//    private final static Retrofit HOST_INSTANCE = new Retrofit.Builder()
+//            .baseUrl("http://192.168.0.104:5000/api/host/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build();
+//    public final static String MEDIA_URL = "media/";
+//
+//    private final static Retrofit COMMON_INSTANCE = new Retrofit.Builder()
+//            .baseUrl("http://192.168.0.104:5000/api/user/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build();
+//
+//    private final static Retrofit SCORE_INSTANCE = new Retrofit.Builder()
+//            .baseUrl("http://192.168.0.104:5000/api/score/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build();
 
 
     public static Retrofit retrofitHost() {

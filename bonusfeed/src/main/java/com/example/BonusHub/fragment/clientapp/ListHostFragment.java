@@ -172,7 +172,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         swipeRefreshLayout.setRefreshing(true);
         clientHostsList.clear();
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(1, AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(0, AuthUtils.getCookie(mainActivity.getApplicationContext()));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(this);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
@@ -262,7 +262,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             host.setLoyalityType(hp.getLoyalityType());
             host.setLatitude(hp.getLatitude());
             host.setLongitude(hp.getLongitude());
-            //Log.d("Longitude", Double.toString(hp.getLongitude()));
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
 
