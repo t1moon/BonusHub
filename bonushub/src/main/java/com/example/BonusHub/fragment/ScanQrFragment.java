@@ -130,28 +130,28 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
 
         final ScoreApiInterface scoreApiInterface = RetrofitFactory.retrofitScore().create(ScoreApiInterface.class);
         final Call<UpdatePointsResponse> call;
-
-        Float bill = Float.parseFloat(et_bill.getText().toString());
-        int loyality_type = getActivity().getPreferences(MODE_PRIVATE).getInt("loy_type", -1);
-        if ((loyality_type == -1) || (loyality_type == 1)) {
-            if (switchCompat.isChecked()) {
-                call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, -bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+        String bill_str = "";
+        bill_str = et_bill.getText().toString();
+        if (bill_str != "") {
+            Float bill = Float.parseFloat(et_bill.getText().toString());
+            int loyality_type = getActivity().getPreferences(MODE_PRIVATE).getInt("loy_type", -1);
+            if ((loyality_type == -1) || (loyality_type == 1)) {
+                if (switchCompat.isChecked()) {
+                    call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, -bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+                } else {
+                    call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+                }
+            } else {
+                if (switchCompat.isChecked()) {
+                    call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, -bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+                } else {
+                    call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+                }
             }
-            else {
-                call = scoreApiInterface.updateBonus(new UpdatePointsPojo(client_identificator, bill), AuthUtils.getCookie(getActivity().getApplicationContext()));
+            if (updatePointsCallbackId == null) {
+                updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);
+                NetworkThread.getInstance().execute(call, updatePointsCallbackId);
             }
-        }
-        else {
-            if (switchCompat.isChecked()) {
-                call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, -1), AuthUtils.getCookie(getActivity().getApplicationContext()));
-            }
-            else {
-                call = scoreApiInterface.updateCups(new UpdatePointsPojo(client_identificator, 1), AuthUtils.getCookie(getActivity().getApplicationContext()));
-            }
-        }
-        if (updatePointsCallbackId == null) {
-            updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);
-            NetworkThread.getInstance().execute(call, updatePointsCallbackId);
         }
     }
 

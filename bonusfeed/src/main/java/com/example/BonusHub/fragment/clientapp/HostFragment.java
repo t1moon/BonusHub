@@ -18,6 +18,7 @@ import com.example.BonusHub.activity.ClientMainActivity;
 import com.example.BonusHub.db.host.Host;
 import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.db.HelperFactory;
+import com.example.BonusHub.utils.FragmentType;
 import com.example.timur.BonusHub.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -159,6 +160,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
     private void goToMapFragment() {
         final Bundle bundle = new Bundle();
         bundle.putInt("host_id", host_id);
+        mainActivity.setCurrentFragment(FragmentType.ListHost);
         mainActivity.pushFragment(new MapFragment(), true, bundle);
     }
 

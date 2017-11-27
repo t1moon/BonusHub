@@ -273,7 +273,7 @@ public class RegisterFragment extends Fragment {
             public void onFailure(Call<LoginResponse> call, Response<LoginResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
-                if(response.code() > 500) {
+                if(response.code() >= 500) {
                     Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
                 }
             }

@@ -228,6 +228,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void goToHostFragment(int host_id) {
         final Bundle bundle = new Bundle();
         bundle.putInt("host_id", host_id);
+        mainActivity.popWholeStack();
         mainActivity.pushFragment(new HostFragment(), true, bundle);
     }
 

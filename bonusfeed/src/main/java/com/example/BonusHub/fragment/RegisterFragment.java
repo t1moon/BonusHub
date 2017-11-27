@@ -191,7 +191,7 @@ public class RegisterFragment extends Fragment {
                 if (response.code() == 409) {
                     Toast.makeText(getActivity(), "Пользователь с таким логином уже существует", Toast.LENGTH_SHORT).show();
                 }
-                else if(response.code() > 500) {
+                else if(response.code() >= 500) {
                     Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
                 }
 
