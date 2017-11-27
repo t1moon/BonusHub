@@ -87,7 +87,9 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         scrollListener = new EndlessScrollListener(mStaggeredLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                loadNextData(totalItemsCount);
+                if (mainActivity.hasConnection()) {
+                    loadNextData(totalItemsCount);
+                }
             }
         };
         recyclerView.addOnScrollListener(scrollListener);
@@ -99,7 +101,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
                     getFromInternet();
                 } else {
                     swipeRefreshLayout.setRefreshing(false);
-
                 }
 
             }
@@ -142,7 +143,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     }
 
     private void getFromCache() {
-        clientHostsList.clear();
+        List<ClientHost> newClientHostsList = new ArrayList<>();
         Client client = null;
         int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
                 getInt(ClientMainActivity.CLIENT_ID, -1);
@@ -161,16 +162,16 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
 
 
         for (ClientHost item : clientHosts) {
-            clientHostsList.add(item);
+            newClientHostsList.add(item);
         }
-
+        clientHostsList.clear();
+        clientHostsList.addAll(newClientHostsList);
         mAdapter.notifyDataSetChanged();
     }
 
     private void getFromInternet() {
         // showing refresh animation before making http call
         swipeRefreshLayout.setRefreshing(true);
-        clientHostsList.clear();
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
         final Call<HostListResponse> call = clientApiInterface.listHosts(0, AuthUtils.getCookie(mainActivity.getApplicationContext()));
         if (hostsCallbackId == null) {
@@ -197,7 +198,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
 
     private void showNewData(HostListResponse response) {
         List<HostListResponse.HostPoints> hostPoints = response.getHosts();
-        List<ClientHost> clientHosts = new ArrayList<>();
         ClientHost clientHost = null;
         Client client = null;
         int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
@@ -216,14 +216,12 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             host.setLoyalityType(hp.getLoyalityType());
             host.setLatitude(hp.getLatitude());
             host.setLongitude(hp.getLongitude());
-            //Log.d("Longitude", Double.toString(hp.getLongitude()));
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
 
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            Log.d("User's Points", Integer.toString(hp.getPoints()));
             clientHost = new ClientHost(client, host, hp.getPoints());
             try {
                 HelperFactory.getHelper().getClientHostDAO().createClientHost(client, host, hp.getPoints());
@@ -240,10 +238,9 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     private void showResponse(HostListResponse response) {
         // clear tables
         HelperFactory.getHelper().clearTablesForClient(HelperFactory.getHelper().getConnectionSource());
-        clientHostsList.clear();
-
+        //clientHostsList.clear();
+        List<ClientHost> newClientHostsList = new ArrayList();
         List<HostListResponse.HostPoints> hostPoints = response.getHosts();
-        List<ClientHost> clientHosts = new ArrayList<>();
         ClientHost clientHost = null;
         Client client = null;
         int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
@@ -275,9 +272,10 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            clientHostsList.add(clientHost);
+            newClientHostsList.add(clientHost);
         }
-
+        clientHostsList.clear();
+        clientHostsList.addAll(newClientHostsList);
 
         mAdapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);

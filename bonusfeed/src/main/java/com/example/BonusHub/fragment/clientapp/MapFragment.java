@@ -115,13 +115,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         if ((map != null) && (host != null)) {
             LatLng pos;
-            if (host.getLatitude() == 0.0 && host.getLongitude() == 0.0) {
-                Location currentLoc = getLocation(host.getAddress());
-                pos = new LatLng(currentLoc.getLatitude(), currentLoc.getLongitude());
-            }
-            else {
-                pos = new LatLng(host.getLatitude(), host.getLongitude());
-            }
+            pos = new LatLng(host.getLatitude(), host.getLongitude());
             map.addMarker(new MarkerOptions()
                     .position(pos)
                     .title(host.getTitle()));
@@ -140,16 +134,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if (currHost != null) {
                 String address = currHost.getAddress();
                 String title = currHost.getTitle();
-                //Location currentLocation = getLocation(address);
                 if (map != null) {
                     LatLng pos;
-                    if (currHost.getLatitude() == 0.0 && currHost.getLongitude() == 0.0) {
-                        Location currentLoc = getLocation(currHost.getAddress());
-                        pos = new LatLng(currentLoc.getLatitude(), currentLoc.getLongitude());
-                    }
-                    else {
-                        pos = new LatLng(currHost.getLatitude(), currHost.getLongitude());
-                    }
+                    pos = new LatLng(currHost.getLatitude(), currHost.getLongitude());
                     map.addMarker(new MarkerOptions()
                             .position(pos)
                             .title(title));
@@ -158,26 +145,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         }
 
-    }
-
-    private Location getLocation(String address) {
-        Boolean geoResult = false;
-        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = geoCoder.getFromLocationName(address, 3);
-            if (addresses.size() > 0) {
-                Location currentLoc = new Location(addresses.get(0).getAddressLine(0),
-                        addresses.get(0).getLatitude(),
-                        addresses.get(0).getLongitude());
-                return currentLoc;
-            }
-            else {
-                return null;
-            }
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     private void getFromCache() {

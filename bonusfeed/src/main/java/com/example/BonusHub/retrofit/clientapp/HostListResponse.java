@@ -58,7 +58,7 @@ public class HostListResponse {
         private String profile_image;
 
         @SerializedName("points")
-        private int points;
+        private float points;
 
         @SerializedName("loyality_type")
         private int loyality_type;
@@ -113,7 +113,7 @@ public class HostListResponse {
         }
 
         public int getPoints() {
-            return points;
+            return (int)Math.floor(points);
         }
 
         public void setPoints(int points) {

@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -241,36 +242,40 @@ public class StartFragment extends Fragment  implements OnMapReadyCallback {
                 if (hubLocation != null) {
                     address = hubLocation.getAddress();
                 }
-                if (title.equals(""))
-                    host_title.setError("Введите название");
-                else if (description.equals(""))
-                    host_description.setError("Введите описание");
-                else if (address.equals("") || (address == null))
-                    host_address.setError("Введите адрес");
-                else if (hubLocation == null)
-                    host_address.setError("Неверный адрес");
-
+                if (!logInActivity.hasConnection()) {
+                    Snackbar.make(view, "Нет соединения с сетью", Snackbar.LENGTH_LONG).show();
+                }
                 else {
-                    Host host = new Host(title, description, address);
-                    host.setTime_open(open_time);
-                    host.setTime_close(close_time);
-                    host.setProfile_image(null);
-                    host.setLongitude(hubLocation.getLongtitude());
-                    host.setLatitude(hubLocation.getLatitude());
-                    progressDialog = new ProgressDialog(logInActivity);
-                    progressDialog.setIndeterminate(true);
-                    progressDialog.setMessage("Отправка информации на сервер...");
-                    progressDialog.show();
+                    if (title.equals(""))
+                        host_title.setError("Введите название");
+                    else if (description.equals(""))
+                        host_description.setError("Введите описание");
+                    else if (address.equals("") || (address == null))
+                        host_address.setError("Введите адрес");
+                    else if (hubLocation == null)
+                        host_address.setError("Неверный адрес");
+                    else {
+                        Host host = new Host(title, description, address);
+                        host.setTime_open(open_time);
+                        host.setTime_close(close_time);
+                        host.setProfile_image(null);
+                        host.setLongitude(hubLocation.getLongtitude());
+                        host.setLatitude(hubLocation.getLatitude());
+                        progressDialog = new ProgressDialog(logInActivity);
+                        progressDialog.setIndeterminate(true);
+                        progressDialog.setMessage("Отправка информации на сервер...");
+                        progressDialog.show();
 
 
-                    final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
-                    final Call<HostResult> call = hostApiInterface.createHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));
-                    if (netHostCallbackId == null) {
-                        netHostCallbackId = NetworkThread.getInstance().registerCallback(netHostCallback);
-                        NetworkThread.getInstance().execute(call, netHostCallbackId);
+                        final HostApiInterface hostApiInterface = retrofitHost().create(HostApiInterface.class);
+                        final Call<HostResult> call = hostApiInterface.createHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));
+                        if (netHostCallbackId == null) {
+                            netHostCallbackId = NetworkThread.getInstance().registerCallback(netHostCallback);
+                            NetworkThread.getInstance().execute(call, netHostCallbackId);
+                        }
+                        DbExecutorService.getInstance().setCallback(dBHostCallback);
+                        DbExecutorService.getInstance().createHost(host);
                     }
-                    DbExecutorService.getInstance().setCallback(dBHostCallback);
-                    DbExecutorService.getInstance().createHost(host);
                 }
         }
         return super.onOptionsItemSelected(item);

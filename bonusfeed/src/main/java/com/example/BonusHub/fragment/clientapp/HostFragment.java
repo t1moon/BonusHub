@@ -119,7 +119,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
             host_close_time_tv.setText(host.getTime_close());
 
             if (loyality_type == 1) {
-                loyality_descr = getResources().getString(R.string.bonus_feed_description) + Float.toString(param);
+                loyality_descr = getResources().getString(R.string.bonus_feed_description) + Float.toString(param) + "%";
             }
             else {
                 loyality_descr = getResources().getString(R.string.cup_feed_description) + Integer.toString(Math.round(param));
@@ -142,13 +142,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
         host_address.setText(address);
         if ((map != null) && (host != null)) {
             LatLng pos;
-            if (host.getLatitude() == 0.0 && host.getLongitude() == 0.0) {
-                Location currentLoc = getLocation(host.getAddress());
-                pos = new LatLng(currentLoc.getLatitude(), currentLoc.getLongitude());
-            }
-            else {
-                pos = new LatLng(host.getLatitude(), host.getLongitude());
-            }
+            pos = new LatLng(host.getLatitude(), host.getLongitude());
             map.addMarker(new MarkerOptions()
                     .position(pos)
                     .title(title));
@@ -160,26 +154,6 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
                 goToMapFragment();
             }
         });
-    }
-
-    private Location getLocation(String address) {
-        Boolean geoResult = false;
-        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = geoCoder.getFromLocationName(address, 3);
-            if (addresses.size() > 0) {
-                Location currentLoc = new Location(addresses.get(0).getAddressLine(0),
-                        addresses.get(0).getLatitude(),
-                        addresses.get(0).getLongitude());
-                return currentLoc;
-            }
-            else {
-                return null;
-            }
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     private void goToMapFragment() {

@@ -360,8 +360,6 @@ public class EditFragment extends Fragment {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
                 uploadCallbackId = null;
-                NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
-                uploadCallbackId = null;
                 new AlertDialog.Builder(getActivity())
                         .setTitle("Упс!")
                         .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")

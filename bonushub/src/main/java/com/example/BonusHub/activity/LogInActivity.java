@@ -3,9 +3,11 @@ package com.example.BonusHub.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.example.BonusHub.MyApplication;
 import com.example.BonusHub.fragment.QRFragment;
 import com.example.BonusHub.fragment.RoleFragment;
 import com.example.BonusHub.fragment.StartFragment;
@@ -88,6 +90,11 @@ public class LogInActivity extends BaseActivity implements StackListner {
         setCurrentFragment(FragmentType.StaffQR);
         pushFragment(new RoleFragment(), true);
         pushFragment(new QRFragment(), true);
+    }
+
+    public boolean hasConnection() {
+        boolean isConnected = isConnected(MyApplication.getInstance());
+        return isConnected;
     }
 
 
