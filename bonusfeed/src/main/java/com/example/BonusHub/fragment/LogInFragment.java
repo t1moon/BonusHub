@@ -197,5 +197,8 @@ public class LogInFragment extends Fragment {
             AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
             goToMainActivity();
         }
+        else if (result.getCode() == 1) {
+            Toast.makeText(getActivity(), "Неверная пара логин/пароль", Toast.LENGTH_SHORT).show();
+        }
     }
 }
