@@ -135,7 +135,6 @@ public class RegisterFragment extends Fragment {
     }
 
     public void onLoginResult(LoginResponse result) {
-        Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
 
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
