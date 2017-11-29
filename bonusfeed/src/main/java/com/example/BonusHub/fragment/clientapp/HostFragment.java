@@ -132,6 +132,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
             Glide
                     .with(getActivity().getApplicationContext())
                     .load(pathToImageProfile)
+                    .error(R.drawable.default_hub_logo)
                     .fitCenter()
                     .into(imgView);
         }

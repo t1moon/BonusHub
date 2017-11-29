@@ -127,7 +127,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
         Glide
                 .with(getActivity().getApplicationContext())
-                .load(R.drawable.bonus_hub_logo)
+                .load(R.drawable.bonusfeed_logo)
                 .fitCenter()
                 .into(imgView);
 

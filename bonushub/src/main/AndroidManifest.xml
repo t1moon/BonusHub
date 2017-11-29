@@ -10,7 +10,7 @@
 
     <application
         android:name="com.example.BonusHub.MyApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_host"
         android:label="@string/app_name"
         android:supportsRtl="true"

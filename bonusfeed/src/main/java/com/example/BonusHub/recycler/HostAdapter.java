@@ -82,13 +82,14 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
                 Glide
                         .with(context)
                         .load(pathToImageProfile)
+                        .error(R.drawable.default_hub_logo)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(holder.thumbnail);
             } else {
                 // set default
                 Glide
                         .with(context)
-                        .load(R.drawable.test2)
+                        .load(R.drawable.default_hub_logo)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(holder.thumbnail);
             }
