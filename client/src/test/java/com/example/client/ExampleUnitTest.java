@@ -1,4 +1,4 @@
-package com.example.client;
+package com.techpark.client;
 
 import org.junit.Test;
 

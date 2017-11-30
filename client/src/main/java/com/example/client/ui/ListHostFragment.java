@@ -1,4 +1,4 @@
-package com.example.client.ui;
+package com.techpark.client.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,18 +16,18 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.BonusHub.activity.db.client.Client;
-import com.example.BonusHub.activity.db.client_host.ClientHost;
-import com.example.bonuslib.db.HelperFactory;
-import com.example.BonusHub.activity.db.host.Host;
-import com.example.client.AuthUtils;
-import com.example.client.recycler.HostAdapter;
-import com.example.client.recycler.RecyclerTouchListener;
-import com.example.client.R;
-import com.example.client.retrofit.hosts.HostListFetcher;
-import com.example.client.retrofit.hosts.HostListResponse;
-import com.example.client.threadManager.NetworkThread;
-import com.example.client.retrofit.RetrofitFactory;
+import com.techpark.BonusHub.activity.db.client.Client;
+import com.techpark.BonusHub.activity.db.client_host.ClientHost;
+import com.techpark.bonuslib.db.HelperFactory;
+import com.techpark.BonusHub.activity.db.host.Host;
+import com.techpark.client.AuthUtils;
+import com.techpark.client.recycler.HostAdapter;
+import com.techpark.client.recycler.RecyclerTouchListener;
+import com.techpark.client.R;
+import com.techpark.client.retrofit.hosts.HostListFetcher;
+import com.techpark.client.retrofit.hosts.HostListResponse;
+import com.techpark.client.threadManager.NetworkThread;
+import com.techpark.client.retrofit.RetrofitFactory;
 
 
 import java.sql.SQLException;

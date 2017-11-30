@@ -1,4 +1,4 @@
-package com.example.client.retrofit.registration;
+package com.techpark.client.retrofit.registration;
 
 /**
  * Created by mike on 07.05.17.

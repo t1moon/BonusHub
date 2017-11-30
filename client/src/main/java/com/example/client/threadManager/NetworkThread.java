@@ -1,4 +1,4 @@
-package com.example.client.threadManager;
+package com.techpark.client.threadManager;
 
 
 import android.os.Handler;

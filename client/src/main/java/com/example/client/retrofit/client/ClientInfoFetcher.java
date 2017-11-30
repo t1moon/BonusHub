@@ -1,6 +1,6 @@
-package com.example.client.retrofit.client;
+package com.techpark.client.retrofit.client;
 
-import com.example.client.retrofit.hosts.HostListResponse;
+import com.techpark.client.retrofit.hosts.HostListResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

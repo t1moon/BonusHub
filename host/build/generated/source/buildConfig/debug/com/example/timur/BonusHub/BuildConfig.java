@@ -1,7 +1,7 @@
 /**
  * Automatically generated file. DO NOT MODIFY
  */
-package com.example.timur.BonusHub;
+package com.techpark.timur.BonusHub;
 
 public final class BuildConfig {
   public static final boolean DEBUG = Boolean.parseBoolean("true");

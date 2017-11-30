@@ -1,4 +1,4 @@
-package com.example.client.retrofit.login;
+package com.techpark.client.retrofit.login;
 
 /**
  * Created by mike on 16.04.17.

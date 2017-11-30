@@ -10,7 +10,7 @@
         android:name="android.support.test.runner.AndroidJUnitRunner"
         android:functionalTest="false"
         android:handleProfiling="false"
-        android:label="Tests for com.example.bonushub"
+        android:label="Tests for com.techpark.bonushub"
         android:targetPackage="com.example.bonushub" />
 
     <application>

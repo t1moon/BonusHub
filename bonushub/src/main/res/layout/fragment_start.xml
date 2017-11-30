@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="com.example.BonusHub.fragment.StartFragment">
+        tools:context="com.techpark.BonusHub.fragment.StartFragment">
 
         <TextView
             android:layout_width="wrap_content"
@@ -68,7 +68,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp">
-                <com.example.BonusHub.fragment.SquareLinearLayout
+                <com.techpark.BonusHub.fragment.SquareLinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -79,7 +79,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                     </fragment>
-                </com.example.BonusHub.fragment.SquareLinearLayout>
+                </com.techpark.BonusHub.fragment.SquareLinearLayout>
             </LinearLayout>
         </LinearLayout>
 

@@ -1,4 +1,4 @@
-package com.example.client.api;
+package com.techpark.client.api;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

@@ -1,4 +1,4 @@
-package com.example.client;
+package com.techpark.client;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -1,4 +1,4 @@
-package com.example.client.recycler;
+package com.techpark.client.recycler;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -12,11 +12,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.example.BonusHub.activity.db.client_host.ClientHost;
-import com.example.bonuslib.db.HelperFactory;
-import com.example.BonusHub.activity.db.host.Host;
-import com.example.client.R;
-import com.example.client.retrofit.RetrofitFactory;
+import com.techpark.BonusHub.activity.db.client_host.ClientHost;
+import com.techpark.bonuslib.db.HelperFactory;
+import com.techpark.BonusHub.activity.db.host.Host;
+import com.techpark.client.R;
+import com.techpark.client.retrofit.RetrofitFactory;
 
 import java.sql.SQLException;
 import java.util.List;

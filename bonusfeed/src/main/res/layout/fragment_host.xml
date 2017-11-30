@@ -195,7 +195,7 @@
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:orientation="horizontal" android:layout_width="match_parent"
                     android:layout_height="match_parent">
-                    <com.example.BonusHub.fragment.SquareLinearLayout
+                    <com.techpark.BonusHub.fragment.SquareLinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -206,7 +206,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
                         </fragment>
-                    </com.example.BonusHub.fragment.SquareLinearLayout>
+                    </com.techpark.BonusHub.fragment.SquareLinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

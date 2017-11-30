@@ -1,4 +1,4 @@
-package com.example.client.retrofit.hosts;
+package com.techpark.client.retrofit.hosts;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

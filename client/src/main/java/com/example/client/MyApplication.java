@@ -1,8 +1,8 @@
-package com.example.client;
+package com.techpark.client;
 
 import android.app.Application;
 
-import com.example.bonuslib.db.HelperFactory;
+import com.techpark.bonuslib.db.HelperFactory;
 
 /**
  * Created by Timur on 13-Apr-17.

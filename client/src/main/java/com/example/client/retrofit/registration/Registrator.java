@@ -1,5 +1,5 @@
-package com.example.client.retrofit.registration;
-import com.example.client.retrofit.Login;
+package com.techpark.client.retrofit.registration;
+import com.techpark.client.retrofit.Login;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

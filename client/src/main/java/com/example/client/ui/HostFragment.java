@@ -1,4 +1,4 @@
-package com.example.client.ui;
+package com.techpark.client.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,10 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.bonuslib.db.HelperFactory;
-import com.example.BonusHub.activity.db.host.Host;
-import com.example.client.R;
-import com.example.client.retrofit.RetrofitFactory;
+import com.techpark.bonuslib.db.HelperFactory;
+import com.techpark.BonusHub.activity.db.host.Host;
+import com.techpark.client.R;
+import com.techpark.client.retrofit.RetrofitFactory;
 
 import java.sql.SQLException;
 

@@ -1,4 +1,4 @@
-package com.example.bonuslib;
+package com.techpark.bonuslib;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.example.client.recycler;
+package com.techpark.client.recycler;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;

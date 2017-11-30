@@ -1,4 +1,4 @@
-package com.example.client.ui;
+package com.techpark.client.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.example.client.ui.MainActivity;
-import com.example.client.R;
+import com.techpark.client.ui.MainActivity;
+import com.techpark.client.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;

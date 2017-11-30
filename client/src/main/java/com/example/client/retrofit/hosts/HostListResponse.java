@@ -1,4 +1,4 @@
-package com.example.client.retrofit.hosts;
+package com.techpark.client.retrofit.hosts;
 
 /**
  * Created by Timur on 12-May-17.

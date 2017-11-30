@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.example.bonushub.test;
+package com.techpark.bonushub.test;
 
 public final class R {
     public static final class attr {

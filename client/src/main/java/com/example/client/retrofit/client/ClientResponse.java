@@ -1,4 +1,4 @@
-package com.example.client.retrofit.client;
+package com.techpark.client.retrofit.client;
 
 import com.google.gson.annotations.SerializedName;
 

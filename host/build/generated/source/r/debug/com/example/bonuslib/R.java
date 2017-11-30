@@ -4,7 +4,7 @@
  * gradle plugin from the resource data it found. It
  * should not be modified by hand.
  */
-package com.example.bonuslib;
+package com.techpark.bonuslib;
 
 public final class R {
     public static final class anim {

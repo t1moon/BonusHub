@@ -1,4 +1,4 @@
-package com.example.client.ui;
+package com.techpark.client.ui;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -21,23 +21,23 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.bonuslib.BaseActivity;
-import com.example.bonuslib.FragmentType;
-import com.example.bonuslib.StackListner;
-import com.example.bonuslib.db.HelperFactory;
-import com.example.client.AuthUtils;
-import com.example.client.MyApplication;
-import com.example.client.R;
-import com.example.client.retrofit.client.ClientInfoFetcher;
-import com.example.client.retrofit.client.ClientResponse;
-import com.example.client.retrofit.login.LogoutResult;
-import com.example.client.retrofit.login.Logouter;
-import com.example.client.threadManager.NetworkThread;
+import com.techpark.bonuslib.BaseActivity;
+import com.techpark.bonuslib.FragmentType;
+import com.techpark.bonuslib.StackListner;
+import com.techpark.bonuslib.db.HelperFactory;
+import com.techpark.client.AuthUtils;
+import com.techpark.client.MyApplication;
+import com.techpark.client.R;
+import com.techpark.client.retrofit.client.ClientInfoFetcher;
+import com.techpark.client.retrofit.client.ClientResponse;
+import com.techpark.client.retrofit.login.LogoutResult;
+import com.techpark.client.retrofit.login.Logouter;
+import com.techpark.client.threadManager.NetworkThread;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.client.api.RetrofitFactory.retrofitClient;
+import static com.techpark.client.api.RetrofitFactory.retrofitClient;
 
 public class MainActivity extends BaseActivity implements StackListner {
 

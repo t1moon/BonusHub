@@ -18,7 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.client.ui.LogInActivity" />
+        <activity android:name="com.techpark.client.ui.LogInActivity" />
     </application>
 
 </manifest>

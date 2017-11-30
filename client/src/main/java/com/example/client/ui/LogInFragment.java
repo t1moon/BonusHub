@@ -1,4 +1,4 @@
-package com.example.client.ui;
+package com.techpark.client.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -12,18 +12,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.client.AuthUtils;
-import com.example.client.retrofit.Login;
-import com.example.client.retrofit.login.LoginResult;
-import com.example.client.retrofit.login.Loginner;
-import com.example.client.threadManager.NetworkThread;
-import com.example.bonuslib.FragmentType;
-import com.example.client.R;
+import com.techpark.client.AuthUtils;
+import com.techpark.client.retrofit.Login;
+import com.techpark.client.retrofit.login.LoginResult;
+import com.techpark.client.retrofit.login.Loginner;
+import com.techpark.client.threadManager.NetworkThread;
+import com.techpark.bonuslib.FragmentType;
+import com.techpark.client.R;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-import static com.example.client.api.RetrofitFactory.retrofitClient;
+import static com.techpark.client.api.RetrofitFactory.retrofitClient;
 
 public class LogInFragment extends Fragment implements NetworkThread.ExecuteCallback<LoginResult> {
     private LogInActivity logInActivity;
