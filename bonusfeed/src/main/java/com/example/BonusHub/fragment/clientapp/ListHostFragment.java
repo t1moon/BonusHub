@@ -210,7 +210,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         }
 
         for (HostListResponse.HostPoints hp : hostPoints) {
-            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close(), hp.getOffer());
             host.setProfile_image(hp.getProfile_image());
             host.setLoyalityParam(hp.getLoyalityParam());
             host.setLoyalityType(hp.getLoyalityType());
@@ -253,7 +253,8 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         }
 
         for (HostListResponse.HostPoints hp : hostPoints) {
-            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close(), hp.getOffer());
+            //Log.d("Offer", hp.getOffer());
             host.setProfile_image(hp.getProfile_image());
             host.setLoyalityParam(hp.getLoyalityParam());
             host.setLoyalityType(hp.getLoyalityType());
@@ -265,7 +266,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            Log.d("User's Points", Integer.toString(hp.getPoints()));
             clientHost = new ClientHost(client, host, hp.getPoints());
             try {
                 HelperFactory.getHelper().getClientHostDAO().createClientHost(client, host, hp.getPoints());

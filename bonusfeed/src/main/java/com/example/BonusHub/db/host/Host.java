@@ -21,6 +21,7 @@ public class Host{
     public final static String HOST_LOYALITY_PARAM = "loyality_param";
     public final static String HOST_LONG = "longitude";
     public final static String HOST_LAT = "latitude";
+    public final static String HOST_OFFER = "offer";
 
     @DatabaseField(generatedId = true, columnName = HOST_ID_FIELD_NAME)
     private int Id;
@@ -57,6 +58,9 @@ public class Host{
     @DatabaseField(columnName = HOST_LAT, dataType = DataType.DOUBLE)
     private double latitude;
 
+    @DatabaseField(columnName = HOST_OFFER, dataType = DataType.STRING)
+    private String offer;
+
     public Host() {
     }
 
@@ -66,12 +70,13 @@ public class Host{
         this.address = address;
     }
 
-    public Host(String title, String description, String address, String time_open, String time_close){
+    public Host(String title, String description, String address, String time_open, String time_close, String offer){
         this.title = title;
         this.description = description;
         this.address = address;
         this.time_open = time_open;
         this.time_close = time_close;
+        this.offer = offer;
     }
     public String getTitle() {
         return title;
@@ -155,5 +160,13 @@ public class Host{
 
     public double getLatitude() {
         return latitude;
+    }
+
+    public String getOffer() {
+        return offer;
+    }
+
+    public void setOffer(String newOffer) {
+        this.offer = newOffer;
     }
 }

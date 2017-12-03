@@ -203,7 +203,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         for (HostListResponse.HostPoints hp : hostPoints) {
-            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close(), hp.getOffer());
             host.setLongitude(hp.getLongitude());
             host.setLatitude(hp.getLatitude());
             host.setProfile_image(hp.getProfile_image());

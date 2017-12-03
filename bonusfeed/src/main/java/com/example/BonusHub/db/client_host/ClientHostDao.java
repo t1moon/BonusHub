@@ -25,6 +25,12 @@ public class ClientHostDao extends BaseDaoImpl<ClientHost, Integer> {
         return clientHosts;
     }
 
+    public List<ClientHost> lookupHost(Client client, Host host) throws SQLException, java.sql.SQLException {
+
+        List<ClientHost> clientHosts = this.queryBuilder().where().eq(ClientHost.CLIENTHOST_CLIENT_FIELD_NAME, client).and().eq(ClientHost.CLIENTHOST_HOST_FIELD_NAME, host.getId()).query();
+        return clientHosts;
+    }
+
     public void createClientHost(Client client, Host host, int points) throws java.sql.SQLException {
         ClientHost clientHost= new ClientHost(client, host, points);
         this.create(clientHost);

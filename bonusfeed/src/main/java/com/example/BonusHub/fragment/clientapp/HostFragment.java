@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.BonusHub.Location;
 import com.example.BonusHub.activity.ClientMainActivity;
+import com.example.BonusHub.db.client.Client;
+import com.example.BonusHub.db.client_host.ClientHost;
 import com.example.BonusHub.db.host.Host;
 import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.db.HelperFactory;
@@ -29,8 +31,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class HostFragment extends Fragment implements OnMapReadyCallback {
 
@@ -42,6 +44,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
     private TextView host_description;
     private TextView host_address;
     private TextView host_loy_descr;
+    private TextView points_rv;
     private int host_id = -1;
 
     private SupportMapFragment mapFragment;
@@ -72,6 +75,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
         host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
         host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
         host_loy_descr = (TextView) rootView.findViewById(R.id.host_loy_descr);
+        points_rv = (TextView) rootView.findViewById(R.id.host_points_tv);
 
         mapFragment = (SupportMapFragment) (getChildFragmentManager()
                 .findFragmentById(R.id.mini_map));
@@ -119,12 +123,38 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
             host_open_time_tv.setText(host.getTime_open());
             host_close_time_tv.setText(host.getTime_close());
 
-            if (loyality_type == 1) {
-                loyality_descr = getResources().getString(R.string.bonus_feed_description) + Float.toString(param) + "%";
+            Client client = null;
+            int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
+                    getInt(ClientMainActivity.CLIENT_ID, -1);
+            try {
+                client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            List<ClientHost> clientHosts = new ArrayList<>();
+            try {
+                clientHosts = HelperFactory.getHelper().getClientHostDAO().lookupHost(client, host);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            Integer points;
+            if (clientHosts.get(0) != null) {
+                points = clientHosts.get(0).getPoints();
             }
             else {
-                loyality_descr = getResources().getString(R.string.cup_feed_description) + Integer.toString(Math.round(param));
+                points = 0;
             }
+            if (host.getLoyalityType() == 1) {
+                points_rv.setText(Integer.toString(points));
+            }
+            else {
+                points_rv.setText(Integer.toString(points) + "/" + Integer.toString(Math.round(host.getLoyalityParam())));
+            }
+
+            Log.d("Offer", host.getOffer());
+            loyality_descr = host.getOffer();
             host_loy_descr.setText(loyality_descr);
 
             ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
