@@ -137,9 +137,12 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
 
     public void goToHostFragment(int position) {
         final Bundle bundle = new Bundle();
-        int host_id = mAdapter.getItemByPosition(position).getHost().getId();
-        bundle.putInt("host_id", host_id);
-        mainActivity.pushFragment(new HostFragment(), true, bundle);
+        ClientHost clientHost = mAdapter.getItemByPosition(position);
+        if (clientHost != null) {
+            int host_id = clientHost.getHost().getId();
+            bundle.putInt("host_id", host_id);
+            mainActivity.pushFragment(new HostFragment(), true, bundle);
+        }
     }
 
     private void getFromCache() {
