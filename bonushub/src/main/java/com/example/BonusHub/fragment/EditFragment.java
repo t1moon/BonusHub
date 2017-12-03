@@ -326,6 +326,16 @@ public class EditFragment extends Fragment {
             public void onFailure(Call<UploadResponse> call, Response<UploadResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
                 uploadCallbackId = null;
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Укажите название заведения", Toast.LENGTH_SHORT).show();
+
+                }
+                if (response.code() == 401) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+
+                }
                 if (response.code() == 403) {
                     Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
                     AuthUtils.logout(getActivity());
@@ -350,8 +360,6 @@ public class EditFragment extends Fragment {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
                 uploadCallbackId = null;
-                NetworkThread.getInstance().unRegisterCallback(uploadCallbackId);
-                uploadCallbackId = null;
                 new AlertDialog.Builder(getActivity())
                         .setTitle("Упс!")
                         .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
@@ -370,6 +378,16 @@ public class EditFragment extends Fragment {
             public void onFailure(Call<EditResponse> call, Response<EditResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(editCallbackId);
                 editCallbackId = null;
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Укажите название заведения", Toast.LENGTH_SHORT).show();
+
+                }
+                if (response.code() == 401) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+
+                }
                 if (response.code() == 403) {
                     Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
                     AuthUtils.logout(getActivity());

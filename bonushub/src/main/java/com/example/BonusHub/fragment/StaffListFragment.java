@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BonusHub.activity.HostMainActivity;
+import com.example.BonusHub.activity.LogInActivity;
 import com.example.BonusHub.db.staff.Staff;
 import com.example.BonusHub.recycler.RecyclerItemTouchHelperLeft;
 import com.example.BonusHub.recycler.StaffRecyclerAdapter;
@@ -104,6 +105,12 @@ public class StaffListFragment extends Fragment implements RecyclerItemTouchHelp
         return view;
     }
 
+    private void goToLogin() {
+        Intent intent = new Intent(getActivity(), LogInActivity.class);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
     private void prepareCallback() {
         getStaffCallback = new NetworkThread.ExecuteCallback<GetStaffResponse>() {
             @Override
@@ -115,6 +122,21 @@ public class StaffListFragment extends Fragment implements RecyclerItemTouchHelp
             public void onFailure(Call<GetStaffResponse> call, Response<GetStaffResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(getStaffCallbackId);
                 getStaffCallbackId = null;
+                if (response.code() == 401) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+
+                }
+                if (response.code() == 403) {
+                    Toast.makeText(getActivity(), "Вы не являетесь хозяином заведения", Toast.LENGTH_SHORT).show();
+//                    AuthUtils.logout(getActivity());
+//                    goToLogin();
+
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -142,6 +164,31 @@ public class StaffListFragment extends Fragment implements RecyclerItemTouchHelp
             public void onFailure(Call<HireResponse> call, Response<HireResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(hireCallbackId);
                 hireCallbackId = null;
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Укажите название заведения", Toast.LENGTH_SHORT).show();
+
+                }
+                if (response.code() == 401) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+
+                }
+                if (response.code() == 403) {
+                    Toast.makeText(getActivity(), "Вы не являетесь хозяином заведения", Toast.LENGTH_SHORT).show();
+//                    AuthUtils.logout(getActivity());
+//                    goToLogin();
+
+                }
+                if (response.code() == 404) {
+                    Toast.makeText(getActivity(), "Некорректный User_ID", Toast.LENGTH_SHORT).show();
+                }
+                if (response.code() == 409) {
+                    Toast.makeText(getActivity(), "Данный пользователь уже является Вашим сотрудником", Toast.LENGTH_SHORT).show();
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -168,6 +215,31 @@ public class StaffListFragment extends Fragment implements RecyclerItemTouchHelp
             public void onFailure(Call<RetireResponse> call, Response<RetireResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(retireCallbackId);
                 retireCallbackId = null;
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Не указан User_ID", Toast.LENGTH_SHORT).show();
+
+                }
+                if (response.code() == 401) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogin();
+
+                }
+                if (response.code() == 403) {
+                    Toast.makeText(getActivity(), "Вы не являетесь хозяином заведения", Toast.LENGTH_SHORT).show();
+//                    AuthUtils.logout(getActivity());
+//                    goToLogin();
+
+                }
+                if (response.code() == 404) {
+                    Toast.makeText(getActivity(), "Данный пользователь не работает в вашем заведении", Toast.LENGTH_SHORT).show();
+                }
+                if (response.code() == 409) {
+                    Toast.makeText(getActivity(), "Нельзя уволить хозяина заведения", Toast.LENGTH_SHORT).show();
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -188,7 +260,7 @@ public class StaffListFragment extends Fragment implements RecyclerItemTouchHelp
     private void showError(Exception error) {
         new AlertDialog.Builder(getActivity())
                 .setTitle("Ошибка")
-                .setMessage(error.getMessage())
+                .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
                 .setPositiveButton("OK", null)
                 .show();
 

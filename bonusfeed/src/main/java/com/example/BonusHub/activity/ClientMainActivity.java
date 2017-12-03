@@ -34,6 +34,8 @@ import com.example.BonusHub.utils.StackListner;
 import com.example.BonusHub.db.HelperFactory;
 import com.example.timur.BonusHub.R;
 
+import java.util.jar.Attributes;
+
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -142,11 +144,23 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
     }
 
     private void setupClient() {
-        final ClientApiInterface clientApiInterface= retrofitClient().create(ClientApiInterface.class);
-        final Call<ClientInfoResponse> call = clientApiInterface.getInfo(AuthUtils.getCookie(this));
-        if (clientCallbackId == null) {
-            clientCallbackId = NetworkThread.getInstance().registerCallback(clientCallback);
-            NetworkThread.getInstance().execute(call, clientCallbackId);
+        if (this.hasConnection()) {
+            final ClientApiInterface clientApiInterface = retrofitClient().create(ClientApiInterface.class);
+            final Call<ClientInfoResponse> call = clientApiInterface.getInfo(AuthUtils.getCookie(this));
+            if (clientCallbackId == null) {
+                clientCallbackId = NetworkThread.getInstance().registerCallback(clientCallback);
+                NetworkThread.getInstance().execute(call, clientCallbackId);
+            }
+        }
+        else {
+            String name = mainActivity.getPreferences(MODE_PRIVATE).getString(CLIENT_NAME, "Name");
+            NavigationView nvDrawer = (NavigationView) mainActivity.findViewById(R.id.navigation_view);
+            View header = nvDrawer.getHeaderView(0);
+            TextView profileName = (TextView) header.findViewById(R.id.tv_profile_name);
+            if (name.equals("Name")) {
+                showSnack(false);
+            }
+            profileName.setText(name);
         }
     }
 
@@ -356,8 +370,7 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
             public void onError(Exception ex) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
-                showError(ex);
-                //Toast.makeText(ClientMainActivity.this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                onLogoutResult();
             }
         };
 

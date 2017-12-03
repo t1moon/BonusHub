@@ -146,9 +146,9 @@ public class ProfileStaffFragment extends Fragment {
 
     private void showError(Exception error) {
         progressDialog.dismiss();
-        new AlertDialog.Builder(staffMainActivity)
-                .setTitle("Ошибка")
-                .setMessage(error.getMessage())
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Упс!")
+                .setMessage("Ошибка соединения с сервером. Проверьте интернет подключение.")
                 .setPositiveButton("OK", null)
                 .show();
 
@@ -277,9 +277,22 @@ public class ProfileStaffFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(netInfoCallbackId);
                 netInfoCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), String.valueOf(response.code()), Toast.LENGTH_SHORT).show();
-                AuthUtils.logout(getActivity());
-                goToLogIn();
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Вы не являетесь сотрудником или владельцем какого-либо заведения", Toast.LENGTH_SHORT).show();
+                }
+                if (response.code() == 401) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity());
+                    goToLogIn();
+
+                }
+                if (response.code() == 404) {
+                    Toast.makeText(getActivity(), "Данное заведение не существует", Toast.LENGTH_SHORT).show();
+
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -307,7 +320,7 @@ public class ProfileStaffFragment extends Fragment {
             public void onError(Exception ex) {
                 new AlertDialog.Builder(staffMainActivity)
                         .setTitle("Ошибка при записи в кэш")
-                        .setMessage(ex.getMessage())
+                        .setMessage("Ошибка сервера. Попробуйте повторить запрос позже")
                         .setPositiveButton("OK", null)
                         .show();
             }

@@ -7,7 +7,7 @@ import com.j256.ormlite.table.DatabaseTable;
 /**
  * Created by Timur on 13-Apr-17.
  */
-@DatabaseTable(tableName = "host")
+//@DatabaseTable(tableName = "host")
 public class Host{
 
     public final static String HOST_ID_FIELD_NAME = "host_id";
@@ -19,6 +19,8 @@ public class Host{
     public final static String HOST_IMAGE_FIELD_NAME = "profile_image";
     public final static String HOST_LOYALITY_PROGRAMM = "loyality_programm";
     public final static String HOST_LOYALITY_PARAM = "loyality_param";
+    public final static String HOST_LONG = "longitude";
+    public final static String HOST_LAT = "latitude";
 
     @DatabaseField(generatedId = true, columnName = HOST_ID_FIELD_NAME)
     private int Id;
@@ -49,6 +51,11 @@ public class Host{
     @DatabaseField(columnName = HOST_LOYALITY_PARAM, dataType = DataType.FLOAT)
     private float loyality_param;
 
+    @DatabaseField(columnName = HOST_LONG, dataType = DataType.DOUBLE)
+    private double longitude;
+
+    @DatabaseField(columnName = HOST_LAT, dataType = DataType.DOUBLE)
+    private double latitude;
 
     public Host() {
     }
@@ -132,5 +139,21 @@ public class Host{
 
     public float getLoyalityParam() {
         return loyality_param;
+    }
+
+    public void setLongitude(double longt) {
+        longitude = longt;
+    }
+
+    public void setLatitude(double lat) {
+        latitude = lat;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
     }
 }

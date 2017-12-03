@@ -12,8 +12,12 @@ import com.example.BonusHub.db.client.Client;
 import com.example.BonusHub.db.client.ClientDao;
 import com.example.BonusHub.db.client_host.ClientHost;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
+import com.j256.ormlite.field.DatabaseFieldConfig;
 import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.DatabaseTableConfig;
 import com.j256.ormlite.table.TableUtils;
+
+import java.util.List;
 
 /**
  * Created by Timur on 13-Apr-17.

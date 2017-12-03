@@ -12,6 +12,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface ClientApiInterface {
     @POST("login/")
@@ -27,11 +28,17 @@ public interface ClientApiInterface {
     })
     Call<LogoutResponse> logout(@Header("Cookie") String cookie);
 
+//    @GET("list_hosts/")
+//    @Headers({
+//            "Accept: application/json"
+//    })
+//    Call<HostListResponse> listHosts(@Header("Cookie")String cookie);
+
     @GET("list_hosts/")
     @Headers({
             "Accept: application/json"
     })
-    Call<HostListResponse> listHosts(@Header("Cookie")String cookie);
+    Call<HostListResponse> listHosts(@Query("offset") int offset,@Header("Cookie")String cookie);
 
     @GET("get_info/")
     @Headers({

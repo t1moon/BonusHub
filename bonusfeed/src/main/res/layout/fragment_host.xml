@@ -1,6 +1,7 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -22,7 +23,8 @@
                     android:paddingBottom="10dp"
                     android:text="Здесь будет Ваше название"
                     android:textColor="#000"
-                    android:textSize="30dp" />
+                    android:textSize="30dp"
+                    android:fontFamily="sans-serif-light"/>
 
             <View
             android:layout_width="match_parent"
@@ -43,13 +45,26 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <TextView
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_content_paste_black_24dp"
-                    android:text="Описание"
-                    android:textColor="@color/black"
-                    android:textSize="20dp" />
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_content_paste_black_24dp"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="8dp"
+                        android:text="Описание"
+                        android:textColor="@color/black"
+                        android:textSize="20dp"
+                        android:fontFamily="sans-serif-light"/>
+
+                </LinearLayout>
+
 
                 <TextView
                     android:id="@+id/host_description_tv"
@@ -57,21 +72,28 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2sp"
                     android:hint="@string/description"
-                    android:padding="20dp" />
+                    android:padding="@dimen/description_padding"
+                    android:textSize="@dimen/host_profile_text_size"
+                    android:fontFamily="sans-serif-light"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2sp"
-                    android:text="Описание программы лояльности:"
-                    android:padding="2dp" />
+                    android:textSize="@dimen/host_profile_text_size"
+                    android:paddingLeft="@dimen/description_padding"
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="italic"
+                    android:text="Описание программы лояльности:"/>
 
                 <TextView
                     android:id="@+id/host_loy_descr"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2sp"
-                    android:padding="2dp" />
+                    android:textSize="@dimen/host_profile_text_size"
+                    android:fontFamily="sans-serif-light"
+                    android:paddingLeft="@dimen/description_padding"/>
             </LinearLayout>
 
 
@@ -85,13 +107,24 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_access_time_black_24dp"
-                    android:text="Время работы"
-                    android:textColor="@color/black"
-                    android:textSize="20dp" />
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_access_time_black_24dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="8dp"
+                        android:text="Время работы"
+                        android:textColor="@color/black"
+                        android:textSize="20dp"
+                        android:fontFamily="sans-serif-light"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -105,12 +138,15 @@
                         android:layout_marginTop="2sp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:hint="Время открытия" />
+                        android:hint="Время открытия"
+                        android:textSize="@dimen/host_profile_text_size"
+                        android:fontFamily="sans-serif-light"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="-" />
+                        android:text="-"
+                        android:fontFamily="sans-serif-light"/>
 
                     <TextView
                         android:id="@+id/host_close_time_tv"
@@ -119,7 +155,9 @@
                         android:layout_marginTop="2sp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:hint="Время закрытия" />
+                        android:hint="Время закрытия"
+                        android:textSize="@dimen/host_profile_text_size"
+                        android:fontFamily="sans-serif-light"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -135,21 +173,35 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_pin_drop_black_24dp"
-                    android:text="Адрес"
-                    android:textColor="@color/black"
-                    android:textSize="20dp" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_pin_drop_black_24dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="8dp"
+                        android:text="Адрес"
+                        android:textColor="@color/black"
+                        android:textSize="20dp"
+                        android:fontFamily="sans-serif-light"/>
+
+                </LinearLayout>
                 <TextView
                     android:id="@+id/host_address_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2sp"
+                    android:textSize="@dimen/host_profile_text_size"
                     android:hint="Здесь будет ваш адрес"
-                    android:padding="20dp" />
+                    android:padding="20dp"
+                    android:fontFamily="sans-serif-light"/>
 
             </LinearLayout>
             <LinearLayout
@@ -162,13 +214,26 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_pin_drop_black_24dp"
-                    android:text="Карта"
-                    android:textColor="@color/black"
-                    android:textSize="20dp" />
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_map_black_24dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="8dp"
+                        android:text="Карта"
+                        android:textColor="@color/black"
+                        android:textSize="20dp"
+                        android:fontFamily="sans-serif-light"/>
+                </LinearLayout>
+
+
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:orientation="horizontal" android:layout_width="match_parent"
                     android:layout_height="match_parent">

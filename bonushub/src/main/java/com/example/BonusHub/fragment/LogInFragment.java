@@ -192,7 +192,12 @@ public class LogInFragment extends Fragment {
                 NetworkThread.getInstance().unRegisterCallback(loginCallbackId);
                 loginCallbackId = null;
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                if (response.code() == 400) {
+                    Toast.makeText(getActivity(), "Не указан логин или пароль", Toast.LENGTH_SHORT).show();
+                }
+                else if(response.code() >= 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -212,17 +217,13 @@ public class LogInFragment extends Fragment {
 
     public void onLoginResult(LoginResponse result) {
         //Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
+        AuthUtils.setLogin(getActivity().getApplicationContext(), loginInput.getText().toString());
         if (result.getCode() == 0) {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
             if (!AuthUtils.getRole(getActivity().getApplicationContext()).equals("Host")) {
                 // staff
-                if (!AuthUtils.isHosted(getActivity().getApplicationContext())) {
-                    AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
-                    goToQr();
-                }
-                else {
-                    goToMainActivity();
-                }
+                AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
+                goToQr();
             } else {
                 if (result.getHostId() == null) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), false);
@@ -236,6 +237,9 @@ public class LogInFragment extends Fragment {
                     goToMainActivity();
                 }
             }
+        }
+        else if (result.getCode() == 1) {
+            Toast.makeText(getActivity(), "Неверная пара логин/пароль", Toast.LENGTH_SHORT).show();
         }
     }
 }

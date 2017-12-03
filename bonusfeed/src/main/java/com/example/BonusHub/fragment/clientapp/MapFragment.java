@@ -5,6 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
-    private Location location;
     private List<ClientHost> clientHostsList = new ArrayList<>();
     private List<Host> hostsList = new ArrayList<>();
 
@@ -105,20 +105,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void setMap() {
         Bundle args = getArguments();
-        Host host = null;
-        if (args  != null && args.containsKey("host_id")) {
+        if (args  != null && args.containsKey("host_id"))
             host_id = args.getInt("host_id", -1);
-            try {
-                host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        Host host = null;
+        try {
+            host = HelperFactory.getHelper().getHostDAO().getHostById(host_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        if ((host != null) && (map != null)) {
-            Location currentLocation = getLocation(host.getAddress());
-            LatLng pos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongtitude());
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10));
+        if ((map != null) && (host != null)) {
+            LatLng pos;
+            pos = new LatLng(host.getLatitude(), host.getLongitude());
+            map.addMarker(new MarkerOptions()
+                    .position(pos)
+                    .title(host.getTitle()));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
         }
 
         for (ClientHost clientHost : clientHostsList) {
@@ -133,38 +134,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if (currHost != null) {
                 String address = currHost.getAddress();
                 String title = currHost.getTitle();
-                Location currentLocation = getLocation(address);
                 if (map != null) {
-                    if (currentLocation != null) {
-                        LatLng pos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongtitude());
-                        map.addMarker(new MarkerOptions()
-                                .position(pos)
-                                .title(title));
-                        map.setOnMarkerClickListener(markerClickListener);
-                    }
+                    LatLng pos;
+                    pos = new LatLng(currHost.getLatitude(), currHost.getLongitude());
+                    map.addMarker(new MarkerOptions()
+                            .position(pos)
+                            .title(title));
+                    map.setOnMarkerClickListener(markerClickListener);
                 }
             }
         }
 
-    }
-
-    private Location getLocation(String address) {
-        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = geoCoder.getFromLocationName(address, 3);
-            if (addresses.size() > 0) {
-                Location currentLoc = new Location(addresses.get(0).getAddressLine(0),
-                        addresses.get(0).getLatitude(),
-                        addresses.get(0).getLongitude());
-                return currentLoc;
-            }
-            else {
-                return null;
-            }
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     private void getFromCache() {
@@ -197,7 +177,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void getFromInternet() {
         clientHostsList.clear();
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(AuthUtils.getCookie(mainActivity));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(0,AuthUtils.getCookie(mainActivity));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(listHostsCallback);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
@@ -224,6 +204,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         for (HostListResponse.HostPoints hp : hostPoints) {
             Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            host.setLongitude(hp.getLongitude());
+            host.setLatitude(hp.getLatitude());
             host.setProfile_image(hp.getProfile_image());
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
@@ -246,6 +228,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void goToHostFragment(int host_id) {
         final Bundle bundle = new Bundle();
         bundle.putInt("host_id", host_id);
+        mainActivity.popWholeStack();
         mainActivity.pushFragment(new HostFragment(), true, bundle);
     }
 
@@ -275,10 +258,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onFailure(Call<HostListResponse> call, Response<HostListResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
                 hostsCallbackId = null;
-                if (response.code() == 403) {
+                if (response.code() == 401) {
                     Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
-                    AuthUtils.logout(getActivity());
-                    AuthUtils.setCookie(getActivity(), "");
+                    AuthUtils.logout(getActivity().getApplicationContext());
+                    AuthUtils.setCookie(getActivity().getApplicationContext(), "");
 
                 }
                 else if(response.code() > 500) {
@@ -305,10 +288,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        if (mainActivity.hasConnection()) {
-            getFromInternet();
-        } else {
-            getFromCache();
-        }
+        getFromCache();
+//        if (mainActivity.hasConnection()) {
+//            getFromInternet();
+//        } else {
+//            getFromCache();
+//        }
     }
 }

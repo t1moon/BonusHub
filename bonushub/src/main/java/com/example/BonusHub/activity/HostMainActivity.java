@@ -34,6 +34,7 @@ import com.example.BonusHub.utils.FragmentType;
 import com.example.BonusHub.utils.StackListner;
 import com.example.timur.BonusHub.R;
 
+import android.widget.TextView;
 import android.widget.Toast;
 
 import retrofit2.Call;
@@ -92,6 +93,10 @@ public class HostMainActivity extends BaseActivity implements StackListner {
         setupDrawerContent(nvDrawer);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        nvDrawer = (NavigationView) this.findViewById(R.id.navigation_view);
+        View header = nvDrawer.getHeaderView(0);
+        TextView profileName = (TextView) header.findViewById(R.id.tv_profile_name);
+        profileName.setText(AuthUtils.getLogin(this.getApplicationContext()));
 
         setupProfileFragment();
     }

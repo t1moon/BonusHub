@@ -29,6 +29,7 @@ import com.example.BonusHub.retrofit.RetrofitFactory;
 import com.example.BonusHub.threadManager.NetworkThread;
 import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.retrofit.clientapp.HostListResponse;
+import com.example.BonusHub.utils.EndlessScrollListener;
 import com.example.timur.BonusHub.R;
 
 import java.sql.SQLException;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ListHostFragment extends Fragment implements NetworkThread.ExecuteCallback<HostListResponse> {
@@ -45,6 +47,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     private ClientMainActivity mainActivity;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Integer hostsCallbackId;
+    EndlessScrollListener scrollListener;
 
     public ListHostFragment() {
         // Required empty public constructor
@@ -73,18 +76,6 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         final View rootView = inflater.inflate(R.layout.fragment_list_host, container, false);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (mainActivity.hasConnection()) {
-                    getFromInternet();
-                } else {
-                    swipeRefreshLayout.setRefreshing(false);
-
-                }
-
-            }
-        });
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mAdapter = new HostAdapter(getActivity(), clientHostsList);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
@@ -93,6 +84,27 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         StaggeredGridLayoutManager mStaggeredLayoutManager;
         mStaggeredLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(mStaggeredLayoutManager);
+        scrollListener = new EndlessScrollListener(mStaggeredLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                if (mainActivity.hasConnection()) {
+                    loadNextData(totalItemsCount);
+                }
+            }
+        };
+        recyclerView.addOnScrollListener(scrollListener);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (mainActivity.hasConnection()) {
+                    scrollListener.resetState();
+                    getFromInternet();
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+        });
         recyclerView.setAdapter(mAdapter);
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -115,7 +127,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
         Glide
                 .with(getActivity().getApplicationContext())
-                .load(R.drawable.bonus_hub_logo)
+                .load(R.drawable.bonusfeed_logo)
                 .fitCenter()
                 .into(imgView);
 
@@ -125,13 +137,16 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
 
     public void goToHostFragment(int position) {
         final Bundle bundle = new Bundle();
-        int host_id = mAdapter.getItemByPosition(position).getHost().getId();
-        bundle.putInt("host_id", host_id);
-        mainActivity.pushFragment(new HostFragment(), true, bundle);
+        ClientHost clientHost = mAdapter.getItemByPosition(position);
+        if (clientHost != null) {
+            int host_id = clientHost.getHost().getId();
+            bundle.putInt("host_id", host_id);
+            mainActivity.pushFragment(new HostFragment(), true, bundle);
+        }
     }
 
     private void getFromCache() {
-        clientHostsList.clear();
+        List<ClientHost> newClientHostsList = new ArrayList<>();
         Client client = null;
         int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
                 getInt(ClientMainActivity.CLIENT_ID, -1);
@@ -150,30 +165,42 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
 
 
         for (ClientHost item : clientHosts) {
-            clientHostsList.add(item);
+            newClientHostsList.add(item);
         }
-
+        clientHostsList.clear();
+        clientHostsList.addAll(newClientHostsList);
         mAdapter.notifyDataSetChanged();
     }
+
     private void getFromInternet() {
         // showing refresh animation before making http call
         swipeRefreshLayout.setRefreshing(true);
-        clientHostsList.clear();
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(0, AuthUtils.getCookie(mainActivity.getApplicationContext()));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(this);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
         }
     }
 
-    private void showResponse(HostListResponse response) {
-        // clear tables
-        HelperFactory.getHelper().clearTablesForClient(HelperFactory.getHelper().getConnectionSource());
-        clientHostsList.clear();
+    private void loadNextData(int totalItemsCount) {
+        final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
+        final Call<HostListResponse> call = clientApiInterface.listHosts(totalItemsCount, AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        call.enqueue(new Callback<HostListResponse>() {
+            @Override
+            public void onResponse(Call<HostListResponse> call, Response<HostListResponse> response) {
+                showNewData(response.body());
+            }
 
+            @Override
+            public void onFailure(Call<HostListResponse> call, Throwable t) {
+                Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showNewData(HostListResponse response) {
         List<HostListResponse.HostPoints> hostPoints = response.getHosts();
-        List<ClientHost> clientHosts = new ArrayList<>();
         ClientHost clientHost = null;
         Client client = null;
         int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
@@ -190,6 +217,51 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             host.setProfile_image(hp.getProfile_image());
             host.setLoyalityParam(hp.getLoyalityParam());
             host.setLoyalityType(hp.getLoyalityType());
+            host.setLatitude(hp.getLatitude());
+            host.setLongitude(hp.getLongitude());
+            try {
+                HelperFactory.getHelper().getHostDAO().createHost(host);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            clientHost = new ClientHost(client, host, hp.getPoints());
+            try {
+                HelperFactory.getHelper().getClientHostDAO().createClientHost(client, host, hp.getPoints());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            clientHostsList.add(clientHost);
+        }
+
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void showResponse(HostListResponse response) {
+        // clear tables
+        HelperFactory.getHelper().clearTablesForClient(HelperFactory.getHelper().getConnectionSource());
+        //clientHostsList.clear();
+        List<ClientHost> newClientHostsList = new ArrayList();
+        List<HostListResponse.HostPoints> hostPoints = response.getHosts();
+        ClientHost clientHost = null;
+        Client client = null;
+        int client_id = mainActivity.getPreferences(Context.MODE_PRIVATE).
+                getInt(ClientMainActivity.CLIENT_ID, -1);
+
+        try {
+            client = HelperFactory.getHelper().getClientDAO().getClientById(client_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        for (HostListResponse.HostPoints hp : hostPoints) {
+            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            host.setProfile_image(hp.getProfile_image());
+            host.setLoyalityParam(hp.getLoyalityParam());
+            host.setLoyalityType(hp.getLoyalityType());
+            host.setLatitude(hp.getLatitude());
+            host.setLongitude(hp.getLongitude());
             try {
                 HelperFactory.getHelper().getHostDAO().createHost(host);
 
@@ -203,9 +275,10 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            clientHostsList.add(clientHost);
+            newClientHostsList.add(clientHost);
         }
-
+        clientHostsList.clear();
+        clientHostsList.addAll(newClientHostsList);
 
         mAdapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
@@ -240,9 +313,10 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
 
     @Override
     public void onFailure(Call<HostListResponse> call, Response<HostListResponse> response) {
+        swipeRefreshLayout.setRefreshing(false);
         NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
         hostsCallbackId = null;
-        if (response.code() == 403) {
+        if (response.code() == 401) {
             Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
             AuthUtils.logout(getActivity().getApplicationContext());
             AuthUtils.setCookie(getActivity().getApplicationContext(), "");

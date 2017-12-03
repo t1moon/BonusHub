@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BonusHub.MyApplication;
@@ -89,6 +90,10 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
         // Setup drawer view
         setupDrawerContent(nvDrawer);
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        nvDrawer = (NavigationView) this.findViewById(R.id.navigation_view);
+        View header = nvDrawer.getHeaderView(0);
+        TextView profileName = (TextView) header.findViewById(R.id.tv_profile_name);
+        profileName.setText(AuthUtils.getLogin(this.getApplicationContext()));
         setupProfileFragment();
     }
 

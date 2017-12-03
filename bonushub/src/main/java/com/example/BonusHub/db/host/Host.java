@@ -17,6 +17,8 @@ public class Host{
     public final static String HOST_TIMEOPEN_FIELD_NAME = "time_open";
     public final static String HOST_TIMECLOSE_FIELD_NAME = "time_close";
     public final static String HOST_IMAGE_FIELD_NAME = "profile_image";
+    public final static String HOST_LONG = "longitude";
+    public final static String HOST_LAT = "latitude";
 //    public final static String HOST_LOYALITY_PROGRAMM = "loyality_programm";
 //    public final static String HOST_LOYALITY_PARAM = "loyality_param";
 
@@ -43,11 +45,17 @@ public class Host{
     @DatabaseField(columnName = HOST_IMAGE_FIELD_NAME, dataType = DataType.STRING)
     private String profile_image;
 
+    @DatabaseField(columnName = HOST_LONG, dataType = DataType.DOUBLE)
+    private double longitude;
+
+    @DatabaseField(columnName = HOST_LAT, dataType = DataType.DOUBLE)
+    private double latitude;
+
 //    @DatabaseField(columnName = HOST_LOYALITY_PROGRAMM, dataType = DataType.INTEGER)
 //    private Integer loyality_type;
 //
-//    @DatabaseField(columnName = HOST_LOYALITY_PARAM, dataType = DataType.FLOAT)
-//    private Float loyality_param;
+//    @DatabaseField(columnName = HOST_LOYALITY_PARAM, dataType = DataType.double)
+//    private double loyality_param;
 
     public Host() {
     }
@@ -121,7 +129,7 @@ public class Host{
 //        loyality_type = loy_prog;
 //    }
 //
-//    public void setLoyalityParam(float loy_param) {
+//    public void setLoyalityParam(double loy_param) {
 //        loyality_param = loy_param;
 //    }
 //
@@ -129,7 +137,23 @@ public class Host{
 //        return loyality_type;
 //    }
 //
-//    public float getLoyalityParam() {
+//    public double getLoyalityParam() {
 //        return loyality_param;
 //    }
+
+    public void setLongitude(double longt) {
+        longitude = longt;
+    }
+
+    public void setLatitude(double lat) {
+        latitude = lat;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
 }

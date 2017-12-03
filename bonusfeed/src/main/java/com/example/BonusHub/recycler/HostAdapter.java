@@ -1,6 +1,7 @@
 package com.example.BonusHub.recycler;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -82,13 +83,14 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
                 Glide
                         .with(context)
                         .load(pathToImageProfile)
+                        .error(R.drawable.default_hub_logo)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(holder.thumbnail);
             } else {
                 // set default
                 Glide
                         .with(context)
-                        .load(R.drawable.test2)
+                        .load(R.drawable.default_hub_logo)
                         .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .into(holder.thumbnail);
             }
@@ -101,7 +103,14 @@ public class HostAdapter extends RecyclerView.Adapter<HostAdapter.MyViewHolder> 
         return clientHostList.size();
     }
 
+    @Nullable
     public ClientHost getItemByPosition(int position) {
-        return clientHostList.get(position);
+        try {
+            ClientHost clientHost = clientHostList.get(position);
+            return clientHost;
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            Log.d("OUTOFBOUND", ex.toString());
+        }
+        return null;
     }
 }
