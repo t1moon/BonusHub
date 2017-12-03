@@ -34,7 +34,7 @@
                     android:id="@+id/backdrop"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/detail_backdrop_height"
-                    android:background="@drawable/test"
+                    android:background="@drawable/bonusfeed_logo"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax" />
