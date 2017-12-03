@@ -74,7 +74,7 @@ public class BaseActivity extends AppCompatActivity {
         }
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
-        ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        //ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         ft.replace(getFragmentContainerResId(), fragment, fragment.getClass().getSimpleName());
         ft.commit();
     }
@@ -90,7 +90,7 @@ public class BaseActivity extends AppCompatActivity {
         }
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
-        ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        //ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         ft.replace(getFragmentContainerResId(), fragment, fragment.getClass().getSimpleName());
         ft.commit();
     }
@@ -105,7 +105,7 @@ public class BaseActivity extends AppCompatActivity {
             if (fragment != null) {
                 FragmentManager manager = getSupportFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
-                ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                //ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 ft.replace(getFragmentContainerResId(), fragment, fragment.getClass().getSimpleName());
                 ft.commit();
             }
@@ -125,7 +125,7 @@ public class BaseActivity extends AppCompatActivity {
                 }
                 FragmentManager manager = getSupportFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
-                ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                //ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 ft.replace(getFragmentContainerResId(), fragment, fragment.getClass().getSimpleName());
                 ft.commit();
             }
