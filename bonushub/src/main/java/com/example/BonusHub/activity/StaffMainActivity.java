@@ -320,7 +320,8 @@ public class StaffMainActivity extends BaseActivity implements StackListner {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
                 Toast.makeText(StaffMainActivity.this, "Ошибка соединения с сервером. Проверьте интернет подключение.", Toast.LENGTH_SHORT).show();
-                AuthUtils.logout(StaffMainActivity.this);
+                AuthUtils.logout(StaffMainActivity.this.getApplicationContext());
+                AuthUtils.setHosted(StaffMainActivity.this.getApplicationContext(), false);
                 goToLogIn();
             }
         };

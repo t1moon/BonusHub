@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -13,9 +14,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -53,6 +56,8 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
+    private CollapsingToolbarLayout collapsingToolbar;
+    private Menu menu;
 
     public final static int MENUITEM_QR = 0;
     public final static int MENUITEM_LISTHOST = 1;
@@ -127,6 +132,37 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.start_menu, menu);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                appBarLayout.setExpanded(false);
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                appBarLayout.setExpanded(true);
+                return false;
+            }
+        });
+        this.menu = menu;
+        return true;
+    }
+
+    public void showOverflowMenu(boolean showMenu){
+        if(menu == null) {
+            return;
+        }
+        menu.findItem(R.id.action_search).setVisible(showMenu);
+        //menu.setItemVisible(R.id.main_menu_group, showMenu);
+    }
+
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (logoutCallbackId != null) {
@@ -169,7 +205,7 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
      * Will show and hide the toolbar title on scroll
      */
     private void initCollapsingToolbar() {
-        final CollapsingToolbarLayout collapsingToolbar =
+        collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(" ");
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
@@ -249,6 +285,7 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
             case MENUITEM_QR:
                 fragment = new QRFragment();
                 pushFragment(fragment, true);
+                showOverflowMenu(false);
                 break;
             case MENUITEM_LISTHOST:
                 if (fragment.getClass() != ListHostFragment.class) {

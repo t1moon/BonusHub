@@ -132,7 +132,7 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
         final Call<UpdatePointsResponse> call;
         String bill_str = "";
         bill_str = et_bill.getText().toString();
-        if (bill_str != "") {
+        if (!bill_str.equals("")) {
             Float bill = Float.parseFloat(et_bill.getText().toString());
             int loyality_type = getActivity().getPreferences(MODE_PRIVATE).getInt("loy_type", -1);
             if ((loyality_type == -1) || (loyality_type == 1)) {
@@ -152,6 +152,8 @@ public class ScanQrFragment extends Fragment implements NetworkThread.ExecuteCal
                 updatePointsCallbackId = NetworkThread.getInstance().registerCallback(this);
                 NetworkThread.getInstance().execute(call, updatePointsCallbackId);
             }
+        } else {
+            et_bill.setError("Введите сумму");
         }
     }
 

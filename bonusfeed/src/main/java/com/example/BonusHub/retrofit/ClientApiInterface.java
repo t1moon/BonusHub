@@ -38,7 +38,7 @@ public interface ClientApiInterface {
     @Headers({
             "Accept: application/json"
     })
-    Call<HostListResponse> listHosts(@Query("offset") int offset,@Header("Cookie")String cookie);
+    Call<HostListResponse> listHosts(@Query("query") String query, @Query("offset") int offset,@Header("Cookie")String cookie);
 
     @GET("get_info/")
     @Headers({

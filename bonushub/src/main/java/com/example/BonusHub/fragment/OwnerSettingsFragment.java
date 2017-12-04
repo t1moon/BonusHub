@@ -133,7 +133,9 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
         // if any preference changed:
         if (getString(BONUS_SYSTEM_KEY_ADDRESS).equals(key) ||
                 getString(TYPED_SETTINGS_KEYS[0]).equals(key) ||
-                getString(TYPED_SETTINGS_KEYS[1]).equals(key)) {
+                getString(TYPED_SETTINGS_KEYS[1]).equals(key) ||
+                getString(BONUS_SYSTEM_BURN_KEY_ADDRESS).equals(key) ||
+                getString(BONUS_SYSTEM_TIME_KEY_ADDRESS).equals(key)) {
             // take loyality values from sp
             final int loyalityType = Integer.parseInt(sharedPreferences.getString(
                     getString(BONUS_SYSTEM_KEY_ADDRESS), "1"));
@@ -141,8 +143,7 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
                     getString(TYPED_SETTINGS_KEYS[loyalityType]), 10);
             final int loyalityBurn = Integer.parseInt(sharedPreferences.getString(
                     getString(BONUS_SYSTEM_BURN_KEY_ADDRESS), "0"));
-            final int loyalityTime = Integer.parseInt(sharedPreferences.getString(
-                    getString(BONUS_SYSTEM_TIME_KEY_ADDRESS), "30"));
+            final int loyalityTime = sharedPreferences.getInt(getString(BONUS_SYSTEM_TIME_KEY_ADDRESS), 30);
             // make a request with them
             final Call<EditLoyalityResponse> call =
                     hostApiInterface.editLoyality(new EditLoyalityRequest(
@@ -152,7 +153,7 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
             call.enqueue(new Callback<EditLoyalityResponse>() {
                 @Override
                 public void onResponse(Call<EditLoyalityResponse> call, Response<EditLoyalityResponse> response) {
-                    Log.d(TAG, "onResponse: " + response.body().getCode());
+                    //Log.d(TAG, "onResponse: " + response.body().getCode());
                     bst = loyalityType;
                     bsp = loyalityParam;
                     bp = loyalityBurn;

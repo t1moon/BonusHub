@@ -1,7 +1,7 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -25,6 +25,36 @@
                     android:textColor="#000"
                     android:textSize="30dp"
                     android:fontFamily="sans-serif-light"/>
+
+                <!--<TextView-->
+                    <!--android:id="@+id/host_points_tv"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--android:paddingRight="4dp"-->
+                    <!--android:textSize="16sp"-->
+                    <!--android:typeface="monospace"-->
+                    <!--android:fontFamily="sans-serif-light"/>-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/host_points_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:paddingRight="4dp"
+                    android:textSize="16sp"
+                    android:typeface="monospace"
+                    android:fontFamily="sans-serif-light"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_local_atm_black_24dp"/>
+            </LinearLayout>
+
 
             <View
             android:layout_width="match_parent"

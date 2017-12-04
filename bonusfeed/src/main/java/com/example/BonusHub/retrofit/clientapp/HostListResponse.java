@@ -72,6 +72,9 @@ public class HostListResponse {
         @SerializedName("latitude")
         private double latitude;
 
+        @SerializedName("offer")
+        private String offer;
+
         public String getTitle() {
             return title;
         }
@@ -158,6 +161,14 @@ public class HostListResponse {
 
         public double getLatitude() {
             return latitude;
+        }
+
+        public void setOffer(String newOffer) {
+            offer = newOffer;
+        }
+
+        public String getOffer() {
+            return offer;
         }
     }
 

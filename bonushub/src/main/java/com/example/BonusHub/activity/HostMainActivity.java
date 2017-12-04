@@ -327,7 +327,8 @@ public class HostMainActivity extends BaseActivity implements StackListner {
             public void onFailure(Call<LogoutResponse> call, Response<LogoutResponse> response) {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
-                AuthUtils.logout(HostMainActivity.this);
+                AuthUtils.logout(HostMainActivity.this.getApplicationContext());
+                AuthUtils.setHosted(HostMainActivity.this.getApplicationContext(), false);
                 goToLogIn();
             }
 
@@ -343,7 +344,8 @@ public class HostMainActivity extends BaseActivity implements StackListner {
                 NetworkThread.getInstance().unRegisterCallback(logoutCallbackId);
                 logoutCallbackId = null;
                 Toast.makeText(HostMainActivity.this, "Ошибка соединения с сервером. Проверьте интернет подключение.", Toast.LENGTH_SHORT).show();
-                AuthUtils.logout(HostMainActivity.this);
+                AuthUtils.logout(HostMainActivity.this.getApplicationContext());
+                AuthUtils.setHosted(HostMainActivity.this.getApplicationContext(), false);
                 goToLogIn();
             }
         };

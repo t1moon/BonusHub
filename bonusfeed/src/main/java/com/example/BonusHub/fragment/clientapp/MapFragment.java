@@ -89,6 +89,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapFragment = (SupportMapFragment) (getChildFragmentManager()
                 .findFragmentById(R.id.mini_map));
         mapFragment.getMapAsync(this);
+        mainActivity.showOverflowMenu(false);
         return rootView;
     }
 
@@ -177,7 +178,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void getFromInternet() {
         clientHostsList.clear();
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(0,AuthUtils.getCookie(mainActivity));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(null, 0,AuthUtils.getCookie(mainActivity));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(listHostsCallback);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
@@ -203,7 +204,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         for (HostListResponse.HostPoints hp : hostPoints) {
-            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close(), hp.getOffer());
             host.setLongitude(hp.getLongitude());
             host.setLatitude(hp.getLatitude());
             host.setProfile_image(hp.getProfile_image());

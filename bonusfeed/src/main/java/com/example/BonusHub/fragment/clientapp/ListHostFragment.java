@@ -1,5 +1,6 @@
 package com.example.BonusHub.fragment.clientapp;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,9 +9,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,13 +44,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ListHostFragment extends Fragment implements NetworkThread.ExecuteCallback<HostListResponse> {
+public class ListHostFragment extends Fragment {
     private List<ClientHost> clientHostsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private HostAdapter mAdapter;
     private ClientMainActivity mainActivity;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private Menu menu;
     private Integer hostsCallbackId;
+    private NetworkThread.ExecuteCallback<HostListResponse> listHostsCallback;
+    private String searchQuery;
     EndlessScrollListener scrollListener;
 
     public ListHostFragment() {
@@ -56,7 +63,9 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         mainActivity = (ClientMainActivity) getActivity();
+        prepareCallbacks();
     }
 
     @Override
@@ -134,13 +143,56 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        this.menu = menu;
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        //Log.d("Query", query);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query)
+            {
+                searchQuery = (searchView.getQuery()).toString();
+                Log.d("Query", query);
+                swipeRefreshLayout.setRefreshing(true);
+                final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
+                final Call<HostListResponse> call = clientApiInterface.listHosts(query, 0, AuthUtils.getCookie(mainActivity.getApplicationContext()));
+                if (hostsCallbackId == null) {
+                    hostsCallbackId = NetworkThread.getInstance().registerCallback(listHostsCallback);
+                    NetworkThread.getInstance().execute(call, hostsCallbackId);
+                }
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String query)
+            {
+                if (query.equals("")) {
+                    searchQuery = null;
+                }
+                return true;
+            }
+
+        });
+        super.onPrepareOptionsMenu(menu);
+    }
 
     public void goToHostFragment(int position) {
         final Bundle bundle = new Bundle();
+        int host_id = mAdapter.getItemByPosition(position).getHost().getId();
         ClientHost clientHost = mAdapter.getItemByPosition(position);
+        mainActivity.showOverflowMenu(false);
         if (clientHost != null) {
-            int host_id = clientHost.getHost().getId();
             bundle.putInt("host_id", host_id);
+            mainActivity.showOverflowMenu(true);
             mainActivity.pushFragment(new HostFragment(), true, bundle);
         }
     }
@@ -176,16 +228,16 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         // showing refresh animation before making http call
         swipeRefreshLayout.setRefreshing(true);
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(0, AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(searchQuery, 0, AuthUtils.getCookie(mainActivity.getApplicationContext()));
         if (hostsCallbackId == null) {
-            hostsCallbackId = NetworkThread.getInstance().registerCallback(this);
+            hostsCallbackId = NetworkThread.getInstance().registerCallback(listHostsCallback);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
         }
     }
 
     private void loadNextData(int totalItemsCount) {
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(totalItemsCount, AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(searchQuery, totalItemsCount, AuthUtils.getCookie(mainActivity.getApplicationContext()));
         call.enqueue(new Callback<HostListResponse>() {
             @Override
             public void onResponse(Call<HostListResponse> call, Response<HostListResponse> response) {
@@ -213,7 +265,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         }
 
         for (HostListResponse.HostPoints hp : hostPoints) {
-            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close(), hp.getOffer());
             host.setProfile_image(hp.getProfile_image());
             host.setLoyalityParam(hp.getLoyalityParam());
             host.setLoyalityType(hp.getLoyalityType());
@@ -256,7 +308,7 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         }
 
         for (HostListResponse.HostPoints hp : hostPoints) {
-            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close());
+            Host host = new Host(hp.getTitle(), hp.getDescription(), hp.getAddress(), hp.getTime_open(), hp.getTime_close(), hp.getOffer());
             host.setProfile_image(hp.getProfile_image());
             host.setLoyalityParam(hp.getLoyalityParam());
             host.setLoyalityType(hp.getLoyalityType());
@@ -306,39 +358,43 @@ public class ListHostFragment extends Fragment implements NetworkThread.ExecuteC
         super.onDetach();
     }
 
-    @Override
-    public void onResponse(Call<HostListResponse> call, Response<HostListResponse> response) {
+    private void prepareCallbacks() {
+        listHostsCallback = new NetworkThread.ExecuteCallback<HostListResponse>() {
+            @Override
+            public void onResponse(Call<HostListResponse> call, Response<HostListResponse> response) {
 
-    }
+            }
 
-    @Override
-    public void onFailure(Call<HostListResponse> call, Response<HostListResponse> response) {
-        swipeRefreshLayout.setRefreshing(false);
-        NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
-        hostsCallbackId = null;
-        if (response.code() == 401) {
-            Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
-            AuthUtils.logout(getActivity().getApplicationContext());
-            AuthUtils.setCookie(getActivity().getApplicationContext(), "");
+            @Override
+            public void onFailure(Call<HostListResponse> call, Response<HostListResponse> response) {
+                swipeRefreshLayout.setRefreshing(false);
+                NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
+                hostsCallbackId = null;
+                if (response.code() == 401) {
+                    Toast.makeText(getActivity(), "Пожалуйста, авторизуйтесь", Toast.LENGTH_SHORT).show();
+                    AuthUtils.logout(getActivity().getApplicationContext());
+                    AuthUtils.setCookie(getActivity().getApplicationContext(), "");
 
-        }
-        else if(response.code() > 500) {
-            Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
-        }
-    }
+                }
+                else if(response.code() > 500) {
+                    Toast.makeText(getActivity(), "Ошибка сервера. Попробуйте повторить запрос позже", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-    @Override
-    public void onSuccess(HostListResponse result) {
-        NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
-        hostsCallbackId = null;
-        showResponse(result);
-    }
+            @Override
+            public void onSuccess(HostListResponse result) {
+                NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
+                hostsCallbackId = null;
+                showResponse(result);
+            }
 
-    @Override
-    public void onError(Exception ex) {
-        NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
-        hostsCallbackId = null;
-        showError(ex);
+            @Override
+            public void onError(Exception ex) {
+                NetworkThread.getInstance().unRegisterCallback(hostsCallbackId);
+                hostsCallbackId = null;
+                showError(ex);
+            }
+        };
     }
 
 }
