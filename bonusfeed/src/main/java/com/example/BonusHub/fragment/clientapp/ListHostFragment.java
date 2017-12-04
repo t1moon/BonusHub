@@ -189,9 +189,12 @@ public class ListHostFragment extends Fragment {
     public void goToHostFragment(int position) {
         final Bundle bundle = new Bundle();
         int host_id = mAdapter.getItemByPosition(position).getHost().getId();
-        bundle.putInt("host_id", host_id);
-        mainActivity.showOverflowMenu(true);
-        mainActivity.pushFragment(new HostFragment(), true, bundle);
+        ClientHost clientHost = mAdapter.getItemByPosition(position);
+        if (clientHost != null) {
+            bundle.putInt("host_id", host_id);
+            mainActivity.showOverflowMenu(true);
+            mainActivity.pushFragment(new HostFragment(), true, bundle);
+        }
     }
 
     private void getFromCache() {
