@@ -15,4 +15,13 @@
             <!--android:title="@string/bonus_system_offer_title">-->
         <!--</EditTextPreference>-->
     </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Параметры сгорания бонусов">
+        <ListPreference
+            android:key="@string/bonus_system_burn"
+            android:title="@string/bonus_system_burn_header"
+            android:entries="@array/bonus_system_burn_array"
+            android:entryValues="@array/bonus_system_burn_values">
+        </ListPreference>
+    </PreferenceCategory>
 </PreferenceScreen>
