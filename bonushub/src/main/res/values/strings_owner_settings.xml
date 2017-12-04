@@ -31,4 +31,6 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
+    <string name="time_param_key">loyality_time_key</string>
 </resources>

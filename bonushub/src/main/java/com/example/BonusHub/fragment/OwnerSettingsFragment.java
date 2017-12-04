@@ -44,6 +44,8 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
     private SharedPreferences sp;
     protected final String THIS_FRAGMENT = "android.support.v7.preference.PreferenceFragment.DIALOG";
     protected final int BONUS_SYSTEM_KEY_ADDRESS = R.string.bonus_system_key;
+    protected final int BONUS_SYSTEM_BURN_KEY_ADDRESS = R.string.bonus_system_burn;
+    protected final int BONUS_SYSTEM_TIME_KEY_ADDRESS = R.string.time_param_key;
     protected final int TYPED_SETTINGS_KEYS[] = {
             R.string.cup_param_key,
             R.string.percent_param_key
@@ -55,6 +57,8 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
     };
     protected int bst = 1; // bonus system type (before update)
     protected int bsp = 10; // bonus system param (before update)
+    protected int bp = 0; // burn
+    protected int tp = 30; // time
     HostApiInterface hostApiInterface;
 
     public OwnerSettingsFragment() {
@@ -81,9 +85,13 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
                 bst = response.body().getLoyalityType();
                 if (bst != 0 && bst != 1) return;
                 bsp = (int) response.body().getLoyalityParam();
+                bp = (int) response.body().getLoyality_burn();
+                tp = (int) response.body().getLoyality_time();
                 ((ListPreference) findPreference(getString(BONUS_SYSTEM_KEY_ADDRESS))).setValueIndex(bst);
+                ((ListPreference) findPreference(getString(BONUS_SYSTEM_BURN_KEY_ADDRESS))).setValueIndex(bp);
                 render();
                 ((NumberPreference) findPreference(getString(TYPED_SETTINGS_KEYS[bst]))).setValue(bsp);
+                ((NumberPreference) findPreference(getString(BONUS_SYSTEM_TIME_KEY_ADDRESS))).setValue(tp);
             }
 
             @Override
@@ -101,7 +109,9 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
         sp.registerOnSharedPreferenceChangeListener(this);
         // update bonus system type
         bst = Integer.parseInt(sp.getString(getString(BONUS_SYSTEM_KEY_ADDRESS), "1"));
+        bp = Integer.parseInt(sp.getString(getString(BONUS_SYSTEM_BURN_KEY_ADDRESS), "0"));
         bsp = (int) sp.getInt(getString(TYPED_SETTINGS_KEYS[bst]), 10);
+        tp = (int) sp.getInt(getString(BONUS_SYSTEM_TIME_KEY_ADDRESS), 30);
         render();
     }
 
@@ -129,9 +139,14 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
                     getString(BONUS_SYSTEM_KEY_ADDRESS), "1"));
             final int loyalityParam = (int) sharedPreferences.getInt(
                     getString(TYPED_SETTINGS_KEYS[loyalityType]), 10);
+            final int loyalityBurn = Integer.parseInt(sharedPreferences.getString(
+                    getString(BONUS_SYSTEM_BURN_KEY_ADDRESS), "0"));
+            final int loyalityTime = Integer.parseInt(sharedPreferences.getString(
+                    getString(BONUS_SYSTEM_TIME_KEY_ADDRESS), "30"));
             // make a request with them
             final Call<EditLoyalityResponse> call =
-                    hostApiInterface.editLoyality(new EditLoyalityRequest(loyalityType, loyalityParam, ""),
+                    hostApiInterface.editLoyality(new EditLoyalityRequest(
+                            loyalityType, loyalityParam, loyalityBurn, loyalityTime, ""),
                     AuthUtils.getCookie(((HostMainActivity) getActivity()).getApplicationContext()));
             // success => ok, failure => we need to reset values
             call.enqueue(new Callback<EditLoyalityResponse>() {
@@ -140,6 +155,8 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
                     Log.d(TAG, "onResponse: " + response.body().getCode());
                     bst = loyalityType;
                     bsp = loyalityParam;
+                    bp = loyalityBurn;
+                    tp = loyalityTime;
                     render();
                     Snackbar snackbar = Snackbar.make(getView(), getString(R.string.loyality_changed), Snackbar.LENGTH_LONG);
                     snackbar.show();
@@ -153,6 +170,8 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
                     // change back
                     ((ListPreference) findPreference(getString(BONUS_SYSTEM_KEY_ADDRESS))).setValueIndex(bst);
                     ((NumberPreference) findPreference(getString(TYPED_SETTINGS_KEYS[bst]))).setValue(bsp);
+                    ((ListPreference) findPreference(getString(BONUS_SYSTEM_BURN_KEY_ADDRESS))).setValueIndex(bp);
+                    ((NumberPreference) findPreference(getString(BONUS_SYSTEM_TIME_KEY_ADDRESS))).setValue(tp);
                     if (resumed) sp.registerOnSharedPreferenceChangeListener(OwnerSettingsFragment.this);
                 }
             });

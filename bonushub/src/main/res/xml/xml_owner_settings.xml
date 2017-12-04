@@ -23,5 +23,10 @@
             android:entries="@array/bonus_system_burn_array"
             android:entryValues="@array/bonus_system_burn_values">
         </ListPreference>
+        <com.example.BonusHub.utils.NumberPreference.NumberPreference
+            android:key="@string/time_param_key"
+            android:title="Время действия бонусов (дни)"
+            android:defaultValue="30">
+        </com.example.BonusHub.utils.NumberPreference.NumberPreference>
     </PreferenceCategory>
 </PreferenceScreen>
