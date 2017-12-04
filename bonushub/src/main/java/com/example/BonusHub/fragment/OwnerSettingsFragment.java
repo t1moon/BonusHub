@@ -197,6 +197,8 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
         //set bonus system type summary
         findPreference(getString(BONUS_SYSTEM_KEY_ADDRESS)).setSummary(
                         getResources().getStringArray(R.array.bonus_system)[bst]);
+        findPreference(getString(BONUS_SYSTEM_BURN_KEY_ADDRESS)).setSummary(
+                getResources().getStringArray(R.array.bonus_system_burn_array)[bp]);
         // show specialized settings
         addPreferencesFromResource(TYPED_SETTINGS[bst]);
     }
