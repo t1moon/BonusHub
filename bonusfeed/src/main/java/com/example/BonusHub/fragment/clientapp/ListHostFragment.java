@@ -189,6 +189,7 @@ public class ListHostFragment extends Fragment {
         final Bundle bundle = new Bundle();
         int host_id = mAdapter.getItemByPosition(position).getHost().getId();
         ClientHost clientHost = mAdapter.getItemByPosition(position);
+        mainActivity.showOverflowMenu(false);
         if (clientHost != null) {
             bundle.putInt("host_id", host_id);
             mainActivity.showOverflowMenu(true);

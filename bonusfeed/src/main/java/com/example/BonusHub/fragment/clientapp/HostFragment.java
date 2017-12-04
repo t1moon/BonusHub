@@ -59,7 +59,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (ClientMainActivity) getActivity();
-        //mainActivity.showOverflowMenu(false);
+        mainActivity.showOverflowMenu(false);
     }
 
 
