@@ -4,11 +4,15 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -108,7 +112,8 @@ public class EditFragment extends Fragment {
         open_time_btn = (Button) rootView.findViewById(R.id.edit_open_time_btn);
         close_time_btn = (Button) rootView.findViewById(R.id.edit_close_time_btn);
         fab_upload = (FloatingActionButton) hostMainActivity.findViewById(R.id.fab);
-        fab_upload.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_a_photo_black_24dp));
+        Drawable drawable = DrawableCompat.wrap(ContextCompat.getDrawable(getActivity(), R.drawable.ic_add_a_photo_black_24dp));
+        fab_upload.setImageDrawable(drawable);
         fab_upload.setOnClickListener(new View.OnClickListener() {
 
             @Override

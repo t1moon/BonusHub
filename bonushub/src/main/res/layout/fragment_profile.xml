@@ -1,6 +1,7 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -23,6 +24,7 @@
                     android:paddingBottom="@dimen/material_vertical"
                     android:typeface="monospace"
                     android:text="Здесь будет Ваше название"
+                    android:fontFamily="sans-serif-light"
                     android:textColor="#000"
                     android:textSize="24dp" />
 
@@ -32,22 +34,31 @@
             android:background="@color/colorAccent" />
 
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_content_paste_black_24dp"
-                android:drawablePadding="32dp"
-                android:text="Описание"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:paddingLeft="@dimen/profile_item"
-                android:paddingTop="@dimen/material_vertical"/>
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/material_horizontal"
+                    app:srcCompat="@drawable/ic_content_paste_black_24dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/material_horizontal"
+                    android:text="Описание"
+                    android:textColor="@color/black"
+                    android:textSize="20dp"
+                    android:fontFamily="sans-serif-light"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/host_description_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/description"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="@dimen/profile_subitem"
                 android:paddingRight="@dimen/material_horizontal"
                 android:paddingBottom="@dimen/material_vertical"
@@ -58,16 +69,24 @@
                 android:layout_height="1dp"
                 android:background="#12000000"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_pin_drop_black_24dp"
-                android:drawablePadding="32dp"
-                android:text="Адрес"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:paddingLeft="@dimen/profile_item"
-                android:paddingTop="@dimen/material_vertical"/>
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/material_horizontal"
+                    app:srcCompat="@drawable/ic_pin_drop_black_24dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/material_horizontal"
+                    android:text="Адрес"
+                    android:textColor="@color/black"
+                    android:textSize="20dp"
+                    android:fontFamily="sans-serif-light"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/host_address_tv"
@@ -75,6 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2sp"
                 android:hint="Здесь будет ваш адрес"
+                android:fontFamily="sans-serif-light"
                 android:paddingLeft="@dimen/profile_subitem"
                 android:paddingRight="@dimen/material_horizontal"
                 android:paddingBottom="@dimen/material_vertical"
@@ -85,16 +105,24 @@
                 android:layout_height="1dp"
                 android:background="#12000000"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_access_time_black_24dp"
-                android:drawablePadding="32dp"
-                android:text="Время работы"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:paddingLeft="@dimen/profile_item"
-                android:paddingTop="@dimen/material_vertical"/>
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/material_horizontal"
+                    app:srcCompat="@drawable/ic_access_time_black_24dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/material_horizontal"
+                    android:text="Время работы"
+                    android:textColor="@color/black"
+                    android:textSize="20dp"
+                    android:fontFamily="sans-serif-light"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -110,12 +138,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2sp"
+                    android:fontFamily="sans-serif-light"
                     android:hint="00:00" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2sp"
+                    android:fontFamily="sans-serif-light"
                     android:text="-" />
 
                 <TextView
@@ -123,6 +153,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2sp"
+                    android:fontFamily="sans-serif-light"
                     android:hint="00:00" />
             </LinearLayout>
         </LinearLayout>

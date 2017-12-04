@@ -317,6 +317,7 @@ public class ListHostFragment extends Fragment {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            Log.d("User's Points", Integer.toString(hp.getPoints()));
             clientHost = new ClientHost(client, host, hp.getPoints());
             try {
                 HelperFactory.getHelper().getClientHostDAO().createClientHost(client, host, hp.getPoints());
