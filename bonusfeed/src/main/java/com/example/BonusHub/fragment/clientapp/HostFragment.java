@@ -59,6 +59,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (ClientMainActivity) getActivity();
+        //mainActivity.showOverflowMenu(false);
     }
 
 
@@ -67,7 +68,6 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_host, container, false);
-
 
         host_title = (TextView) rootView.findViewById(R.id.host_title_tv);
         host_description = (TextView) rootView.findViewById(R.id.host_description_tv);
@@ -81,9 +81,7 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
                 .findFragmentById(R.id.mini_map));
         mapFragment.getMapAsync(this);
         setInfo();
-
-        mainActivity.showOverflowMenu(false);
-
+        //mainActivity.showOverflowMenu(false);
         return rootView;
     }
 

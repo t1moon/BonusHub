@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -55,6 +56,7 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
+    private CollapsingToolbarLayout collapsingToolbar;
     private Menu menu;
 
     public final static int MENUITEM_QR = 0;
@@ -133,6 +135,20 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.start_menu, menu);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                appBarLayout.setExpanded(false);
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                appBarLayout.setExpanded(true);
+                return false;
+            }
+        });
         this.menu = menu;
         return true;
     }
@@ -141,12 +157,10 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
         if(menu == null) {
             return;
         }
-        menu.setGroupVisible(R.id.main_menu_group, showMenu);
+        menu.findItem(R.id.action_search).setVisible(showMenu);
+        //menu.setItemVisible(R.id.main_menu_group, showMenu);
     }
 
-    public void setSearch(SearchView.OnQueryTextListener listener){
-
-    }
 
     @Override
     public void onDestroy() {
@@ -191,7 +205,7 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
      * Will show and hide the toolbar title on scroll
      */
     private void initCollapsingToolbar() {
-        final CollapsingToolbarLayout collapsingToolbar =
+        collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(" ");
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
@@ -271,6 +285,7 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
             case MENUITEM_QR:
                 fragment = new QRFragment();
                 pushFragment(fragment, true);
+                showOverflowMenu(false);
                 break;
             case MENUITEM_LISTHOST:
                 if (fragment.getClass() != ListHostFragment.class) {

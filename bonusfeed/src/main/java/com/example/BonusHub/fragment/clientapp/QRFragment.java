@@ -38,6 +38,7 @@ public class QRFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mainActivity = (ClientMainActivity) getActivity();
         rootView = inflater.inflate(R.layout.fragment_qrcode, container, false);
         imageView = (ImageView) rootView.findViewById(R.id.iv_qrcode);
         final ProgressBar spinner;
@@ -61,7 +62,6 @@ public class QRFragment extends Fragment {
                 }
             }
         }).start();
-        mainActivity = (ClientMainActivity) getActivity();
         mainActivity.showOverflowMenu(false);
         return rootView;
     }

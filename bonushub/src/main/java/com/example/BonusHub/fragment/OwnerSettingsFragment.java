@@ -137,7 +137,7 @@ public class OwnerSettingsFragment extends PreferenceFragmentCompat implements S
             call.enqueue(new Callback<EditLoyalityResponse>() {
                 @Override
                 public void onResponse(Call<EditLoyalityResponse> call, Response<EditLoyalityResponse> response) {
-                    Log.d(TAG, "onResponse: " + response.body().getCode());
+                    //Log.d(TAG, "onResponse: " + response.body().getCode());
                     bst = loyalityType;
                     bsp = loyalityParam;
                     render();
