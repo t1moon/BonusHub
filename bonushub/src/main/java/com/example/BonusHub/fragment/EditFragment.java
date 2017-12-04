@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -108,7 +109,7 @@ public class EditFragment extends Fragment {
         open_time_btn = (Button) rootView.findViewById(R.id.edit_open_time_btn);
         close_time_btn = (Button) rootView.findViewById(R.id.edit_close_time_btn);
         fab_upload = (FloatingActionButton) hostMainActivity.findViewById(R.id.fab);
-        fab_upload.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_a_photo_black_24dp));
+        fab_upload.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.ic_add_a_photo_black_24dp, null));
         fab_upload.setOnClickListener(new View.OnClickListener() {
 
             @Override
