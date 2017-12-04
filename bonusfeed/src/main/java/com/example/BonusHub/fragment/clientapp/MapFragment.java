@@ -89,6 +89,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapFragment = (SupportMapFragment) (getChildFragmentManager()
                 .findFragmentById(R.id.mini_map));
         mapFragment.getMapAsync(this);
+        //mainActivity.showOverflowMenu(true);
         return rootView;
     }
 

@@ -53,7 +53,7 @@ public class ListHostFragment extends Fragment {
     private Menu menu;
     private Integer hostsCallbackId;
     private NetworkThread.ExecuteCallback<HostListResponse> listHostsCallback;
-    private String query;
+    private String searchQuery;
     EndlessScrollListener scrollListener;
 
     public ListHostFragment() {
@@ -162,7 +162,7 @@ public class ListHostFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query)
             {
-                query = (searchView.getQuery()).toString();
+                searchQuery = (searchView.getQuery()).toString();
                 Log.d("Query", query);
                 swipeRefreshLayout.setRefreshing(true);
                 final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
@@ -176,7 +176,9 @@ public class ListHostFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String query)
             {
-
+                if (query.equals("")) {
+                    searchQuery = null;
+                }
                 return true;
             }
 
@@ -188,6 +190,7 @@ public class ListHostFragment extends Fragment {
         final Bundle bundle = new Bundle();
         int host_id = mAdapter.getItemByPosition(position).getHost().getId();
         bundle.putInt("host_id", host_id);
+        mainActivity.showOverflowMenu(true);
         mainActivity.pushFragment(new HostFragment(), true, bundle);
     }
 
@@ -222,7 +225,7 @@ public class ListHostFragment extends Fragment {
         // showing refresh animation before making http call
         swipeRefreshLayout.setRefreshing(true);
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(query, 0, AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(searchQuery, 0, AuthUtils.getCookie(mainActivity.getApplicationContext()));
         if (hostsCallbackId == null) {
             hostsCallbackId = NetworkThread.getInstance().registerCallback(listHostsCallback);
             NetworkThread.getInstance().execute(call, hostsCallbackId);
@@ -231,7 +234,7 @@ public class ListHostFragment extends Fragment {
 
     private void loadNextData(int totalItemsCount) {
         final ClientApiInterface clientApiInterface = RetrofitFactory.retrofitClient().create(ClientApiInterface.class);
-        final Call<HostListResponse> call = clientApiInterface.listHosts(query, totalItemsCount, AuthUtils.getCookie(mainActivity.getApplicationContext()));
+        final Call<HostListResponse> call = clientApiInterface.listHosts(searchQuery, totalItemsCount, AuthUtils.getCookie(mainActivity.getApplicationContext()));
         call.enqueue(new Callback<HostListResponse>() {
             @Override
             public void onResponse(Call<HostListResponse> call, Response<HostListResponse> response) {

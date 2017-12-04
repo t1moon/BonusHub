@@ -80,12 +80,11 @@ public class HostFragment extends Fragment implements OnMapReadyCallback {
         mapFragment = (SupportMapFragment) (getChildFragmentManager()
                 .findFragmentById(R.id.mini_map));
         mapFragment.getMapAsync(this);
-
         setInfo();
 
+        mainActivity.showOverflowMenu(false);
+
         return rootView;
-
-
     }
 
 
