@@ -20,7 +20,7 @@ import com.google.zxing.common.BitMatrix;
 
 
 public class QRFragment extends Fragment {
-
+    private ClientMainActivity mainActivity;
     View rootView;
     public final static int QRcodeWidth = 800;
     Bitmap bitmap;
@@ -61,6 +61,8 @@ public class QRFragment extends Fragment {
                 }
             }
         }).start();
+        mainActivity = (ClientMainActivity) getActivity();
+        mainActivity.showOverflowMenu(false);
         return rootView;
     }
 

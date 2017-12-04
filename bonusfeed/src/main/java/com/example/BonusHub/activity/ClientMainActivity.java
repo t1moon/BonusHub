@@ -13,9 +13,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -53,6 +55,7 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private AppBarLayout appBarLayout;
+    private Menu menu;
 
     public final static int MENUITEM_QR = 0;
     public final static int MENUITEM_LISTHOST = 1;
@@ -123,6 +126,24 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
         prepareCallbacks();
         setupClient();
         setupStartFragment();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.start_menu, menu);
+        this.menu = menu;
+        return true;
+    }
+
+    public void showOverflowMenu(boolean showMenu){
+        if(menu == null)
+            return;
+        menu.setGroupVisible(R.id.main_menu_group, showMenu);
+    }
+
+    public void setSearch(SearchView.OnQueryTextListener listener){
 
     }
 
