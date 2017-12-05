@@ -68,6 +68,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (ClientMainActivity) getActivity();
+        mainActivity.showOverflowMenu(false);
         prepareCallbacks();
         prepareListeners();
     }
@@ -89,7 +90,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapFragment = (SupportMapFragment) (getChildFragmentManager()
                 .findFragmentById(R.id.mini_map));
         mapFragment.getMapAsync(this);
-        mainActivity.showOverflowMenu(false);
         return rootView;
     }
 

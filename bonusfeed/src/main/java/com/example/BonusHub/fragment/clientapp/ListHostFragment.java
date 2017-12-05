@@ -3,6 +3,8 @@ package com.example.BonusHub.fragment.clientapp;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -63,7 +65,7 @@ public class ListHostFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        //setHasOptionsMenu(true);
         mainActivity = (ClientMainActivity) getActivity();
         prepareCallbacks();
     }
@@ -82,8 +84,8 @@ public class ListHostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        mainActivity.showOverflowMenu(true);
         final View rootView = inflater.inflate(R.layout.fragment_list_host, container, false);
-
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mAdapter = new HostAdapter(getActivity(), clientHostsList);
@@ -192,7 +194,7 @@ public class ListHostFragment extends Fragment {
         mainActivity.showOverflowMenu(false);
         if (clientHost != null) {
             bundle.putInt("host_id", host_id);
-            mainActivity.showOverflowMenu(true);
+            //mainActivity.showOverflowMenu(true);
             mainActivity.pushFragment(new HostFragment(), true, bundle);
         }
     }

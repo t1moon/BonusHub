@@ -136,10 +136,13 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.start_menu, menu);
         final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        collapsingToolbar =
+                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                appBarLayout.setExpanded(false);
+                appBarLayout.setExpanded(false,false);
             }
         });
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
@@ -155,8 +158,10 @@ public class ClientMainActivity extends BaseActivity implements StackListner {
 
     public void showOverflowMenu(boolean showMenu){
         if(menu == null) {
+            Log.d("menuNull", "Yes");
             return;
         }
+        Log.d("menuNull", "No");
         menu.findItem(R.id.action_search).setVisible(showMenu);
         //menu.setItemVisible(R.id.main_menu_group, showMenu);
     }
