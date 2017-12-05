@@ -48,7 +48,7 @@ public class NetworkThread {
             @Override
             public void run() {
                 try {
-                    final Response<T> response = call.execute();
+                    final Response<T> response = call.clone().execute();
                     if (response.isSuccessful() && callbackMap.containsKey(callbackId)) {
                         uiHandler.post(new Runnable() {
                             @Override
