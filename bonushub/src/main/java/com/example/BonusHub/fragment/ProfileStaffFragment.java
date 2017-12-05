@@ -4,11 +4,13 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -102,7 +104,8 @@ public class ProfileStaffFragment extends Fragment {
         host_open_time_tv = (TextView) rootView.findViewById(R.id.host_open_time_tv);
         host_close_time_tv = (TextView) rootView.findViewById(R.id.host_close_time_tv);
         fab_edit = (FloatingActionButton) staffMainActivity.findViewById(R.id.fab);
-        fab_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_black_24dp));
+        Drawable drawable = DrawableCompat.wrap(ContextCompat.getDrawable(getActivity(), R.drawable.ic_edit_black_24dp));
+        fab_edit.setImageDrawable(drawable);
         fab_edit.setVisibility(View.INVISIBLE);
 
 //        fab_edit.setOnClickListener(new View.OnClickListener() {

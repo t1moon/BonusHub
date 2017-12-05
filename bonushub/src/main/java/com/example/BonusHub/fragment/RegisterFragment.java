@@ -171,6 +171,10 @@ public class RegisterFragment extends Fragment {
         }
     }
 
+    public void goToQr() {
+        logInActivity.pushFragment(new QRFragment(), true);
+    }
+
     public void onLoginResult(LoginResponse result) {
         AuthUtils.setLogin(getActivity().getApplicationContext(), loginInput.getText().toString());
         //Toast.makeText(getActivity(), result.getMessage(), Toast.LENGTH_SHORT).show();
@@ -179,7 +183,7 @@ public class RegisterFragment extends Fragment {
             AuthUtils.setAuthorized(getActivity().getApplicationContext());
             if (!AuthUtils.getRole(logInActivity).equals("Host")) {
                 AuthUtils.setUserId(getActivity().getApplicationContext(), result.getUserId());
-                goToMainActivity();
+                goToQr();
             } else {
                 if (result.getHostId() == null) {
                     AuthUtils.setHosted(getActivity().getApplicationContext(), false);
