@@ -171,6 +171,8 @@ public class ProfileFragment extends Fragment {
                 result.getTime_open(),
                 result.getTime_close());
 
+        host.setLongitude(result.getLongitude());
+        host.setLatitude(result.getLatitude());
         ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
 
         pathToImageProfile = RetrofitFactory.retrofitHost().baseUrl() + RetrofitFactory.MEDIA_URL + result.getProfile_image();

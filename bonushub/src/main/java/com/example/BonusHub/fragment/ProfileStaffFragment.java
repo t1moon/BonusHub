@@ -167,6 +167,8 @@ public class ProfileStaffFragment extends Fragment {
                 result.getAddress(),
                 result.getTime_open(),
                 result.getTime_close());
+        host.setLatitude(result.getLatitude());
+        host.setLongitude(result.getLongitude());
 
         ImageView imgView = (ImageView) getActivity().findViewById(R.id.backdrop);
 

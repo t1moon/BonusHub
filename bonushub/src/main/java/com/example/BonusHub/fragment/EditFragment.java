@@ -1,14 +1,18 @@
 package com.example.BonusHub.fragment;
 
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
@@ -29,6 +33,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.BonusHub.Location;
 import com.example.BonusHub.utils.AuthUtils;
 import com.example.BonusHub.activity.HostMainActivity;
 import com.example.BonusHub.activity.LogInActivity;
@@ -40,8 +45,17 @@ import com.example.BonusHub.retrofit.editInfo.UploadResponse;
 import com.example.BonusHub.threadManager.NetworkThread;
 import com.example.BonusHub.db.host.Host;
 import com.example.timur.BonusHub.R;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.MediaType;
@@ -52,7 +66,7 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class EditFragment extends Fragment {
+public class EditFragment extends Fragment implements OnMapReadyCallback {
     private static int RESULT_LOAD_IMG = 1;
 
     private static NetworkThread.ExecuteCallback<EditResponse> editCallback;
@@ -75,6 +89,10 @@ public class EditFragment extends Fragment {
     private int host_id;
     private Uri targetUri;
     private HostMainActivity hostMainActivity;
+    private SupportMapFragment mapFragment;
+    private GoogleMap map;
+    private Location location;
+    private Host host;
 
     public EditFragment() {
         // Required empty public constructor
@@ -123,8 +141,6 @@ public class EditFragment extends Fragment {
         });
         setHasOptionsMenu(true);
 
-        getFromCache();
-
         open_time_btn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -139,8 +155,50 @@ public class EditFragment extends Fragment {
                 pickTime(v);
             }
         });
-
+        mapFragment = (SupportMapFragment) (getChildFragmentManager()
+                .findFragmentById(R.id.mini_map));
+        getFromCache();
+        mapFragment.getMapAsync(this);
+        host_address_et.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    if (map != null) {
+                        Location currentLocation = getLocation();
+                        if (currentLocation != null) {
+                            map.clear();
+                            LatLng pos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongtitude());
+                            map.addMarker(new MarkerOptions()
+                                    .position(pos)
+                                    .title("Ваше кафе"));
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,15));
+                        }
+                    }
+                }
+            }
+        });
         return rootView;
+    }
+
+    private Location getLocation() {
+        String address = host_address_et.getText().toString();
+        Boolean geoResult = false;
+        Geocoder geoCoder = new Geocoder(getActivity(), Locale.getDefault());
+        List<Address> addresses;
+        try {
+            addresses = geoCoder.getFromLocationName(address, 3);
+            if (addresses.size() > 0) {
+                Location currentLoc = new Location(addresses.get(0).getAddressLine(0),
+                        addresses.get(0).getLatitude(),
+                        addresses.get(0).getLongitude());
+                return currentLoc;
+            }
+            else {
+                return null;
+            }
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     private void goToLogin() {
@@ -159,9 +217,18 @@ public class EditFragment extends Fragment {
 
     public void onCacheLoaded(Host host) {
         if (host != null) {
+            this.host = host;
             String title = host.getTitle();
             String description = host.getDescription();
             String address = host.getAddress();
+            if (map != null) {
+                map.clear();
+                LatLng pos = new LatLng(host.getLatitude(), host.getLongitude());
+                map.addMarker(new MarkerOptions()
+                        .position(pos)
+                        .title("Ваше кафе"));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,15));
+            }
             //open_hour = host.getTime_open() / 60;
             //open_minute = host.getTime_open() % 60;
             //close_hour = host.getTime_close() / 60;
@@ -210,25 +277,47 @@ public class EditFragment extends Fragment {
             // Respond to the action bar's Up/Home button
             case R.id.continue_btn:
                 //hide keyboard
+                View view = hostMainActivity.getCurrentFocus();
                 InputMethodManager imm = (InputMethodManager) hostMainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(hostMainActivity.getCurrentFocus().getWindowToken(), 0);
-
-                Host host = new Host();
-                host.setTitle(host_title_et.getText().toString());
-                host.setDescription(host_description_et.getText().toString());
-                host.setAddress(host_address_et.getText().toString());
-                host.setTime_open(open_time);
-                host.setTime_close(close_time);
-
-                final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
-                Call<EditResponse> call = hostApiInterface.editHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));
-                if (editCallbackId == null) {
-                    editCallbackId = NetworkThread.getInstance().registerCallback(editCallback);
-                    NetworkThread.getInstance().execute(call, editCallbackId);
+                String title = host_title_et.getText().toString();
+                String description = host_description_et.getText().toString();
+                String address = host_address_et.getText().toString();
+                Location hubLocation = getLocation();
+                if (hubLocation != null) {
+                    address = hubLocation.getAddress();
                 }
-                hostMainActivity.popFragment();
-                return true;
-        }
+                if (!hostMainActivity.hasConnection()) {
+                    Snackbar.make(view, "Нет соединения с сетью", Snackbar.LENGTH_LONG).show();
+                }
+                else {
+                    if (title.equals(""))
+                        host_title_et.setError("Введите название");
+                    else if (description.equals(""))
+                        host_title_et.setError("Введите описание");
+                    else if (address.equals("") || (address == null))
+                        host_title_et.setError("Введите адрес");
+                    else if (hubLocation == null)
+                        host_title_et.setError("Неверный адрес");
+                    else {
+                        Host host = new Host(title, description, address);
+                        host.setTime_open(open_time);
+                        host.setTime_close(close_time);
+                        host.setProfile_image(null);
+                        host.setLongitude(hubLocation.getLongtitude());
+                        host.setLatitude(hubLocation.getLatitude());
+
+                        final HostApiInterface hostApiInterface = RetrofitFactory.retrofitHost().create(HostApiInterface.class);
+                        Call<EditResponse> call = hostApiInterface.editHost(host, AuthUtils.getCookie(getActivity().getApplicationContext()));
+                        if (editCallbackId == null) {
+                            editCallbackId = NetworkThread.getInstance().registerCallback(editCallback);
+                            NetworkThread.getInstance().execute(call, editCallbackId);
+                        }
+                        hostMainActivity.popFragment();
+                        return true;
+                    }
+                }
+            }
         return super.onOptionsItemSelected(item);
     }
 
@@ -447,5 +536,35 @@ public class EditFragment extends Fragment {
 
             }
         };
+    }
+
+    private void setMap() {
+        String address = host_address_et.getText().toString();
+        String title = host_title_et.getText().toString();
+        host_address_et.setText(address);
+        if ((map != null) && (host != null)) {
+            LatLng pos;
+            pos = new LatLng(host.getLatitude(), host.getLongitude());
+            map.addMarker(new MarkerOptions()
+                    .position(pos)
+                    .title(title));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
+        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+        setMap();
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                map.clear();
+                map.addMarker(new MarkerOptions()
+                        .position(point)
+                        .title("Ваше кафе"));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(point,17));
+            }
+        });
     }
 }

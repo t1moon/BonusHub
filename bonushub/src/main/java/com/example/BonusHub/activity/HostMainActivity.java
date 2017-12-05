@@ -171,7 +171,7 @@ public class HostMainActivity extends BaseActivity implements StackListner {
         drawerMenu.add(0, MENUITEM_READ_QR, 0, "Считать QR-код");
         drawerMenu.add(0, MENUITEM_SHOW_PROFILE, 1, "Профиль заведения");
         drawerMenu.add(0, MENUITEM_OWNER_SETTINGS, 2, "Параметры акций");
-        drawerMenu.add(0, MENUITEM_STATISTIC, 3, "Статистика");
+        //drawerMenu.add(0, MENUITEM_STATISTIC, 3, "Статистика");
         drawerMenu.add(0, MENUITEM_STAFF, 4, "Сотрудники");
         drawerMenu.add(0, MENUITEM_LOGOUT, 5, "Выход");
 
@@ -202,10 +202,10 @@ public class HostMainActivity extends BaseActivity implements StackListner {
                 fragment = new ScanQrFragment();
                 pushFragment(fragment, true);
                 break;
-            case MENUITEM_STATISTIC:
-                fragment = new StatisticFragment();
-                pushFragment(fragment, true);
-                break;
+//            case MENUITEM_STATISTIC:
+//                fragment = new StatisticFragment();
+//                pushFragment(fragment, true);
+//                break;
             case MENUITEM_SHOW_PROFILE:
                 if (fragment.getClass() != ProfileFragment.class) {
                     setCurrentFragment(FragmentType.ProfileHost);

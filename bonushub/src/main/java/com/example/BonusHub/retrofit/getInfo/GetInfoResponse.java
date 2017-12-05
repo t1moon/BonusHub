@@ -28,6 +28,10 @@ public class GetInfoResponse {
     private int loyality_burn;
     @SerializedName("loyality_time_param")
     private int loyality_time;
+    @SerializedName("longitude")
+    private double longitude;
+    @SerializedName("latitude")
+    private double latitude;
 
     public String getTitle() {
         return title;
@@ -107,5 +111,21 @@ public class GetInfoResponse {
 
     public int getLoyality_time() {
         return loyality_time;
+    }
+
+    public void setLongitude(double longt) {
+        longitude = longt;
+    }
+
+    public void setLatitude(double lat) {
+        latitude = lat;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
     }
 }

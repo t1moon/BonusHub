@@ -299,7 +299,7 @@ public class StaffListFragment extends Fragment implements RecyclerItemTouchHelp
                 Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_LONG).show();
                 ((HostMainActivity)getActivity()).popFragment();
             } else {
-                Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 final Call<HireResponse> call = hostApiInterface.hire(new Hire(result.getContents()),
                         AuthUtils.getCookie(((HostMainActivity) getActivity()).getApplicationContext()));
                 if (hireCallbackId == null) {

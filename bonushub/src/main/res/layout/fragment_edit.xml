@@ -53,6 +53,26 @@
                     android:hint="Адрес" />
             </android.support.design.widget.TextInputLayout>
 
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal" android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp">
+                <com.example.BonusHub.fragment.SquareLinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/holo_blue_bright">
+                    <fragment
+                        android:id="@+id/mini_map"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                    </fragment>
+                </com.example.BonusHub.fragment.SquareLinearLayout>
+            </LinearLayout>
+
         </LinearLayout>
 
         <TextView
