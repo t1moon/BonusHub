@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
 public class StaffListFragment extends Fragment implements RecyclerItemTouchHelperLeft.RecyclerItemTouchHelperListener {
@@ -336,15 +337,27 @@ public class StaffListFragment extends Fragment implements RecyclerItemTouchHelp
                     NetworkThread.getInstance().execute(call, retireCallbackId);
                 }
 
-
                 snackbar.setAction(getString(R.string.undo), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         // undo is selected, restore the deleted item
-                        adapter.restoreItem(deletedItem, deletedIndex);
                         if (direction == ItemTouchHelper.LEFT) {
                             final Call<HireResponse> call = hostApiInterface.hire(new Hire(userId),
                                     AuthUtils.getCookie(((HostMainActivity) getActivity()).getApplicationContext()));
+                            call.enqueue(new Callback<HireResponse>() {
+                                @Override
+                                public void onResponse(Call<HireResponse> call, Response<HireResponse> response) {
+                                    adapter.restoreItem(deletedItem, deletedIndex);
+                                }
+
+                                @Override
+                                public void onFailure(Call<HireResponse> call, Throwable t) {
+                                    Snackbar snackbar = Snackbar.make(getView(), getString(R.string.loyality_change_failed), Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                }
+                            });
+
+
                             if (hireCallbackId == null) {
                                 hireCallbackId = NetworkThread.getInstance().registerCallback(hireCallback);
                                 NetworkThread.getInstance().execute(call, hireCallbackId);

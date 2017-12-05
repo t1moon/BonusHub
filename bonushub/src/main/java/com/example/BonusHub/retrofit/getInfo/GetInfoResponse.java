@@ -24,6 +24,10 @@ public class GetInfoResponse {
     private Float loyality_param;
     @SerializedName("loyality_type")
     private int loyality_type;
+    @SerializedName("loyality_burn_param")
+    private int loyality_burn;
+    @SerializedName("loyality_time_param")
+    private int loyality_time;
 
     public String getTitle() {
         return title;
@@ -81,11 +85,27 @@ public class GetInfoResponse {
         loyality_param = loy_param;
     }
 
+    public void setLoyality_burn(int loyality_burn) {
+        this.loyality_burn = loyality_burn;
+    }
+
+    public void setLoyality_time(int loyality_time) {
+        this.loyality_time = loyality_time;
+    }
+
     public int getLoyalityType() {
         return loyality_type;
     }
 
     public float getLoyalityParam() {
         return loyality_param;
+    }
+
+    public int getLoyality_burn() {
+        return loyality_burn;
+    }
+
+    public int getLoyality_time() {
+        return loyality_time;
     }
 }

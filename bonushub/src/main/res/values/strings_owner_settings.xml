@@ -18,4 +18,19 @@
     </string-array>
     <string name="bonus_system_offer_key">bonus_offer</string>
     <string name="bonus_system_offer_title">Описание Вашей программы лояльности</string>
+
+    <string name="bonus_system_burn">bonus_system_burn</string>
+    <string name="bonus_system_burn_header">Способ сгорания бонусов</string>
+    <string-array name="bonus_system_burn_array">
+        <item>Без сгорания</item>
+        <item>Все сразу</item>
+        <item>В порядке начисления</item>
+    </string-array>
+    <string-array name="bonus_system_burn_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="time_param_key">loyality_time_key</string>
 </resources>
